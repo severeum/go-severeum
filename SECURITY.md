@@ -1,0 +1,1 @@
+../go-ethereum/SECURITY.md
