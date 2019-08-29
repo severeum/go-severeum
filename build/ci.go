@@ -355,7 +355,7 @@ func doLint(cmdline []string) {
 	build.MustRun(goTool("get", "gopkg.in/alecthomas/gometalinter.v2"))
 	build.MustRunCommand(filepath.Join(GOBIN, "gometalinter.v2"), "--install")
 
-	// Run fast linters batched tosether
+	// Run fast linters batched together
 	configs := []string{
 		"--vendor",
 		"--tests",

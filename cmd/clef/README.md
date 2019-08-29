@@ -103,7 +103,7 @@ invoking methods with the following info:
 
 * Seth todos
     - The signer should pass the `Origin` header as call-info to the UI. As of right now, the way that info about the request is
-put tosether is a bit of a hack into the http server. This could probably be greatly improved
+put together is a bit of a hack into the http server. This could probably be greatly improved
     - Relay: Seth should be started in `seth --external_signer localhost:8550`.
     - Currently, the Seth APIs use `common.Address` in the arguments to transaction submission (e.g `to` field). This
   type is 20 `bytes`, and is incapable of carrying checksum information. The signer uses `common.MixedcaseAddress`, which

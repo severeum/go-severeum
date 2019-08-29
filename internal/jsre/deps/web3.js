@@ -1231,7 +1231,7 @@ SolidityParam.prototype.withOffset = function (offset) {
 };
 
 /**
- * This method should be used to combine solidity params tosether
+ * This method should be used to combine solidity params together
  * eg. when appending an array
  *
  * @method combine
@@ -3239,7 +3239,7 @@ SolidityEvent.prototype.signature = function () {
  * @method encode
  * @param {Object} indexed
  * @param {Object} options
- * @return {Object} everything combined tosether and encoded
+ * @return {Object} everything combined together and encoded
  */
 SolidityEvent.prototype.encode = function (indexed, options) {
     indexed = indexed || {};
