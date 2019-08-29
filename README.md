@@ -22,7 +22,7 @@ Building seth requires both a Go (version 1.9 or later) and a C compiler.
 You can install them using your favourite package manager.
 Once the dependencies are installed, run
 
-    make seth
+    make seth;sudo make seth
 
 or, to build the full suite of utilities:
 
