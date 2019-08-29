@@ -694,7 +694,7 @@ func (net *Network) refresh(done chan<- struct{}) {
 		if n.state == unknown {
 			net.transition(n, verifyinit)
 		}
-		// Force-add the seed node so Lookup does somseving.
+		// Force-add the seed node so Lookup does something.
 		// It will be deleted again if verification fails.
 		net.tab.add(n)
 	}

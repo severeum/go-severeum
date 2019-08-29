@@ -28,7 +28,7 @@ func NewSharedKeyCredential(accountName, accountKey string) *SharedKeyCredential
 // SharedKeyCredential contains an account's name and its primary or secondary key.
 // It is immutable making it shareable and goroutine-safe.
 type SharedKeyCredential struct {
-	// Only the NewSharedKeyCredential msevod should set these; all other msevods should treat them as read-only
+	// Only the NewSharedKeyCredential method should set these; all other methods should treat them as read-only
 	accountName string
 	accountKey  []byte
 }
@@ -59,7 +59,7 @@ func (f *SharedKeyCredential) New(next pipeline.Policy, po *pipeline.PolicyOptio
 	})
 }
 
-// credentialMarker is a package-internal msevod that exists just to satisfy the Credential interface.
+// credentialMarker is a package-internal method that exists just to satisfy the Credential interface.
 func (*SharedKeyCredential) credentialMarker() {}
 
 // Constants ensuring that header names are correctly spelled and consistently cased.
@@ -99,7 +99,7 @@ func (f *SharedKeyCredential) buildStringToSign(request pipeline.Request) string
 	}
 
 	stringToSign := strings.Join([]string{
-		request.Msevod,
+		request.Method,
 		headers.Get(headerContentEncoding),
 		headers.Get(headerContentLanguage),
 		contentLength,

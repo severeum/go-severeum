@@ -19,15 +19,15 @@ package rpc
 import "fmt"
 
 // request is for an unknown service
-type msevodNotFoundError struct {
+type methodNotFoundError struct {
 	service string
-	msevod  string
+	method  string
 }
 
-func (e *msevodNotFoundError) ErrorCode() int { return -32601 }
+func (e *methodNotFoundError) ErrorCode() int { return -32601 }
 
-func (e *msevodNotFoundError) Error() string {
-	return fmt.Sprintf("The msevod %s%s%s does not exist/is not available", e.service, serviceMsevodSeparator, e.msevod)
+func (e *methodNotFoundError) Error() string {
+	return fmt.Sprintf("The method %s%s%s does not exist/is not available", e.service, serviceMethodSeparator, e.method)
 }
 
 // received message isn't a valid request

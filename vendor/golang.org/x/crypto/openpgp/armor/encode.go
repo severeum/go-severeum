@@ -25,7 +25,7 @@ func writeSlices(out io.Writer, slices ...[]byte) (err error) {
 	return
 }
 
-// lineBreaker breaks data across several lines, all of the same byte length
+// lineBreaker breaks data across etheral lines, all of the same byte length
 // (except possibly the last). Lines are broken with a single '\n'.
 type lineBreaker struct {
 	lineLength  int

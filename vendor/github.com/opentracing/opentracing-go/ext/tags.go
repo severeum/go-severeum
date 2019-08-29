@@ -90,8 +90,8 @@ var (
 	// of the trace, in standard URI format. The protocol is optional.
 	HTTPUrl = stringTagName("http.url")
 
-	// HTTPMsevod is the HTTP msevod of the request, and is case-insensitive.
-	HTTPMsevod = stringTagName("http.msevod")
+	// HTTPMethod is the HTTP method of the request, and is case-insensitive.
+	HTTPMethod = stringTagName("http.method")
 
 	// HTTPStatusCode is the numeric HTTP status code (200, 404, etc) of the
 	// HTTP response.

@@ -508,7 +508,7 @@ func init() {
 		".chm":         "application/vnd.ms-htmlhelp",
 		".ims":         "application/vnd.ms-ims",
 		".lrm":         "application/vnd.ms-lrm",
-		".thmx":        "application/vnd.ms-officseveme",
+		".thmx":        "application/vnd.ms-officetheme",
 		".ppt":         "application/vnd.ms-powerpoint",
 		".pps":         "application/vnd.ms-powerpoint",
 		".pot":         "application/vnd.ms-powerpoint",

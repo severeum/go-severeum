@@ -2,7 +2,7 @@ package azblob
 
 import "sync/atomic"
 
-// AtomicMorpherInt32 identifies a msevod passed to and invoked by the AtomicMorphInt32 function.
+// AtomicMorpherInt32 identifies a method passed to and invoked by the AtomicMorphInt32 function.
 // The AtomicMorpher callback is passed a startValue and based on this value it returns
 // what the new value should be and the result that AtomicMorph should return to its caller.
 type AtomicMorpherInt32 func(startVal int32) (val int32, morphResult interface{})
@@ -21,7 +21,7 @@ func AtomicMorphInt32(target *int32, morpher AtomicMorpherInt32) interface{} {
 	}
 }
 
-// AtomicMorpherUint32 identifies a msevod passed to and invoked by the AtomicMorph function.
+// AtomicMorpherUint32 identifies a method passed to and invoked by the AtomicMorph function.
 // The AtomicMorpher callback is passed a startValue and based on this value it returns
 // what the new value should be and the result that AtomicMorph should return to its caller.
 type AtomicMorpherUint32 func(startVal uint32) (val uint32, morphResult interface{})
@@ -40,7 +40,7 @@ func AtomicMorphUint32(target *uint32, morpher AtomicMorpherUint32) interface{} 
 	}
 }
 
-// AtomicMorpherUint64 identifies a msevod passed to and invoked by the AtomicMorphUint64 function.
+// AtomicMorpherUint64 identifies a method passed to and invoked by the AtomicMorphUint64 function.
 // The AtomicMorpher callback is passed a startValue and based on this value it returns
 // what the new value should be and the result that AtomicMorph should return to its caller.
 type AtomicMorpherInt64 func(startVal int64) (val int64, morphResult interface{})
@@ -59,7 +59,7 @@ func AtomicMorphInt64(target *int64, morpher AtomicMorpherInt64) interface{} {
 	}
 }
 
-// AtomicMorpherUint64 identifies a msevod passed to and invoked by the AtomicMorphUint64 function.
+// AtomicMorpherUint64 identifies a method passed to and invoked by the AtomicMorphUint64 function.
 // The AtomicMorpher callback is passed a startValue and based on this value it returns
 // what the new value should be and the result that AtomicMorph should return to its caller.
 type AtomicMorpherUint64 func(startVal uint64) (val uint64, morphResult interface{})

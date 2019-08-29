@@ -20,7 +20,7 @@ import (
 	"container/list"
 
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
 )
 
@@ -29,7 +29,7 @@ type TestManager struct {
 	// stateManager *StateManager
 	eventMux *event.TypeMux
 
-	db         sevdb.Database
+	db         ethdb.Database
 	txPool     *TxPool
 	blockChain *BlockChain
 	Blocks     []*types.Block
@@ -71,14 +71,14 @@ func (tm *TestManager) EventMux() *event.TypeMux {
 // 	return nil
 // }
 
-func (tm *TestManager) Db() sevdb.Database {
+func (tm *TestManager) Db() ethdb.Database {
 	return tm.db
 }
 
 func NewTestManager() *TestManager {
 	testManager := &TestManager{}
 	testManager.eventMux = new(event.TypeMux)
-	testManager.db = sevdb.NewMemDatabase()
+	testManager.db = ethdb.NewMemDatabase()
 	// testManager.txPool = NewTxPool(testManager)
 	// testManager.blockChain = NewBlockChain(testManager)
 	// testManager.stateManager = NewStateManager(testManager)

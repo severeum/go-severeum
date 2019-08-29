@@ -4,32 +4,32 @@ import (
 	"sync"
 )
 
-var signingMsevods = map[string]func() SigningMsevod{}
-var signingMsevodLock = new(sync.RWMutex)
+var signingMethods = map[string]func() SigningMethod{}
+var signingMethodLock = new(sync.RWMutex)
 
-// Implement SigningMsevod to add new msevods for signing or verifying tokens.
-type SigningMsevod interface {
+// Implement SigningMethod to add new methods for signing or verifying tokens.
+type SigningMethod interface {
 	Verify(signingString, signature string, key interface{}) error // Returns nil if signature is valid
 	Sign(signingString string, key interface{}) (string, error)    // Returns encoded signature or error
-	Alg() string                                                   // returns the alg identifier for this msevod (example: 'HS256')
+	Alg() string                                                   // returns the alg identifier for this method (example: 'HS256')
 }
 
-// Register the "alg" name and a factory function for signing msevod.
-// This is typically done during init() in the msevod's implementation
-func RegisterSigningMsevod(alg string, f func() SigningMsevod) {
-	signingMsevodLock.Lock()
-	defer signingMsevodLock.Unlock()
+// Register the "alg" name and a factory function for signing method.
+// This is typically done during init() in the method's implementation
+func RegisterSigningMethod(alg string, f func() SigningMethod) {
+	signingMethodLock.Lock()
+	defer signingMethodLock.Unlock()
 
-	signingMsevods[alg] = f
+	signingMethods[alg] = f
 }
 
-// Get a signing msevod from an "alg" string
-func GetSigningMsevod(alg string) (msevod SigningMsevod) {
-	signingMsevodLock.RLock()
-	defer signingMsevodLock.RUnlock()
+// Get a signing method from an "alg" string
+func GetSigningMethod(alg string) (method SigningMethod) {
+	signingMethodLock.RLock()
+	defer signingMethodLock.RUnlock()
 
-	if msevodF, ok := signingMsevods[alg]; ok {
-		msevod = msevodF()
+	if methodF, ok := signingMethods[alg]; ok {
+		method = methodF()
 	}
 	return
 }

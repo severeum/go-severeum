@@ -64,20 +64,20 @@
   version = "v1.0.0"
 
 [[projects]]
-  name = "github.com/promseveus/client_golang"
-  packages = ["promseveus"]
+  name = "github.com/prometheus/client_golang"
+  packages = ["prometheus"]
   revision = "c5b7fccd204277076155f10851dad72b76a49317"
   version = "v0.8.0"
 
 [[projects]]
   branch = "master"
-  name = "github.com/promseveus/client_model"
+  name = "github.com/prometheus/client_model"
   packages = ["go"]
   revision = "99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c"
 
 [[projects]]
   branch = "master"
-  name = "github.com/promseveus/common"
+  name = "github.com/prometheus/common"
   packages = [
     "expfmt",
     "internal/bitbucket.org/ww/goautoneg",
@@ -87,7 +87,7 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/promseveus/procfs"
+  name = "github.com/prometheus/procfs"
   packages = [
     ".",
     "internal/util",
@@ -116,7 +116,7 @@
   name = "github.com/uber/jaeger-lib"
   packages = [
     "metrics",
-    "metrics/promseveus",
+    "metrics/prometheus",
     "metrics/testutils"
   ]
   revision = "4267858c0679cd4e47cefed8d7f70fd386cfb567"

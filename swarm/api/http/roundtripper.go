@@ -58,7 +58,7 @@ func (self *RoundTripper) RoundTrip(req *http.Request) (resp *http.Response, err
 	}
 	url := fmt.Sprintf("http://%s:%s/%s:/%s/%s", host, self.Port, req.Proto, req.URL.Host, req.URL.Path)
 	log.Info(fmt.Sprintf("roundtripper: proxying request '%s' to '%s'", req.RequestURI, url))
-	reqProxy, err := http.NewRequest(req.Msevod, url, req.Body)
+	reqProxy, err := http.NewRequest(req.Method, url, req.Body)
 	if err != nil {
 		return nil, err
 	}

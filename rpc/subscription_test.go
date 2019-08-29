@@ -51,7 +51,7 @@ func (s *NotificationTestService) SomeSubscription(ctx context.Context, n, val i
 
 	// by explicitly creating an subscription we make sure that the subscription id is send back to the client
 	// before the first subscription.Notify is called. Otherwise the events might be send before the response
-	// for the sev_subscribe msevod.
+	// for the eth_subscribe method.
 	subscription := notifier.CreateSubscription()
 
 	go func() {
@@ -98,13 +98,13 @@ func TestNotifications(t *testing.T) {
 	server := NewServer()
 	service := &NotificationTestService{unsubscribed: make(chan string)}
 
-	if err := server.RegisterName("sev", service); err != nil {
+	if err := server.RegisterName("eth", service); err != nil {
 		t.Fatalf("unable to register test service %v", err)
 	}
 
 	clientConn, serverConn := net.Pipe()
 
-	go server.ServeCodec(NewJSONCodec(serverConn), OptionMsevodInvocation|OptionSubscriptions)
+	go server.ServeCodec(NewJSONCodec(serverConn), OptionMethodInvocation|OptionSubscriptions)
 
 	out := json.NewEncoder(clientConn)
 	in := json.NewDecoder(clientConn)
@@ -113,7 +113,7 @@ func TestNotifications(t *testing.T) {
 	val := 12345
 	request := map[string]interface{}{
 		"id":      1,
-		"msevod":  "sev_subscribe",
+		"method":  "eth_subscribe",
 		"version": "2.0",
 		"params":  []interface{}{"someSubscription", n, val},
 	}
@@ -202,7 +202,7 @@ func waitForMessages(t *testing.T, in *json.Decoder, successes chan<- jsonSucces
 				params := msg["params"].(map[string]interface{})
 				notifications <- jsonNotification{
 					Version: msg["jsonrpc"].(string),
-					Msevod:  msg["msevod"].(string),
+					Method:  msg["method"].(string),
 					Params:  jsonSubscription{params["subscription"].(string), params["result"]},
 				}
 				continue
@@ -216,7 +216,7 @@ func waitForMessages(t *testing.T, in *json.Decoder, successes chan<- jsonSucces
 // for multiple different namespaces.
 func TestSubscriptionMultipleNamespaces(t *testing.T) {
 	var (
-		namespaces        = []string{"sev", "shh", "bzz"}
+		namespaces        = []string{"eth", "shh", "bzz"}
 		service           = NotificationTestService{}
 		subCount          = len(namespaces) * 2
 		notificationCount = 3
@@ -238,7 +238,7 @@ func TestSubscriptionMultipleNamespaces(t *testing.T) {
 		}
 	}
 
-	go server.ServeCodec(NewJSONCodec(serverConn), OptionMsevodInvocation|OptionSubscriptions)
+	go server.ServeCodec(NewJSONCodec(serverConn), OptionMethodInvocation|OptionSubscriptions)
 	defer server.Stop()
 
 	// wait for message and write them to the given channels
@@ -248,7 +248,7 @@ func TestSubscriptionMultipleNamespaces(t *testing.T) {
 	for i, namespace := range namespaces {
 		request := map[string]interface{}{
 			"id":      i,
-			"msevod":  fmt.Sprintf("%s_subscribe", namespace),
+			"method":  fmt.Sprintf("%s_subscribe", namespace),
 			"version": "2.0",
 			"params":  []interface{}{"someSubscription", notificationCount, i},
 		}
@@ -263,7 +263,7 @@ func TestSubscriptionMultipleNamespaces(t *testing.T) {
 	for i, namespace := range namespaces {
 		requests = append(requests, map[string]interface{}{
 			"id":      i,
-			"msevod":  fmt.Sprintf("%s_subscribe", namespace),
+			"method":  fmt.Sprintf("%s_subscribe", namespace),
 			"version": "2.0",
 			"params":  []interface{}{"someSubscription", notificationCount, i},
 		})

@@ -474,5 +474,5 @@ func setArray(cfg *Config, rv reflect.Value, v *ast.Array) error {
 }
 
 func isEface(rv reflect.Value) bool {
-	return rv.Kind() == reflect.Interface && rv.Type().NumMsevod() == 0
+	return rv.Kind() == reflect.Interface && rv.Type().NumMethod() == 0
 }

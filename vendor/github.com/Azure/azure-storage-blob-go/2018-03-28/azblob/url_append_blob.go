@@ -53,7 +53,7 @@ func (ab AppendBlobURL) Create(ctx context.Context, h BlobHTTPHeaders, metadata 
 }
 
 // AppendBlock writes a stream to a new block of data to the end of the existing append blob.
-// This msevod panics if the stream is not at position 0.
+// This method panics if the stream is not at position 0.
 // Note that the http client closes the body stream after the request is sent to the service.
 // For more information, see https://docs.microsoft.com/rest/api/storageservices/append-block.
 func (ab AppendBlobURL) AppendBlock(ctx context.Context, body io.ReadSeeker, ac BlobAccessConditions) (*AppendBlobAppendBlockResponse, error) {

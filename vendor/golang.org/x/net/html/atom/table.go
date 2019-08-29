@@ -91,7 +91,7 @@ const (
 	Form                Atom = 0x1f204
 	Formaction          Atom = 0x1f20a
 	Formenctype         Atom = 0x20d0b
-	Formmsevod          Atom = 0x2280a
+	Formmethod          Atom = 0x2280a
 	Formnovalidate      Atom = 0x2320e
 	Formtarget          Atom = 0x2470a
 	Frame               Atom = 0x9a05
@@ -157,7 +157,7 @@ const (
 	Menuitem            Atom = 0x33808
 	Meta                Atom = 0x45d04
 	Meter               Atom = 0x24205
-	Msevod              Atom = 0x22c06
+	Method              Atom = 0x22c06
 	Mglyph              Atom = 0x2a206
 	Mi                  Atom = 0x2eb02
 	Min                 Atom = 0x2eb03
@@ -551,7 +551,7 @@ var table = [1 << 9]Atom{
 	0x135: 0x3af07, // onended
 	0x136: 0x26506, // hidden
 	0x137: 0x2c01,  // s
-	0x139: 0x2280a, // formmsevod
+	0x139: 0x2280a, // formmethod
 	0x13a: 0x3e805, // input
 	0x13c: 0x50b02, // h6
 	0x13d: 0xc902,  // ol
@@ -615,7 +615,7 @@ var table = [1 << 9]Atom{
 	0x18e: 0x4420c, // onloadeddata
 	0x190: 0xa605,  // audio
 	0x192: 0x2e05,  // tbody
-	0x193: 0x22c06, // msevod
+	0x193: 0x22c06, // method
 	0x195: 0xf404,  // loop
 	0x196: 0x29606, // iframe
 	0x198: 0x2d504, // head
@@ -693,7 +693,7 @@ const atomText = "abbradiogrouparamalignmarkbdialogaccept-charsetbodyaccesskey" 
 	"nnotation-xmlcommandraggablegendcontrolsmallcoordsortedcross" +
 	"originsourcefieldsetfigcaptionafterprintfigurequiredforeignO" +
 	"bjectforeignobjectformactionautocompleteerrorformenctypemust" +
-	"matchallengeformmsevodformnovalidatetimeterformtarsseveightm" +
+	"matchallengeformmethodformnovalidatetimeterformtarsetheightm" +
 	"lhgroupreloadhiddenhigh1hreflanghttp-equivideoncanplaythroug" +
 	"h2iframeimageimglyph3isindexismappletitemscopeditemtypemarqu" +
 	"eematheaderspacermaxlength4minlength5mtextareadonlymultiplem" +

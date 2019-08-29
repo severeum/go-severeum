@@ -14,7 +14,7 @@ import (
 )
 
 // The Permissions type holds fine-grained permissions that are
-// specific to a user or a specific authentication msevod for a user.
+// specific to a user or a specific authentication method for a user.
 // The Permissions value for a successful authentication attempt is
 // available in ServerConn, so it can be used to pass information from
 // the user-authentication phase to the application layer.
@@ -87,7 +87,7 @@ type ServerConfig struct {
 
 	// AuthLogCallback, if non-nil, is called to log all authentication
 	// attempts.
-	AuthLogCallback func(conn ConnMetadata, msevod string, err error)
+	AuthLogCallback func(conn ConnMetadata, method string, err error)
 
 	// ServerVersion is the version identification string to announce in
 	// the public handshake.
@@ -115,7 +115,7 @@ func (s *ServerConfig) AddHostKey(key Signer) {
 	s.hostKeys = append(s.hostKeys, key)
 }
 
-// cachedPubKey contains the results of querying whsever a public key is
+// cachedPubKey contains the results of querying whether a public key is
 // acceptable for a user.
 type cachedPubKey struct {
 	user       string
@@ -127,7 +127,7 @@ type cachedPubKey struct {
 const maxCachedPubKeys = 16
 
 // pubKeyCache caches tests for public keys.  Since SSH clients
-// will query whsever a public key is acceptable before attempting to
+// will query whether a public key is acceptable before attempting to
 // authenticate with it, we end up with duplicate queries for public
 // key validity.  The cache only applies to a single ServerConn.
 type pubKeyCache struct {
@@ -205,7 +205,7 @@ func (s *connection) serverHandshake(config *ServerConfig) (*Permissions, error)
 	}
 
 	if !config.NoClientAuth && config.PasswordCallback == nil && config.PublicKeyCallback == nil && config.KeyboardInteractiveCallback == nil {
-		return nil, errors.New("ssh: no authentication msevods configured but NoClientAuth is also false")
+		return nil, errors.New("ssh: no authentication methods configured but NoClientAuth is also false")
 	}
 
 	if config.ServerVersion != "" {
@@ -298,10 +298,10 @@ func checkSourceAddress(addr net.Addr, sourceAddrs string) error {
 // ServerAuthError represents server authentication errors and is
 // sometimes returned by NewServerConn. It appends any authentication
 // errors that may occur, and is returned if all of the authentication
-// msevods provided by the user failed to authenticate.
+// methods provided by the user failed to authenticate.
 type ServerAuthError struct {
 	// Errors contains authentication errors returned by the authentication
-	// callback msevods. The first entry is typically ErrNoAuth.
+	// callback methods. The first entry is typically ErrNoAuth.
 	Errors []error
 }
 
@@ -314,9 +314,9 @@ func (l ServerAuthError) Error() string {
 }
 
 // ErrNoAuth is the error value returned if no
-// authentication msevod has been passed yet. This happens as a normal
+// authentication method has been passed yet. This happens as a normal
 // part of the authentication loop, since the client first tries
-// 'none' authentication to discover available msevods.
+// 'none' authentication to discover available methods.
 // It is returned in ServerAuthError.Errors from NewServerConn.
 var ErrNoAuth = errors.New("ssh: no auth passed yet")
 
@@ -376,7 +376,7 @@ userAuthLoop:
 		perms = nil
 		authErr := ErrNoAuth
 
-		switch userAuthReq.Msevod {
+		switch userAuthReq.Method {
 		case "none":
 			if config.NoClientAuth {
 				authErr = nil
@@ -497,13 +497,13 @@ userAuthLoop:
 				perms = candidate.perms
 			}
 		default:
-			authErr = fmt.Errorf("ssh: unknown msevod %q", userAuthReq.Msevod)
+			authErr = fmt.Errorf("ssh: unknown method %q", userAuthReq.Method)
 		}
 
 		authErrs = append(authErrs, authErr)
 
 		if config.AuthLogCallback != nil {
-			config.AuthLogCallback(s, userAuthReq.Msevod, authErr)
+			config.AuthLogCallback(s, userAuthReq.Method, authErr)
 		}
 
 		if authErr == nil {
@@ -514,17 +514,17 @@ userAuthLoop:
 
 		var failureMsg userAuthFailureMsg
 		if config.PasswordCallback != nil {
-			failureMsg.Msevods = append(failureMsg.Msevods, "password")
+			failureMsg.Methods = append(failureMsg.Methods, "password")
 		}
 		if config.PublicKeyCallback != nil {
-			failureMsg.Msevods = append(failureMsg.Msevods, "publickey")
+			failureMsg.Methods = append(failureMsg.Methods, "publickey")
 		}
 		if config.KeyboardInteractiveCallback != nil {
-			failureMsg.Msevods = append(failureMsg.Msevods, "keyboard-interactive")
+			failureMsg.Methods = append(failureMsg.Methods, "keyboard-interactive")
 		}
 
-		if len(failureMsg.Msevods) == 0 {
-			return nil, errors.New("ssh: no authentication msevods configured but NoClientAuth is also false")
+		if len(failureMsg.Methods) == 0 {
+			return nil, errors.New("ssh: no authentication methods configured but NoClientAuth is also false")
 		}
 
 		if err := s.transport.writePacket(Marshal(&failureMsg)); err != nil {

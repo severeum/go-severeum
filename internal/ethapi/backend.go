@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package sevapi implements the general Severeum API functions.
-package sevapi
+// Package ethapi implements the general Severeum API functions.
+package ethapi
 
 import (
 	"context"
@@ -27,8 +27,8 @@ import (
 	"github.com/severeum/go-severeum/core/state"
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/core/vm"
-	"github.com/severeum/go-severeum/sev/downloader"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/eth/downloader"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/params"
 	"github.com/severeum/go-severeum/rpc"
@@ -41,7 +41,7 @@ type Backend interface {
 	Downloader() *downloader.Downloader
 	ProtocolVersion() int
 	SuggestPrice(ctx context.Context) (*big.Int, error)
-	ChainDb() sevdb.Database
+	ChainDb() ethdb.Database
 	EventMux() *event.TypeMux
 	AccountManager() *accounts.Manager
 
@@ -75,17 +75,17 @@ func GetAPIs(apiBackend Backend) []rpc.API {
 	nonceLock := new(AddrLocker)
 	return []rpc.API{
 		{
-			Namespace: "sev",
+			Namespace: "eth",
 			Version:   "1.0",
 			Service:   NewPublicSevereumAPI(apiBackend),
 			Public:    true,
 		}, {
-			Namespace: "sev",
+			Namespace: "eth",
 			Version:   "1.0",
 			Service:   NewPublicBlockChainAPI(apiBackend),
 			Public:    true,
 		}, {
-			Namespace: "sev",
+			Namespace: "eth",
 			Version:   "1.0",
 			Service:   NewPublicTransactionPoolAPI(apiBackend, nonceLock),
 			Public:    true,
@@ -104,7 +104,7 @@ func GetAPIs(apiBackend Backend) []rpc.API {
 			Version:   "1.0",
 			Service:   NewPrivateDebugAPI(apiBackend),
 		}, {
-			Namespace: "sev",
+			Namespace: "eth",
 			Version:   "1.0",
 			Service:   NewPublicAccountAPI(apiBackend.AccountManager()),
 			Public:    true,

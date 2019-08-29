@@ -88,9 +88,9 @@ type Tracer interface {
 	//     var serverSpan opentracing.Span
 	//     if err == nil {
 	//         span = tracer.StartSpan(
-	//             rpcMsevodName, ext.RPCServerOption(clientContext))
+	//             rpcMethodName, ext.RPCServerOption(clientContext))
 	//     } else {
-	//         span = tracer.StartSpan(rpcMsevodName)
+	//         span = tracer.StartSpan(rpcMethodName)
 	//     }
 	//
 	//
@@ -278,7 +278,7 @@ func (t Tags) Apply(o *StartSpanOptions) {
 }
 
 // Tag may be passed as a StartSpanOption to add a tag to new spans,
-// or its Set msevod may be used to apply the tag to an existing Span,
+// or its Set method may be used to apply the tag to an existing Span,
 // for example:
 //
 // tracer.StartSpan("opName", Tag{"Key", value})

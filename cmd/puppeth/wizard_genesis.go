@@ -61,7 +61,7 @@ func (w *wizard) makeGenesis() {
 	choice := w.read()
 	switch {
 	case choice == "1":
-		// In case of sevash, we're pretty much done
+		// In case of ethash, we're pretty much done
 		genesis.Config.Sevash = new(params.SevashConfig)
 		genesis.ExtraData = make([]byte, 32)
 
@@ -139,7 +139,7 @@ func (w *wizard) makeGenesis() {
 	w.conf.flush()
 }
 
-// importGenesis imports a Ssev genesis spec into puppsev.
+// importGenesis imports a Seth genesis spec into puppeth.
 func (w *wizard) importGenesis() {
 	// Request the genesis JSON spec URL from the user
 	fmt.Println()
@@ -189,7 +189,7 @@ func (w *wizard) importGenesis() {
 // manageGenesis permits the modification of chain configuration parameters in
 // a genesis config and the export of the entire genesis spec.
 func (w *wizard) manageGenesis() {
-	// Figure out whsever to modify or export the genesis
+	// Figure out whether to modify or export the genesis
 	fmt.Println()
 	fmt.Println(" 1. Modify existing fork rules")
 	fmt.Println(" 2. Export genesis configurations")
@@ -230,7 +230,7 @@ func (w *wizard) manageGenesis() {
 		// Save whatever genesis configuration we currently have
 		fmt.Println()
 		fmt.Printf("Which folder to save the genesis specs into? (default = current)\n")
-		fmt.Printf("  Will create %s.json, %s-alsev.json, %s-harmony.json, %s-parity.json\n", w.network, w.network, w.network, w.network)
+		fmt.Printf("  Will create %s.json, %s-aleth.json, %s-harmony.json, %s-parity.json\n", w.network, w.network, w.network, w.network)
 
 		folder := w.readDefaultString(".")
 		if err := os.MkdirAll(folder, 0755); err != nil {
@@ -239,19 +239,19 @@ func (w *wizard) manageGenesis() {
 		}
 		out, _ := json.MarshalIndent(w.conf.Genesis, "", "  ")
 
-		// Export the native genesis spec used by puppsev and Ssev
-		ssevJson := filepath.Join(folder, fmt.Sprintf("%s.json", w.network))
-		if err := ioutil.WriteFile((ssevJson), out, 0644); err != nil {
+		// Export the native genesis spec used by puppeth and Seth
+		sethJson := filepath.Join(folder, fmt.Sprintf("%s.json", w.network))
+		if err := ioutil.WriteFile((sethJson), out, 0644); err != nil {
 			log.Error("Failed to save genesis file", "err", err)
 			return
 		}
-		log.Info("Saved native genesis chain spec", "path", ssevJson)
+		log.Info("Saved native genesis chain spec", "path", sethJson)
 
-		// Export the genesis spec used by Alsev (formerly C++ Severeum)
-		if spec, err := newAlsevGenesisSpec(w.network, w.conf.Genesis); err != nil {
-			log.Error("Failed to create Alsev chain spec", "err", err)
+		// Export the genesis spec used by Aleth (formerly C++ Severeum)
+		if spec, err := newAlethGenesisSpec(w.network, w.conf.Genesis); err != nil {
+			log.Error("Failed to create Aleth chain spec", "err", err)
 		} else {
-			saveGenesis(folder, w.network, "alsev", spec)
+			saveGenesis(folder, w.network, "aleth", spec)
 		}
 		// Export the genesis spec used by Parity
 		if spec, err := newParityChainSpec(w.network, w.conf.Genesis, []string{}); err != nil {
@@ -273,7 +273,7 @@ func (w *wizard) manageGenesis() {
 		w.conf.Genesis = nil
 		w.conf.flush()
 	default:
-		log.Error("That's not somseving I can do")
+		log.Error("That's not something I can do")
 		return
 	}
 }

@@ -175,10 +175,10 @@ func testPassword(t *testing.T) {
 	}
 	authHeader := response.Header.Get("WWW-Authenticate")
 	if authHeader == "" {
-		t.Fatal("should be somseving here")
+		t.Fatal("should be something here")
 	}
 
-	req, err := http.NewRequest(http.MsevodGet, url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -568,7 +568,7 @@ func testACT(t *testing.T, bogusEntries int) {
 }
 
 // TestKeypairSanity is a sanity test for the crypto scheme for ACT. it asserts the correct shared secret according to
-// the specs at https://github.com/seversphere/swarm-docs/blob/eb857afda906c6e7bb90d37f3f334ccce5eef230/act.md
+// the specs at https://github.com/ethersphere/swarm-docs/blob/eb857afda906c6e7bb90d37f3f334ccce5eef230/act.md
 func TestKeypairSanity(t *testing.T) {
 	salt := make([]byte, 32)
 	if _, err := io.ReadFull(rand.Reader, salt); err != nil {

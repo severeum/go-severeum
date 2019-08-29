@@ -10,15 +10,15 @@ import (
 
 // The Response interface exposes an http.Response object as it returns through the pipeline of Policy objects.
 // This ensures that Policy objects have access to the HTTP response. However, the object this interface encapsulates
-// might be a struct with additional fields that is created by a Policy object (typically a msevod-specific Factory).
-// The msevod that injected the msevod-specific Factory gets this returned Response and performs a type assertion
+// might be a struct with additional fields that is created by a Policy object (typically a method-specific Factory).
+// The method that injected the method-specific Factory gets this returned Response and performs a type assertion
 // to the expected struct and returns the struct to its caller.
 type Response interface {
 	Response() *http.Response
 }
 
 // This is the default struct that has the http.Response.
-// A msevod can replace this struct with its own struct containing an http.Response
+// A method can replace this struct with its own struct containing an http.Response
 // field and any other additional fields.
 type httpResponse struct {
 	response *http.Response
@@ -29,7 +29,7 @@ func NewHTTPResponse(response *http.Response) Response {
 	return &httpResponse{response: response}
 }
 
-// This msevod satisfies the public Response interface's Response msevod
+// This method satisfies the public Response interface's Response method
 func (r httpResponse) Response() *http.Response {
 	return r.response
 }
@@ -38,7 +38,7 @@ func (r httpResponse) Response() *http.Response {
 // not nil, then these are also written into the Buffer.
 func WriteRequestWithResponse(b *bytes.Buffer, request *http.Request, response *http.Response, err error) {
 	// Write the request into the buffer.
-	fmt.Fprint(b, "   "+request.Msevod+" "+request.URL.String()+"\n")
+	fmt.Fprint(b, "   "+request.Method+" "+request.URL.String()+"\n")
 	writeHeader(b, request.Header)
 	if response != nil {
 		fmt.Fprintln(b, "   --------------------------------------------------------------------------------")

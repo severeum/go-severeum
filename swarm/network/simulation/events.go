@@ -37,7 +37,7 @@ type PeerEvent struct {
 }
 
 // PeerEventsFilter defines a filter on PeerEvents to exclude messages with
-// defined properties. Use PeerEventsFilter msevods to set required options.
+// defined properties. Use PeerEventsFilter methods to set required options.
 type PeerEventsFilter struct {
 	eventType simulations.EventType
 

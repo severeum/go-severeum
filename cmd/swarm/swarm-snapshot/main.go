@@ -38,7 +38,7 @@ func main() {
 }
 
 // newApp construct a new instance of Swarm Snapshot Utility.
-// Msevod Run is called on it in the main function and in tests.
+// Method Run is called on it in the main function and in tests.
 func newApp() (app *cli.App) {
 	app = utils.NewApp(gitCommit, "Swarm Snapshot Utility")
 

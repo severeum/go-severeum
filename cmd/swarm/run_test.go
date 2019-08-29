@@ -103,8 +103,8 @@ type testCluster struct {
 // ports (assigned by first listening on 127.0.0.1:0 and then passing the ports
 // as flags).
 //
-// When starting more than one node, they are connected tossever using the
-// admin SetPeer RPC msevod.
+// When starting more than one node, they are connected tosether using the
+// admin SetPeer RPC method.
 
 func newTestCluster(t *testing.T, size int) *testCluster {
 	cluster := &testCluster{}
@@ -127,7 +127,7 @@ func newTestCluster(t *testing.T, size int) *testCluster {
 		return cluster
 	}
 
-	// connect the nodes tossever
+	// connect the nodes tosether
 	for _, node := range cluster.Nodes {
 		if err := node.Client.Call(nil, "admin_addPeer", cluster.Nodes[0].Enode); err != nil {
 			t.Fatal(err)

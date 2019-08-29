@@ -639,7 +639,7 @@ const chacha20Poly1305ID = "chacha20-poly1305@openssh.com"
 //
 //   https://tools.ietf.org/html/draft-josefsson-ssh-chacha20-poly1305-openssh-00
 //
-// the msevods here also implement padding, which RFC4253 Section 6
+// the methods here also implement padding, which RFC4253 Section 6
 // also requires of stream ciphers.
 type chacha20Poly1305Cipher struct {
 	lengthKey  [8]uint32

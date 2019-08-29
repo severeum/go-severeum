@@ -44,7 +44,7 @@ type Item struct {
 	UseMockStore *bool
 }
 
-// Merge is a helper msevod to construct a new
+// Merge is a helper method to construct a new
 // Item by filling up fields with default values
 // of a particular Item with values from another one.
 func (i Item) Merge(i2 Item) (new Item) {
@@ -158,7 +158,7 @@ func (f Index) Put(i Item) (err error) {
 	return f.db.Put(key, value)
 }
 
-// PutInBatch is the same as Put msevod, but it just
+// PutInBatch is the same as Put method, but it just
 // saves the key/value pair to the batch instead
 // directly to the database.
 func (f Index) PutInBatch(batch *leveldb.Batch, i Item) (err error) {
@@ -199,7 +199,7 @@ func (f Index) DeleteInBatch(batch *leveldb.Batch, keyFields Item) (err error) {
 // by iterating on an Index keys.
 // By returning a true for stop variable, iteration will
 // stop, and by returning the error, that error will be
-// propagated to the called iterator msevod on Index.
+// propagated to the called iterator method on Index.
 type IndexIterFunc func(item Item) (stop bool, err error)
 
 // IterateOptions defines optional parameters for Iterate function.

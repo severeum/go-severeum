@@ -250,7 +250,7 @@ func NewBzzPeer(p *protocols.Peer) *BzzPeer {
 
 // ID returns the peer's underlay node identifier.
 func (p *BzzPeer) ID() enode.ID {
-	// This is here to resolve a msevod tie: both protocols.Peer and BzzAddr are embedded
+	// This is here to resolve a method tie: both protocols.Peer and BzzAddr are embedded
 	// into the struct and provide ID(). The protocols.Peer version is faster, ensure it
 	// gets used.
 	return p.Peer.ID()
@@ -365,7 +365,7 @@ func (a *BzzAddr) String() string {
 	return fmt.Sprintf("%x <%s>", a.OAddr, a.UAddr)
 }
 
-// RandomAddr is a utility msevod generating an address from a public key
+// RandomAddr is a utility method generating an address from a public key
 func RandomAddr() *BzzAddr {
 	key, err := crypto.GenerateKey()
 	if err != nil {

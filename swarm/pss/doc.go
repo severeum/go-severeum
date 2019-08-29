@@ -24,17 +24,17 @@
 //
 // Documentation can be found in the README file.
 //
-// For the current state and roadmap of pss development please see https://github.com/seversphere/swarm/wiki/swarm-dev-progress.
+// For the current state and roadmap of pss development please see https://github.com/ethersphere/swarm/wiki/swarm-dev-progress.
 //
-// Please report issues on https://github.com/seversphere/go-severeum
+// Please report issues on https://github.com/ethersphere/go-severeum
 //
-// Feel free to ask questions in https://gitter.im/seversphere/pss
+// Feel free to ask questions in https://gitter.im/ethersphere/pss
 //
 // TOPICS
 //
 // An encrypted envelope of a pss messages always contains a Topic. This is pss' way of determining what action to take on the message. The topic is only visible for the node(s) who can decrypt the message.
 //
-// This "topic" is not like the subject of an email message, but a hash-like arbitrary 4 byte value. A valid topic can be generated using the `pss_*ToTopic` API msevods.
+// This "topic" is not like the subject of an email message, but a hash-like arbitrary 4 byte value. A valid topic can be generated using the `pss_*ToTopic` API methods.
 //
 // IDENTITY IN PSS
 //
@@ -48,7 +48,7 @@
 //
 // When implementing the devp2p protocol stack, the "adding" of a remote peer is a prerequisite for the side actually initiating the protocol communication. Adding a peer in effect "runs" the protocol on that peer, and adds an internal mapping between a topic and that peer. It also enables sending and receiving messages using the main io-construct in devp2p - the p2p.MsgReadWriter.
 //
-// Under the hood, pss implements its own MsgReadWriter, which bridges MsgReadWriter.WriteMsg with Pss.SendRaw, and deftly adds an InjectMsg msevod which pipes incoming messages to appear on the MsgReadWriter.ReadMsg channel.
+// Under the hood, pss implements its own MsgReadWriter, which bridges MsgReadWriter.WriteMsg with Pss.SendRaw, and deftly adds an InjectMsg method which pipes incoming messages to appear on the MsgReadWriter.ReadMsg channel.
 //
 // An incoming connection is nothing more than an actual PssMsg appearing with a certain Topic. If a Handler har been registered to that Topic, the message will be passed to it. This constitutes a "new" connection if:
 //

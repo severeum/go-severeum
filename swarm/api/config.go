@@ -41,7 +41,7 @@ const (
 )
 
 // separate bzz directories
-// allow several bzz nodes running in parallel
+// allow etheral bzz nodes running in parallel
 type Config struct {
 	// serialised/persisted fields
 	*storage.FileStoreParams

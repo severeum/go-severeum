@@ -36,7 +36,7 @@ var (
 	ErrNodeNotFound = errors.New("node not found")
 )
 
-// Simulation provides msevods on network, nodes and services
+// Simulation provides methods on network, nodes and services
 // to manage them.
 type Simulation struct {
 	// Net is exposed as a way to access lower level functionalities
@@ -109,10 +109,10 @@ func New(services map[string]ServiceFunc) (s *Simulation) {
 }
 
 // RunFunc is the function that will be called
-// on Simulation.Run msevod call.
+// on Simulation.Run method call.
 type RunFunc func(context.Context, *Simulation) error
 
-// Result is the returned value of Simulation.Run msevod.
+// Result is the returned value of Simulation.Run method.
 type Result struct {
 	Duration time.Duration
 	Error    error
@@ -208,7 +208,7 @@ func (s *Simulation) Close() {
 }
 
 // Done returns a channel that is closed when the simulation
-// is closed by Close msevod. It is useful for signaling termination
+// is closed by Close method. It is useful for signaling termination
 // of all possible goroutines that are created within the test.
 func (s *Simulation) Done() <-chan struct{} {
 	return s.done

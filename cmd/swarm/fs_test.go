@@ -174,7 +174,7 @@ func TestCLISwarmFs(t *testing.T) {
 	}
 
 	if len(filesInDir) == 0 {
-		t.Fatal("there should be somseving here")
+		t.Fatal("there should be something here")
 	}
 
 	log.Debug("swarmfs cli test: traversing file tree to see it matches previous mount")

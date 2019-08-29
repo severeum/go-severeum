@@ -25,13 +25,13 @@ Example of proximity order is the length of the common prefix over bitvectors.
 (which is equivalent to the reverse rank of order of magnitude of the MSB first X
 OR distance over finite set of integers).
 
-Msevods take a comparison operator (pof, proximity order function) to compare two
+Methods take a comparison operator (pof, proximity order function) to compare two
 value types. The default pof assumes Val to be or project to a byte slice using
 the reverse rank on the MSB first XOR logarithmic distance.
 
 If the address space if limited, equality is defined as the maximum proximity order.
 
-The container offers applicative (functional) style msevods on PO trees:
+The container offers applicative (functional) style methods on PO trees:
 * adding/removing en element
 * swap (value based add/remove)
 * merging two PO trees (union)

@@ -16,7 +16,7 @@
 
 // Contains all the wrappers from the bind package.
 
-package ssev
+package seth
 
 import (
 	"math/big"
@@ -29,7 +29,7 @@ import (
 )
 
 // Signer is an interaface defining the callback when a contract requires a
-// msevod to sign the transaction before submission.
+// method to sign the transaction before submission.
 type Signer interface {
 	Sign(*Address, *Transaction) (tx *Transaction, _ error)
 }
@@ -103,7 +103,7 @@ func (opts *TransactOpts) SetGasLimit(limit int64)     { opts.opts.GasLimit = ui
 func (opts *TransactOpts) SetContext(context *Context) { opts.opts.Context = context.context }
 
 // BoundContract is the base wrapper object that reflects a contract on the
-// Severeum network. It contains a collection of msevods that are used by the
+// Severeum network. It contains a collection of methods that are used by the
 // higher level contract bindings to operate.
 type BoundContract struct {
 	contract *bind.BoundContract
@@ -151,19 +151,19 @@ func (c *BoundContract) GetDeployer() *Transaction {
 	return &Transaction{c.deployer}
 }
 
-// Call invokes the (constant) contract msevod with params as input values and
+// Call invokes the (constant) contract method with params as input values and
 // sets the output to result.
-func (c *BoundContract) Call(opts *CallOpts, out *Interfaces, msevod string, args *Interfaces) error {
+func (c *BoundContract) Call(opts *CallOpts, out *Interfaces, method string, args *Interfaces) error {
 	if len(out.objects) == 1 {
 		result := out.objects[0]
-		if err := c.contract.Call(&opts.opts, result, msevod, args.objects...); err != nil {
+		if err := c.contract.Call(&opts.opts, result, method, args.objects...); err != nil {
 			return err
 		}
 		out.objects[0] = result
 	} else {
 		results := make([]interface{}, len(out.objects))
 		copy(results, out.objects)
-		if err := c.contract.Call(&opts.opts, &results, msevod, args.objects...); err != nil {
+		if err := c.contract.Call(&opts.opts, &results, method, args.objects...); err != nil {
 			return err
 		}
 		copy(out.objects, results)
@@ -171,9 +171,9 @@ func (c *BoundContract) Call(opts *CallOpts, out *Interfaces, msevod string, arg
 	return nil
 }
 
-// Transact invokes the (paid) contract msevod with params as input values.
-func (c *BoundContract) Transact(opts *TransactOpts, msevod string, args *Interfaces) (tx *Transaction, _ error) {
-	rawTx, err := c.contract.Transact(&opts.opts, msevod, args.objects...)
+// Transact invokes the (paid) contract method with params as input values.
+func (c *BoundContract) Transact(opts *TransactOpts, method string, args *Interfaces) (tx *Transaction, _ error) {
+	rawTx, err := c.contract.Transact(&opts.opts, method, args.objects...)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +181,7 @@ func (c *BoundContract) Transact(opts *TransactOpts, msevod string, args *Interf
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
-// its default msevod if one is available.
+// its default method if one is available.
 func (c *BoundContract) Transfer(opts *TransactOpts) (tx *Transaction, _ error) {
 	rawTx, err := c.contract.Transfer(&opts.opts)
 	if err != nil {

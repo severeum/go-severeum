@@ -27,12 +27,12 @@ import (
 
 	severeum "github.com/severeum/go-severeum"
 	"github.com/severeum/go-severeum/common"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/bloombits"
 	"github.com/severeum/go-severeum/core/rawdb"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/params"
 	"github.com/severeum/go-severeum/rpc"
@@ -40,7 +40,7 @@ import (
 
 type testBackend struct {
 	mux        *event.TypeMux
-	db         sevdb.Database
+	db         ethdb.Database
 	sections   uint64
 	txFeed     *event.Feed
 	rmLogsFeed *event.Feed
@@ -48,7 +48,7 @@ type testBackend struct {
 	chainFeed  *event.Feed
 }
 
-func (b *testBackend) ChainDb() sevdb.Database {
+func (b *testBackend) ChainDb() ethdb.Database {
 	return b.db
 }
 
@@ -161,7 +161,7 @@ func TestBlockSubscription(t *testing.T) {
 
 	var (
 		mux         = new(event.TypeMux)
-		db          = sevdb.NewMemDatabase()
+		db          = ethdb.NewMemDatabase()
 		txFeed      = new(event.Feed)
 		rmLogsFeed  = new(event.Feed)
 		logsFeed    = new(event.Feed)
@@ -169,7 +169,7 @@ func TestBlockSubscription(t *testing.T) {
 		backend     = &testBackend{mux, db, 0, txFeed, rmLogsFeed, logsFeed, chainFeed}
 		api         = NewPublicFilterAPI(backend, false)
 		genesis     = new(core.Genesis).MustCommit(db)
-		chain, _    = core.GenerateChain(params.TestChainConfig, genesis, sevash.NewFaker(), db, 10, func(i int, gen *core.BlockGen) {})
+		chain, _    = core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), db, 10, func(i int, gen *core.BlockGen) {})
 		chainEvents = []core.ChainEvent{}
 	)
 
@@ -212,13 +212,13 @@ func TestBlockSubscription(t *testing.T) {
 	<-sub1.Err()
 }
 
-// TestPendingTxFilter tests whsever pending tx filters retrieve all pending transactions that are posted to the event mux.
+// TestPendingTxFilter tests whether pending tx filters retrieve all pending transactions that are posted to the event mux.
 func TestPendingTxFilter(t *testing.T) {
 	t.Parallel()
 
 	var (
 		mux        = new(event.TypeMux)
-		db         = sevdb.NewMemDatabase()
+		db         = ethdb.NewMemDatabase()
 		txFeed     = new(event.Feed)
 		rmLogsFeed = new(event.Feed)
 		logsFeed   = new(event.Feed)
@@ -273,12 +273,12 @@ func TestPendingTxFilter(t *testing.T) {
 	}
 }
 
-// TestLogFilterCreation test whsever a given filter criteria makes sense.
+// TestLogFilterCreation test whether a given filter criteria makes sense.
 // If not it must return an error.
 func TestLogFilterCreation(t *testing.T) {
 	var (
 		mux        = new(event.TypeMux)
-		db         = sevdb.NewMemDatabase()
+		db         = ethdb.NewMemDatabase()
 		txFeed     = new(event.Feed)
 		rmLogsFeed = new(event.Feed)
 		logsFeed   = new(event.Feed)
@@ -320,14 +320,14 @@ func TestLogFilterCreation(t *testing.T) {
 	}
 }
 
-// TestInvalidLogFilterCreation tests whsever invalid filter log criteria results in an error
+// TestInvalidLogFilterCreation tests whether invalid filter log criteria results in an error
 // when the filter is created.
 func TestInvalidLogFilterCreation(t *testing.T) {
 	t.Parallel()
 
 	var (
 		mux        = new(event.TypeMux)
-		db         = sevdb.NewMemDatabase()
+		db         = ethdb.NewMemDatabase()
 		txFeed     = new(event.Feed)
 		rmLogsFeed = new(event.Feed)
 		logsFeed   = new(event.Feed)
@@ -354,7 +354,7 @@ func TestInvalidLogFilterCreation(t *testing.T) {
 func TestInvalidGetLogsRequest(t *testing.T) {
 	var (
 		mux        = new(event.TypeMux)
-		db         = sevdb.NewMemDatabase()
+		db         = ethdb.NewMemDatabase()
 		txFeed     = new(event.Feed)
 		rmLogsFeed = new(event.Feed)
 		logsFeed   = new(event.Feed)
@@ -378,13 +378,13 @@ func TestInvalidGetLogsRequest(t *testing.T) {
 	}
 }
 
-// TestLogFilter tests whsever log filters match the correct logs that are posted to the event feed.
+// TestLogFilter tests whether log filters match the correct logs that are posted to the event feed.
 func TestLogFilter(t *testing.T) {
 	t.Parallel()
 
 	var (
 		mux        = new(event.TypeMux)
-		db         = sevdb.NewMemDatabase()
+		db         = ethdb.NewMemDatabase()
 		txFeed     = new(event.Feed)
 		rmLogsFeed = new(event.Feed)
 		logsFeed   = new(event.Feed)
@@ -503,7 +503,7 @@ func TestPendingLogsSubscription(t *testing.T) {
 
 	var (
 		mux        = new(event.TypeMux)
-		db         = sevdb.NewMemDatabase()
+		db         = ethdb.NewMemDatabase()
 		txFeed     = new(event.Feed)
 		rmLogsFeed = new(event.Feed)
 		logsFeed   = new(event.Feed)

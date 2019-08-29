@@ -25,12 +25,12 @@ import (
 
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/common/math"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core/rawdb"
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/core/vm"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/params"
 )
 
@@ -105,7 +105,7 @@ func init() {
 	}
 }
 
-// genTxRing returns a block generator that sends sever in a ring
+// genTxRing returns a block generator that sends ether in a ring
 // among n accounts. This is creates n entries in the state database
 // and fills the blocks with many small transactions.
 func genTxRing(naccounts int) func(int, *BlockGen) {
@@ -148,16 +148,16 @@ func genUncles(i int, gen *BlockGen) {
 
 func benchInsertChain(b *testing.B, disk bool, gen func(int, *BlockGen)) {
 	// Create the database in memory or in a temporary directory.
-	var db sevdb.Database
+	var db ethdb.Database
 	if !disk {
-		db = sevdb.NewMemDatabase()
+		db = ethdb.NewMemDatabase()
 	} else {
-		dir, err := ioutil.TempDir("", "sev-core-bench")
+		dir, err := ioutil.TempDir("", "eth-core-bench")
 		if err != nil {
 			b.Fatalf("cannot create temporary directory: %v", err)
 		}
 		defer os.RemoveAll(dir)
-		db, err = sevdb.NewLDBDatabase(dir, 128, 128)
+		db, err = ethdb.NewLDBDatabase(dir, 128, 128)
 		if err != nil {
 			b.Fatalf("cannot create temporary database: %v", err)
 		}
@@ -171,11 +171,11 @@ func benchInsertChain(b *testing.B, disk bool, gen func(int, *BlockGen)) {
 		Alloc:  GenesisAlloc{benchRootAddr: {Balance: benchRootFunds}},
 	}
 	genesis := gspec.MustCommit(db)
-	chain, _ := GenerateChain(gspec.Config, genesis, sevash.NewFaker(), db, b.N, gen)
+	chain, _ := GenerateChain(gspec.Config, genesis, ethash.NewFaker(), db, b.N, gen)
 
 	// Time the insertion of the new chain.
 	// State and blocks are stored in the same DB.
-	chainman, _ := NewBlockChain(db, nil, gspec.Config, sevash.NewFaker(), vm.Config{}, nil)
+	chainman, _ := NewBlockChain(db, nil, gspec.Config, ethash.NewFaker(), vm.Config{}, nil)
 	defer chainman.Stop()
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -223,7 +223,7 @@ func BenchmarkChainWrite_full_500k(b *testing.B) {
 
 // makeChainForBench writes a given number of headers or empty blocks/receipts
 // into a database.
-func makeChainForBench(db sevdb.Database, full bool, count uint64) {
+func makeChainForBench(db ethdb.Database, full bool, count uint64) {
 	var hash common.Hash
 	for n := uint64(0); n < count; n++ {
 		header := &types.Header{
@@ -251,11 +251,11 @@ func makeChainForBench(db sevdb.Database, full bool, count uint64) {
 
 func benchWriteChain(b *testing.B, full bool, count uint64) {
 	for i := 0; i < b.N; i++ {
-		dir, err := ioutil.TempDir("", "sev-chain-bench")
+		dir, err := ioutil.TempDir("", "eth-chain-bench")
 		if err != nil {
 			b.Fatalf("cannot create temporary directory: %v", err)
 		}
-		db, err := sevdb.NewLDBDatabase(dir, 128, 1024)
+		db, err := ethdb.NewLDBDatabase(dir, 128, 1024)
 		if err != nil {
 			b.Fatalf("error opening database at %v: %v", dir, err)
 		}
@@ -266,13 +266,13 @@ func benchWriteChain(b *testing.B, full bool, count uint64) {
 }
 
 func benchReadChain(b *testing.B, full bool, count uint64) {
-	dir, err := ioutil.TempDir("", "sev-chain-bench")
+	dir, err := ioutil.TempDir("", "eth-chain-bench")
 	if err != nil {
 		b.Fatalf("cannot create temporary directory: %v", err)
 	}
 	defer os.RemoveAll(dir)
 
-	db, err := sevdb.NewLDBDatabase(dir, 128, 1024)
+	db, err := ethdb.NewLDBDatabase(dir, 128, 1024)
 	if err != nil {
 		b.Fatalf("error opening database at %v: %v", dir, err)
 	}
@@ -283,11 +283,11 @@ func benchReadChain(b *testing.B, full bool, count uint64) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		db, err := sevdb.NewLDBDatabase(dir, 128, 1024)
+		db, err := ethdb.NewLDBDatabase(dir, 128, 1024)
 		if err != nil {
 			b.Fatalf("error opening database at %v: %v", dir, err)
 		}
-		chain, err := NewBlockChain(db, nil, params.TestChainConfig, sevash.NewFaker(), vm.Config{}, nil)
+		chain, err := NewBlockChain(db, nil, params.TestChainConfig, ethash.NewFaker(), vm.Config{}, nil)
 		if err != nil {
 			b.Fatalf("error creating chain: %v", err)
 		}

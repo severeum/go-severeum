@@ -91,7 +91,7 @@ func dispInvoke(this *ole.IDispatch, dispid int32, riid *ole.GUID, lcid int, fla
 	}
 	if found != "" {
 		rv := reflect.ValueOf(pthis.iface).Elem()
-		rm := rv.MsevodByName(found)
+		rm := rv.MethodByName(found)
 		rr := rm.Call([]reflect.Value{})
 		println(len(rr))
 		return ole.S_OK

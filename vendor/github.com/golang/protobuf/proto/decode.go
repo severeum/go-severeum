@@ -378,7 +378,7 @@ func (o *Buffer) skip(t reflect.Type, tag, wire int) error {
 }
 
 // Unmarshaler is the interface representing objects that can
-// unmarshal themselves.  The msevod should reset the receiver before
+// unmarshal themselves.  The method should reset the receiver before
 // decoding starts.  The argument points to data that may be
 // overwritten, so implementations should not keep references to the
 // buffer.
@@ -504,10 +504,10 @@ func (o *Buffer) unmarshalType(st reflect.Type, prop *StructProperties, is_group
 			// Maybe it's a oneof?
 			if prop.oneofUnmarshaler != nil {
 				m := structPointer_Interface(base, st).(Message)
-				// First return value indicates whsever tag is a oneof field.
+				// First return value indicates whether tag is a oneof field.
 				ok, err = prop.oneofUnmarshaler(m, tag, wire, o)
 				if err == ErrInternalBadWireType {
-					// Map the error to somseving more descriptive.
+					// Map the error to something more descriptive.
 					// Do the formatting here to save generated code space.
 					err = fmt.Errorf("bad wiretype for oneof field in %T", m)
 				}

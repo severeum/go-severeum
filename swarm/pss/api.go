@@ -36,7 +36,7 @@ type APIMsg struct {
 	Key        string
 }
 
-// Additional public msevods accessible through API for pss
+// Additional public methods accessible through API for pss
 type API struct {
 	*Pss
 }

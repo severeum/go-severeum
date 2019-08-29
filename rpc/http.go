@@ -106,7 +106,7 @@ var DefaultHTTPTimeouts = HTTPTimeouts{
 // DialHTTPWithClient creates a new RPC client that connects to an RPC server over HTTP
 // using the provided HTTP Client.
 func DialHTTPWithClient(endpoint string, client *http.Client) (*Client, error) {
-	req, err := http.NewRequest(http.MsevodPost, endpoint, nil)
+	req, err := http.NewRequest(http.MethodPost, endpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func (hc *httpConn) doRequest(ctx context.Context, msg interface{}) (io.ReadClos
 	return resp.Body, nil
 }
 
-// httpReadWriteNopCloser wraps a io.Reader and io.Writer with a NOP Close msevod.
+// httpReadWriteNopCloser wraps a io.Reader and io.Writer with a NOP Close method.
 type httpReadWriteNopCloser struct {
 	io.Reader
 	io.Writer
@@ -228,7 +228,7 @@ func NewHTTPServer(cors []string, vhosts []string, timeouts HTTPTimeouts, srv *S
 // ServeHTTP serves JSON-RPC requests over HTTP.
 func (srv *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Permit dumb empty requests for remote health-checks (AWS)
-	if r.Msevod == http.MsevodGet && r.ContentLength == 0 && r.URL.RawQuery == "" {
+	if r.Method == http.MethodGet && r.ContentLength == 0 && r.URL.RawQuery == "" {
 		return
 	}
 	if code, err := validateRequest(r); err != nil {
@@ -254,21 +254,21 @@ func (srv *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer codec.Close()
 
 	w.Header().Set("content-type", contentType)
-	srv.ServeSingleRequest(ctx, codec, OptionMsevodInvocation)
+	srv.ServeSingleRequest(ctx, codec, OptionMethodInvocation)
 }
 
 // validateRequest returns a non-zero response code and error message if the
 // request is invalid.
 func validateRequest(r *http.Request) (int, error) {
-	if r.Msevod == http.MsevodPut || r.Msevod == http.MsevodDelete {
-		return http.StatusMsevodNotAllowed, errors.New("msevod not allowed")
+	if r.Method == http.MethodPut || r.Method == http.MethodDelete {
+		return http.StatusMethodNotAllowed, errors.New("method not allowed")
 	}
 	if r.ContentLength > maxRequestContentLength {
 		err := fmt.Errorf("content length too large (%d>%d)", r.ContentLength, maxRequestContentLength)
 		return http.StatusRequestEntityTooLarge, err
 	}
 	// Allow OPTIONS (regardless of content-type)
-	if r.Msevod == http.MsevodOptions {
+	if r.Method == http.MethodOptions {
 		return 0, nil
 	}
 	// Check content-type
@@ -291,7 +291,7 @@ func newCorsHandler(srv *Server, allowedOrigins []string) http.Handler {
 	}
 	c := cors.New(cors.Options{
 		AllowedOrigins: allowedOrigins,
-		AllowedMsevods: []string{http.MsevodPost, http.MsevodGet},
+		AllowedMethods: []string{http.MethodPost, http.MethodGet},
 		MaxAge:         600,
 		AllowedHeaders: []string{"*"},
 	})

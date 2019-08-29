@@ -24,7 +24,7 @@ import (
 
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/internal/sevapi"
+	"github.com/severeum/go-severeum/internal/ethapi"
 	"github.com/severeum/go-severeum/params"
 	"github.com/severeum/go-severeum/rpc"
 )
@@ -40,7 +40,7 @@ type Config struct {
 // Oracle recommends gas prices based on the content of recent
 // blocks. Suitable for both light and full clients.
 type Oracle struct {
-	backend   sevapi.Backend
+	backend   ethapi.Backend
 	lastHead  common.Hash
 	lastPrice *big.Int
 	cacheLock sync.RWMutex
@@ -51,7 +51,7 @@ type Oracle struct {
 }
 
 // NewOracle returns a new oracle.
-func NewOracle(backend sevapi.Backend, params Config) *Oracle {
+func NewOracle(backend ethapi.Backend, params Config) *Oracle {
 	blocks := params.Blocks
 	if blocks < 1 {
 		blocks = 1

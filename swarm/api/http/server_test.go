@@ -82,7 +82,7 @@ func TestBzzWithFeed(t *testing.T) {
 	srv := NewTestSwarmServer(t, serverFunc, nil)
 	defer srv.Close()
 
-	// put tossever some data for our test:
+	// put tosether some data for our test:
 	dataBytes := []byte(`
 	//
 	// Create some data our manifest will point to. Data that could be very big and wouldn't fit in a feed update.
@@ -195,7 +195,7 @@ func TestBzzWithFeed(t *testing.T) {
 	}
 }
 
-// Test Swarm feeds using the raw update msevods
+// Test Swarm feeds using the raw update methods
 func TestBzzFeed(t *testing.T) {
 	srv := NewTestSwarmServer(t, serverFunc, nil)
 	signer, _ := newTestSigner()
@@ -208,7 +208,7 @@ func TestBzzFeed(t *testing.T) {
 	//data for update 2
 	update2Data := []byte("foo")
 
-	topic, _ := feed.NewTopic("foo.sev", nil)
+	topic, _ := feed.NewTopic("foo.eth", nil)
 	updateRequest := feed.NewFirstRequest(topic)
 	updateRequest.SetData(update1Data)
 
@@ -636,7 +636,7 @@ func testBzzGetPath(encrypted bool, t *testing.T) {
 			}
 		})
 		t.Run("html list "+c.path, func(t *testing.T) {
-			req, err := http.NewRequest(http.MsevodGet, url, nil)
+			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
 				t.Fatalf("New request: %v", err)
 			}
@@ -901,7 +901,7 @@ func testBzzRootRedirect(toEncrypt bool, t *testing.T) {
 	}
 }
 
-func TestMsevodsNotAllowed(t *testing.T) {
+func TestMethodsNotAllowed(t *testing.T) {
 	srv := NewTestSwarmServer(t, serverFunc, nil)
 	defer srv.Close()
 	databytes := "bar"
@@ -911,14 +911,14 @@ func TestMsevodsNotAllowed(t *testing.T) {
 	}{
 		{
 			url:  fmt.Sprintf("%s/bzz-list:/", srv.URL),
-			code: http.StatusMsevodNotAllowed,
+			code: http.StatusMethodNotAllowed,
 		}, {
 			url:  fmt.Sprintf("%s/bzz-hash:/", srv.URL),
-			code: http.StatusMsevodNotAllowed,
+			code: http.StatusMethodNotAllowed,
 		},
 		{
 			url:  fmt.Sprintf("%s/bzz-immutable:/", srv.URL),
-			code: http.StatusMsevodNotAllowed,
+			code: http.StatusMethodNotAllowed,
 		},
 	} {
 		res, _ := http.Post(c.url, "text/plain", bytes.NewReader([]byte(databytes)))
@@ -929,9 +929,9 @@ func TestMsevodsNotAllowed(t *testing.T) {
 
 }
 
-func httpDo(httpMsevod string, url string, reqBody io.Reader, headers map[string]string, verbose bool, t *testing.T) (*http.Response, string) {
+func httpDo(httpMethod string, url string, reqBody io.Reader, headers map[string]string, verbose bool, t *testing.T) (*http.Response, string) {
 	// Build the Request
-	req, err := http.NewRequest(httpMsevod, url, reqBody)
+	req, err := http.NewRequest(httpMethod, url, reqBody)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -939,7 +939,7 @@ func httpDo(httpMsevod string, url string, reqBody io.Reader, headers map[string
 		req.Header.Set(key, value)
 	}
 	if verbose {
-		t.Log(req.Msevod, req.URL, req.Header, req.Body)
+		t.Log(req.Method, req.URL, req.Header, req.Body)
 	}
 
 	// Send Request out
@@ -966,7 +966,7 @@ func TestGet(t *testing.T) {
 
 	for _, testCase := range []struct {
 		uri                string
-		msevod             string
+		method             string
 		headers            map[string]string
 		expectedStatusCode int
 		assertResponseBody string
@@ -974,7 +974,7 @@ func TestGet(t *testing.T) {
 	}{
 		{
 			uri:                fmt.Sprintf("%s/", srv.URL),
-			msevod:             "GET",
+			method:             "GET",
 			headers:            map[string]string{"Accept": "text/html"},
 			expectedStatusCode: http.StatusOK,
 			assertResponseBody: "Swarm: Serverless Hosting Incentivised Peer-To-Peer Storage And Content Distribution",
@@ -982,7 +982,7 @@ func TestGet(t *testing.T) {
 		},
 		{
 			uri:                fmt.Sprintf("%s/", srv.URL),
-			msevod:             "GET",
+			method:             "GET",
 			headers:            map[string]string{"Accept": "application/json"},
 			expectedStatusCode: http.StatusOK,
 			assertResponseBody: "Swarm: Please request a valid ENS or swarm hash with the appropriate bzz scheme",
@@ -990,7 +990,7 @@ func TestGet(t *testing.T) {
 		},
 		{
 			uri:                fmt.Sprintf("%s/robots.txt", srv.URL),
-			msevod:             "GET",
+			method:             "GET",
 			headers:            map[string]string{"Accept": "text/html"},
 			expectedStatusCode: http.StatusOK,
 			assertResponseBody: "User-agent: *\nDisallow: /",
@@ -998,41 +998,41 @@ func TestGet(t *testing.T) {
 		},
 		{
 			uri:                fmt.Sprintf("%s/nonexistent_path", srv.URL),
-			msevod:             "GET",
+			method:             "GET",
 			headers:            map[string]string{},
 			expectedStatusCode: http.StatusNotFound,
 			verbose:            false,
 		},
 		{
 			uri:                fmt.Sprintf("%s/bzz:asdf/", srv.URL),
-			msevod:             "GET",
+			method:             "GET",
 			headers:            map[string]string{},
 			expectedStatusCode: http.StatusNotFound,
 			verbose:            false,
 		},
 		{
 			uri:                fmt.Sprintf("%s/tbz2/", srv.URL),
-			msevod:             "GET",
+			method:             "GET",
 			headers:            map[string]string{},
 			expectedStatusCode: http.StatusNotFound,
 			verbose:            false,
 		},
 		{
 			uri:                fmt.Sprintf("%s/bzz-rack:/", srv.URL),
-			msevod:             "GET",
+			method:             "GET",
 			headers:            map[string]string{},
 			expectedStatusCode: http.StatusNotFound,
 			verbose:            false,
 		},
 		{
 			uri:                fmt.Sprintf("%s/bzz-ls", srv.URL),
-			msevod:             "GET",
+			method:             "GET",
 			headers:            map[string]string{},
 			expectedStatusCode: http.StatusNotFound,
 			verbose:            false,
 		}} {
 		t.Run("GET "+testCase.uri, func(t *testing.T) {
-			res, body := httpDo(testCase.msevod, testCase.uri, nil, testCase.headers, testCase.verbose, t)
+			res, body := httpDo(testCase.method, testCase.uri, nil, testCase.headers, testCase.verbose, t)
 			if res.StatusCode != testCase.expectedStatusCode {
 				t.Fatalf("expected status code %d but got %d", testCase.expectedStatusCode, res.StatusCode)
 			}
@@ -1065,7 +1065,7 @@ func TestModify(t *testing.T) {
 
 	for _, testCase := range []struct {
 		uri                   string
-		msevod                string
+		method                string
 		headers               map[string]string
 		requestBody           []byte
 		expectedStatusCode    int
@@ -1075,7 +1075,7 @@ func TestModify(t *testing.T) {
 	}{
 		{
 			uri:                fmt.Sprintf("%s/bzz:/%s", srv.URL, hash),
-			msevod:             "DELETE",
+			method:             "DELETE",
 			headers:            map[string]string{},
 			expectedStatusCode: http.StatusOK,
 			assertResponseBody: "8b634aea26eec353ac0ecbec20c94f44d6f8d11f38d4578a4c207a84c74ef731",
@@ -1083,28 +1083,28 @@ func TestModify(t *testing.T) {
 		},
 		{
 			uri:                fmt.Sprintf("%s/bzz:/%s", srv.URL, hash),
-			msevod:             "PUT",
+			method:             "PUT",
 			headers:            map[string]string{},
-			expectedStatusCode: http.StatusMsevodNotAllowed,
+			expectedStatusCode: http.StatusMethodNotAllowed,
 			verbose:            false,
 		},
 		{
 			uri:                fmt.Sprintf("%s/bzz-raw:/%s", srv.URL, hash),
-			msevod:             "PUT",
+			method:             "PUT",
 			headers:            map[string]string{},
-			expectedStatusCode: http.StatusMsevodNotAllowed,
+			expectedStatusCode: http.StatusMethodNotAllowed,
 			verbose:            false,
 		},
 		{
 			uri:                fmt.Sprintf("%s/bzz:/%s", srv.URL, hash),
-			msevod:             "PATCH",
+			method:             "PATCH",
 			headers:            map[string]string{},
-			expectedStatusCode: http.StatusMsevodNotAllowed,
+			expectedStatusCode: http.StatusMethodNotAllowed,
 			verbose:            false,
 		},
 		{
 			uri:                   fmt.Sprintf("%s/bzz-raw:/", srv.URL),
-			msevod:                "POST",
+			method:                "POST",
 			headers:               map[string]string{},
 			requestBody:           []byte("POSTdata"),
 			expectedStatusCode:    http.StatusOK,
@@ -1113,7 +1113,7 @@ func TestModify(t *testing.T) {
 		},
 		{
 			uri:                   fmt.Sprintf("%s/bzz-raw:/encrypt", srv.URL),
-			msevod:                "POST",
+			method:                "POST",
 			headers:               map[string]string{},
 			requestBody:           []byte("POSTdata"),
 			expectedStatusCode:    http.StatusOK,
@@ -1121,9 +1121,9 @@ func TestModify(t *testing.T) {
 			verbose:               false,
 		},
 	} {
-		t.Run(testCase.msevod+" "+testCase.uri, func(t *testing.T) {
+		t.Run(testCase.method+" "+testCase.uri, func(t *testing.T) {
 			reqBody := bytes.NewReader(testCase.requestBody)
-			res, body := httpDo(testCase.msevod, testCase.uri, reqBody, testCase.headers, testCase.verbose, t)
+			res, body := httpDo(testCase.method, testCase.uri, reqBody, testCase.headers, testCase.verbose, t)
 
 			if res.StatusCode != testCase.expectedStatusCode {
 				t.Fatalf("expected status code %d but got %d, %s", testCase.expectedStatusCode, res.StatusCode, body)
@@ -1156,7 +1156,7 @@ func TestMultiPartUpload(t *testing.T) {
 	file1, _ := form.CreateFormFile("cv", "cv.txt")
 	file1.Write([]byte("John Doe's Credentials"))
 	file2, _ := form.CreateFormFile("profile_picture", "profile.jpg")
-	file2.Write([]byte("imaginsevisisjpegdata"))
+	file2.Write([]byte("imaginethisisjpegdata"))
 	form.Close()
 
 	headers := map[string]string{

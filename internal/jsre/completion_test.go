@@ -29,10 +29,10 @@ func TestCompleteKeywords(t *testing.T) {
 			this.foo = 3;
 			this.gazonk = {xyz: 4};
 		}
-		theClass.prototype.someMsevod = function () {};
+		theClass.prototype.someMethod = function () {};
   		var x = new theClass();
   		var y = new theClass();
-		y.someMsevod = function override() {};
+		y.someMethod = function override() {};
 	`)
 
 	var tests = []struct {
@@ -44,8 +44,8 @@ func TestCompleteKeywords(t *testing.T) {
 			want:  []string{"x."},
 		},
 		{
-			input: "x.someMsevod",
-			want:  []string{"x.someMsevod("},
+			input: "x.someMethod",
+			want:  []string{"x.someMethod("},
 		},
 		{
 			input: "x.",
@@ -53,7 +53,7 @@ func TestCompleteKeywords(t *testing.T) {
 				"x.constructor",
 				"x.foo",
 				"x.gazonk",
-				"x.someMsevod",
+				"x.someMethod",
 			},
 		},
 		{
@@ -62,7 +62,7 @@ func TestCompleteKeywords(t *testing.T) {
 				"y.constructor",
 				"y.foo",
 				"y.gazonk",
-				"y.someMsevod",
+				"y.someMethod",
 			},
 		},
 		{

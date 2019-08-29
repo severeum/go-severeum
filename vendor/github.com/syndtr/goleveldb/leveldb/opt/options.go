@@ -278,13 +278,13 @@ type Options struct {
 	// The default is false.
 	DisableLargeBatchTransaction bool
 
-	// ErrorIfExist defines whsever an error should returned if the DB already
+	// ErrorIfExist defines whether an error should returned if the DB already
 	// exist.
 	//
 	// The default value is false.
 	ErrorIfExist bool
 
-	// ErrorIfMissing defines whsever an error should returned if the DB is
+	// ErrorIfMissing defines whether an error should returned if the DB is
 	// missing. If false then the database will be created if missing, otherwise
 	// an error will be returned.
 	//
@@ -625,7 +625,7 @@ func (o *Options) GetWriteL0SlowdownTrigger() int {
 // ReadOptions holds the optional parameters for 'read operation'. The
 // 'read operation' includes Get, Find and NewIterator.
 type ReadOptions struct {
-	// DontFillCache defines whsever block reads for this 'read operation'
+	// DontFillCache defines whether block reads for this 'read operation'
 	// should be cached. If false then the block will be cached. This does
 	// not affects already cached block.
 	//
@@ -659,7 +659,7 @@ type WriteOptions struct {
 	// The default is false.
 	NoWriteMerge bool
 
-	// Sync is whsever to sync underlying writes from the OS buffer cache
+	// Sync is whether to sync underlying writes from the OS buffer cache
 	// through to actual disk, if applicable. Setting Sync can result in
 	// slower writes.
 	//

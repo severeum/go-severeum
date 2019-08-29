@@ -26,7 +26,7 @@ import (
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/common/hexutil"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/internal/sevapi"
+	"github.com/severeum/go-severeum/internal/ethapi"
 	"github.com/severeum/go-severeum/signer/core"
 	"github.com/severeum/go-severeum/signer/storage"
 )
@@ -35,13 +35,13 @@ const JS = `
 /**
 This is an example implementation of a Javascript rule file.
 
-When the signer receives a request over the external API, the corresponding msevod is evaluated.
+When the signer receives a request over the external API, the corresponding method is evaluated.
 Three things can happen:
 
-1. The msevod returns "Approve". This means the operation is permitted.
-2. The msevod returns "Reject". This means the operation is rejected.
-3. Anything else; other return values [*], msevod not implemented or exception occurred during processing. This means
-that the operation will continue to manual processing, via the regular UI msevod chosen by the user.
+1. The method returns "Approve". This means the operation is permitted.
+2. The method returns "Reject". This means the operation is rejected.
+3. Anything else; other return values [*], method not implemented or exception occurred during processing. This means
+that the operation will continue to manual processing, via the regular UI method chosen by the user.
 
 [*] Note: Future version of the ruleset may use more complex json-based returnvalues, making it possible to not
 only respond Approve/Reject/Manual, but also modify responses. For example, choose to list only one, but not all
@@ -117,7 +117,7 @@ func (alwaysDenyUI) ShowInfo(message string) {
 	panic("implement me")
 }
 
-func (alwaysDenyUI) OnApprovedTx(tx sevapi.SignTransactionResult) {
+func (alwaysDenyUI) OnApprovedTx(tx ethapi.SignTransactionResult) {
 	panic("implement me")
 }
 
@@ -251,7 +251,7 @@ func (d *dummyUI) ShowInfo(message string) {
 	d.calls = append(d.calls, "ShowInfo")
 }
 
-func (d *dummyUI) OnApprovedTx(tx sevapi.SignTransactionResult) {
+func (d *dummyUI) OnApprovedTx(tx ethapi.SignTransactionResult) {
 	d.calls = append(d.calls, "OnApprovedTx")
 }
 
@@ -286,7 +286,7 @@ func TestForwarding(t *testing.T) {
 	r.ShowInfo("test")
 
 	//This one is not forwarded
-	r.OnApprovedTx(sevapi.SignTransactionResult{})
+	r.OnApprovedTx(ethapi.SignTransactionResult{})
 
 	expCalls := 8
 	if len(ui.calls) != expCalls {
@@ -304,18 +304,18 @@ func TestMissingFunc(t *testing.T) {
 		return
 	}
 
-	_, err = r.execute("MissingMsevod", "test")
+	_, err = r.execute("MissingMethod", "test")
 
 	if err == nil {
 		t.Error("Expected error")
 	}
 
-	approved, err := r.checkApproval("MissingMsevod", nil, nil)
+	approved, err := r.checkApproval("MissingMethod", nil, nil)
 	if err == nil {
-		t.Errorf("Expected missing msevod to yield error'")
+		t.Errorf("Expected missing method to yield error'")
 	}
 	if approved {
-		t.Errorf("Expected missing msevod to cause non-approval")
+		t.Errorf("Expected missing method to cause non-approval")
 	}
 	fmt.Printf("Err %v", err)
 
@@ -383,7 +383,7 @@ const ExampleTxWindow = `
 	// Time window: 1 week
 	var window = 1000* 3600*24*7;
 
-	// Limit : 1 sever
+	// Limit : 1 ether
 	var limit = new BigNumber("1e18");
 
 	function isLimitOk(transaction){
@@ -424,14 +424,14 @@ const ExampleTxWindow = `
 	/**
 	* OnApprovedTx(str) is called when a transaction has been approved and signed. The parameter
  	* 'response_str' contains the return value that will be sent to the external caller.
-	* The return value from this msevod is ignore - the reason for having this callback is to allow the
+	* The return value from this method is ignore - the reason for having this callback is to allow the
 	* ruleset to keep track of approved transactions.
 	*
 	* When implementing rate-limited rules, this callback should be used.
 	* If a rule responds with neither 'Approve' nor 'Reject' - the tx goes to manual processing. If the user
-	* then accepts the transaction, this msevod will be called.
+	* then accepts the transaction, this method will be called.
 	*
-	* TLDR; Use this msevod to keep track of signed transactions, instead of using the data in ApproveTx.
+	* TLDR; Use this method to keep track of signed transactions, instead of using the data in ApproveTx.
 	*/
  	function OnApprovedTx(resp){
 		var value = big(resp.tx.value)
@@ -493,7 +493,7 @@ func TestLimitWindow(t *testing.T) {
 		return
 	}
 
-	// 0.3 sever: 429D069189E0000 wei
+	// 0.3 ether: 429D069189E0000 wei
 	v := big.NewInt(0).SetBytes(common.Hex2Bytes("0429D069189E0000"))
 	h := hexutil.Big(*v)
 	// The first three should succeed
@@ -508,7 +508,7 @@ func TestLimitWindow(t *testing.T) {
 		}
 		// Create a dummy signed transaction
 
-		response := sevapi.SignTransactionResult{
+		response := ethapi.SignTransactionResult{
 			Tx:  dummySigned(v),
 			Raw: common.Hex2Bytes("deadbeef"),
 		}
@@ -577,11 +577,11 @@ func (d *dontCallMe) ShowInfo(message string) {
 	d.t.Fatalf("Did not expect next-handler to be called")
 }
 
-func (d *dontCallMe) OnApprovedTx(tx sevapi.SignTransactionResult) {
+func (d *dontCallMe) OnApprovedTx(tx ethapi.SignTransactionResult) {
 	d.t.Fatalf("Did not expect next-handler to be called")
 }
 
-//TestContextIsCleared tests that the rule-engine does not retain variables over several requests.
+//TestContextIsCleared tests that the rule-engine does not retain variables over etheral requests.
 // if it does, that would be bad since developers may rely on that to store data,
 // instead of using the disk-based data storage
 func TestContextIsCleared(t *testing.T) {

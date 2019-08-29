@@ -29,7 +29,7 @@ AUTHORS file. The author names are mapped and deduplicated using the
 address for each author. See git-shortlog(1) for an explanation of the
 .mailmap format.
 
-Please review the resulting diff to check whsever the correct
+Please review the resulting diff to check whether the correct
 copyright assignments are performed.
 */
 
@@ -64,7 +64,7 @@ var (
 		"vendor/", "tests/testdata/", "build/",
 		// don't relicense vendored sources
 		"cmd/internal/browser",
-		"consensus/sevash/xor.go",
+		"consensus/ethash/xor.go",
 		"crypto/bn256/",
 		"crypto/ecies/",
 		"crypto/secp256k1/curve.go",

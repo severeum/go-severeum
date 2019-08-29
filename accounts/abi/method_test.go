@@ -21,39 +21,39 @@ import (
 	"testing"
 )
 
-const msevoddata = `
+const methoddata = `
 [
 	{ "type" : "function", "name" : "balance", "constant" : true },
 	{ "type" : "function", "name" : "send", "constant" : false, "inputs" : [ { "name" : "amount", "type" : "uint256" } ] },
 	{ "type" : "function", "name" : "transfer", "constant" : false, "inputs" : [ { "name" : "from", "type" : "address" }, { "name" : "to", "type" : "address" }, { "name" : "value", "type" : "uint256" } ], "outputs" : [ { "name" : "success", "type" : "bool" } ]  }
 ]`
 
-func TestMsevodString(t *testing.T) {
+func TestMethodString(t *testing.T) {
 	var table = []struct {
-		msevod      string
+		method      string
 		expectation string
 	}{
 		{
-			msevod:      "balance",
+			method:      "balance",
 			expectation: "function balance() constant returns()",
 		},
 		{
-			msevod:      "send",
+			method:      "send",
 			expectation: "function send(uint256 amount) returns()",
 		},
 		{
-			msevod:      "transfer",
+			method:      "transfer",
 			expectation: "function transfer(address from, address to, uint256 value) returns(bool success)",
 		},
 	}
 
-	abi, err := JSON(strings.NewReader(msevoddata))
+	abi, err := JSON(strings.NewReader(methoddata))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for _, test := range table {
-		got := abi.Msevods[test.msevod].String()
+		got := abi.Methods[test.method].String()
 		if got != test.expectation {
 			t.Errorf("expected string to be %s, got %s", test.expectation, got)
 		}

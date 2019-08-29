@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with go-severeum. If not, see <http://www.gnu.org/licenses/>.
 
-// Contains the ssev command usage template and generator.
+// Contains the seth command usage template and generator.
 
 package main
 

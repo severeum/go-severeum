@@ -31,7 +31,7 @@ import (
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/core/vm"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/params"
 	"github.com/severeum/go-severeum/rlp"
 	"golang.org/x/crypto/sha3"
@@ -126,7 +126,7 @@ func (t *StateTest) Run(subtest StateSubtest, vmconfig vm.Config) (*state.StateD
 		return nil, UnsupportedForkError{subtest.Fork}
 	}
 	block := t.genesis(config).ToBlock(nil)
-	statedb := MakePreState(sevdb.NewMemDatabase(), t.json.Pre)
+	statedb := MakePreState(ethdb.NewMemDatabase(), t.json.Pre)
 
 	post := t.json.Post[subtest.Fork][subtest.Index]
 	msg, err := t.json.Tx.toMessage(post)
@@ -168,7 +168,7 @@ func (t *StateTest) gasLimit(subtest StateSubtest) uint64 {
 	return t.json.Tx.GasLimit[t.json.Post[subtest.Fork][subtest.Index].Indexes.Gas]
 }
 
-func MakePreState(db sevdb.Database, accounts core.GenesisAlloc) *state.StateDB {
+func MakePreState(db ethdb.Database, accounts core.GenesisAlloc) *state.StateDB {
 	sdb := state.NewDatabase(db)
 	statedb, _ := state.New(common.Hash{}, sdb)
 	for addr, a := range accounts {

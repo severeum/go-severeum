@@ -22,11 +22,11 @@ import (
 	"testing"
 
 	"github.com/severeum/go-severeum/common"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/rawdb"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/params"
 )
 
@@ -37,8 +37,8 @@ var (
 )
 
 // makeHeaderChain creates a deterministic chain of headers rooted at parent.
-func makeHeaderChain(parent *types.Header, n int, db sevdb.Database, seed int) []*types.Header {
-	blocks, _ := core.GenerateChain(params.TestChainConfig, types.NewBlockWithHeader(parent), sevash.NewFaker(), db, n, func(i int, b *core.BlockGen) {
+func makeHeaderChain(parent *types.Header, n int, db ethdb.Database, seed int) []*types.Header {
+	blocks, _ := core.GenerateChain(params.TestChainConfig, types.NewBlockWithHeader(parent), ethash.NewFaker(), db, n, func(i int, b *core.BlockGen) {
 		b.SetCoinbase(common.Address{0: byte(seed), 19: byte(i)})
 	})
 	headers := make([]*types.Header, len(blocks))
@@ -51,11 +51,11 @@ func makeHeaderChain(parent *types.Header, n int, db sevdb.Database, seed int) [
 // newCanonical creates a chain database, and injects a deterministic canonical
 // chain. Depending on the full flag, if creates either a full block chain or a
 // header only chain.
-func newCanonical(n int) (sevdb.Database, *LightChain, error) {
-	db := sevdb.NewMemDatabase()
+func newCanonical(n int) (ethdb.Database, *LightChain, error) {
+	db := ethdb.NewMemDatabase()
 	gspec := core.Genesis{Config: params.TestChainConfig}
 	genesis := gspec.MustCommit(db)
-	blockchain, _ := NewLightChain(&dummyOdr{db: db, indexerConfig: TestClientIndexerConfig}, gspec.Config, sevash.NewFaker())
+	blockchain, _ := NewLightChain(&dummyOdr{db: db, indexerConfig: TestClientIndexerConfig}, gspec.Config, ethash.NewFaker())
 
 	// Create and inject the requested chain
 	if n == 0 {
@@ -69,13 +69,13 @@ func newCanonical(n int) (sevdb.Database, *LightChain, error) {
 
 // newTestLightChain creates a LightChain that doesn't validate anything.
 func newTestLightChain() *LightChain {
-	db := sevdb.NewMemDatabase()
+	db := ethdb.NewMemDatabase()
 	gspec := &core.Genesis{
 		Difficulty: big.NewInt(1),
 		Config:     params.TestChainConfig,
 	}
 	gspec.MustCommit(db)
-	lc, err := NewLightChain(&dummyOdr{db: db}, gspec.Config, sevash.NewFullFaker())
+	lc, err := NewLightChain(&dummyOdr{db: db}, gspec.Config, ethash.NewFullFaker())
 	if err != nil {
 		panic(err)
 	}
@@ -265,11 +265,11 @@ func makeHeaderChainWithDiff(genesis *types.Block, d []int, seed byte) []*types.
 
 type dummyOdr struct {
 	OdrBackend
-	db            sevdb.Database
+	db            ethdb.Database
 	indexerConfig *IndexerConfig
 }
 
-func (odr *dummyOdr) Database() sevdb.Database {
+func (odr *dummyOdr) Database() ethdb.Database {
 	return odr.db
 }
 
@@ -344,7 +344,7 @@ func TestReorgBadHeaderHashes(t *testing.T) {
 	defer func() { delete(core.BadHashes, headers[3].Hash()) }()
 
 	// Create a new LightChain and check that it rolled back the state.
-	ncm, err := NewLightChain(&dummyOdr{db: bc.chainDb}, params.TestChainConfig, sevash.NewFaker())
+	ncm, err := NewLightChain(&dummyOdr{db: bc.chainDb}, params.TestChainConfig, ethash.NewFaker())
 	if err != nil {
 		t.Fatalf("failed to create new chain manager: %v", err)
 	}

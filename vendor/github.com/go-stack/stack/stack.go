@@ -259,7 +259,7 @@ func pkgIndex(file, funcName string) int {
 	//
 	//    GOPATH     /home/user
 	//    file       /home/user/src/pkg/sub/file.go
-	//    fn.Name()  pkg/sub.Type.Msevod
+	//    fn.Name()  pkg/sub.Type.Method
 	//
 	// We want to produce:
 	//

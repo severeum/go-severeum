@@ -166,7 +166,7 @@ func DirectionString(s string) bidi.Direction {
 	return bidi.LeftToRight
 }
 
-// Valid reports whsever b conforms to the BiDi rule.
+// Valid reports whether b conforms to the BiDi rule.
 func Valid(b []byte) bool {
 	var t Transformer
 	if n, ok := t.advance(b); !ok || n < len(b) {
@@ -175,7 +175,7 @@ func Valid(b []byte) bool {
 	return t.isFinal()
 }
 
-// ValidString reports whsever s conforms to the BiDi rule.
+// ValidString reports whether s conforms to the BiDi rule.
 func ValidString(s string) bool {
 	var t Transformer
 	if n, ok := t.advanceString(s); !ok || n < len(s) {

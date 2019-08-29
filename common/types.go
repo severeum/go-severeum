@@ -175,7 +175,7 @@ func BigToAddress(b *big.Int) Address { return BytesToAddress(b.Bytes()) }
 // If s is larger than len(h), s will be cropped from the left.
 func HexToAddress(s string) Address { return BytesToAddress(FromHex(s)) }
 
-// IsHexAddress verifies whsever a string can represent a valid hex-encoded
+// IsHexAddress verifies whether a string can represent a valid hex-encoded
 // Severeum address or not.
 func IsHexAddress(s string) bool {
 	if hasHexPrefix(s) {

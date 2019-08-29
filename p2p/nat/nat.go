@@ -32,7 +32,7 @@ import (
 // An implementation of nat.Interface can map local ports to ports
 // accessible from the Internet.
 type Interface interface {
-	// These msevods manage a mapping between a port on the local
+	// These methods manage a mapping between a port on the local
 	// machine to a port that can be connected to from the internet.
 	//
 	// protocol is "UDP" or "TCP". Some implementations allow setting
@@ -41,11 +41,11 @@ type Interface interface {
 	AddMapping(protocol string, extport, intport int, name string, lifetime time.Duration) error
 	DeleteMapping(protocol string, extport, intport int) error
 
-	// This msevod should return the external (Internet-facing)
+	// This method should return the external (Internet-facing)
 	// address of the gateway device.
 	ExternalIP() (net.IP, error)
 
-	// Should return name of the msevod. This is used for logging.
+	// Should return name of the method. This is used for logging.
 	String() string
 }
 
@@ -142,7 +142,7 @@ func (ExtIP) DeleteMapping(string, int, int) error                     { return 
 // Any returns a port mapper that tries to discover any supported
 // mechanism on the local network.
 func Any() Interface {
-	// TODO: attempt to discover whsever the local machine has an
+	// TODO: attempt to discover whether the local machine has an
 	// Internet-class address. Return ExtIP in this case.
 	return startautodisc("UPnP or NAT-PMP", func() Interface {
 		found := make(chan Interface, 2)
@@ -174,8 +174,8 @@ func PMP(gateway net.IP) Interface {
 }
 
 // autodisc represents a port mapping mechanism that is still being
-// auto-discovered. Calls to the Interface msevods on this type will
-// wait until the discovery is done and then call the msevod on the
+// auto-discovered. Calls to the Interface methods on this type will
+// wait until the discovery is done and then call the method on the
 // discovered mechanism.
 //
 // This type is useful because discovery can take a while but we

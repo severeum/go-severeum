@@ -46,10 +46,10 @@ import (
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sev"
-	"github.com/severeum/go-severeum/sev/downloader"
-	"github.com/severeum/go-severeum/sevclient"
-	"github.com/severeum/go-severeum/sevstats"
+	"github.com/severeum/go-severeum/eth"
+	"github.com/severeum/go-severeum/eth/downloader"
+	"github.com/severeum/go-severeum/ethclient"
+	"github.com/severeum/go-severeum/ethstats"
 	"github.com/severeum/go-severeum/les"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/node"
@@ -64,10 +64,10 @@ import (
 var (
 	genesisFlag = flag.String("genesis", "", "Genesis json file to seed the chain with")
 	apiPortFlag = flag.Int("apiport", 8080, "Listener port for the HTTP API connection")
-	sevPortFlag = flag.Int("sevport", 30303, "Listener port for the devp2p connection")
+	ethPortFlag = flag.Int("ethport", 30303, "Listener port for the devp2p connection")
 	bootFlag    = flag.String("bootnodes", "", "Comma separated bootnode enode URLs to seed with")
 	netFlag     = flag.Uint64("network", 0, "Network ID to use for the Severeum protocol")
-	statsFlag   = flag.String("sevstats", "", "Sevstats network monitoring auth string")
+	statsFlag   = flag.String("ethstats", "", "Sevstats network monitoring auth string")
 
 	netnameFlag = flag.String("faucet.name", "", "Network name to assign to the faucet")
 	payoutFlag  = flag.Int("faucet.amount", 1, "Number of Severs to pay out per user request")
@@ -85,7 +85,7 @@ var (
 )
 
 var (
-	sever = new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)
+	ether = new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)
 )
 
 func main() {
@@ -171,7 +171,7 @@ func main() {
 	ks.Unlock(acc, pass)
 
 	// Assemble and start the faucet light service
-	faucet, err := newFaucet(genesis, *sevPortFlag, enodes, *netFlag, *statsFlag, ks, website.Bytes())
+	faucet, err := newFaucet(genesis, *ethPortFlag, enodes, *netFlag, *statsFlag, ks, website.Bytes())
 	if err != nil {
 		log.Crit("Failed to start faucet", "err", err)
 	}
@@ -194,7 +194,7 @@ type request struct {
 type faucet struct {
 	config *params.ChainConfig // Chain configurations for signing
 	stack  *node.Node          // Severeum protocol stack
-	client *sevclient.Client   // Client connection to the Severeum chain
+	client *ethclient.Client   // Client connection to the Severeum chain
 	index  []byte              // Index page to serve up on the web
 
 	keystore *keystore.KeyStore // Keystore containing the single signer
@@ -215,7 +215,7 @@ type faucet struct {
 func newFaucet(genesis *core.Genesis, port int, enodes []*discv5.Node, network uint64, stats string, ks *keystore.KeyStore, index []byte) (*faucet, error) {
 	// Assemble the raw devp2p protocol stack
 	stack, err := node.New(&node.Config{
-		Name:    "ssev",
+		Name:    "seth",
 		Version: params.VersionWithMeta,
 		DataDir: filepath.Join(os.Getenv("HOME"), ".faucet"),
 		P2P: p2p.Config{
@@ -232,7 +232,7 @@ func newFaucet(genesis *core.Genesis, port int, enodes []*discv5.Node, network u
 	}
 	// Assemble the Severeum light client protocol
 	if err := stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
-		cfg := sev.DefaultConfig
+		cfg := eth.DefaultConfig
 		cfg.SyncMode = downloader.LightSync
 		cfg.NetworkId = network
 		cfg.Genesis = genesis
@@ -240,12 +240,12 @@ func newFaucet(genesis *core.Genesis, port int, enodes []*discv5.Node, network u
 	}); err != nil {
 		return nil, err
 	}
-	// Assemble the sevstats monitoring and reporting service'
+	// Assemble the ethstats monitoring and reporting service'
 	if stats != "" {
 		if err := stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
 			var serv *les.LightSevereum
 			ctx.Service(&serv)
-			return sevstats.New(stats, nil, serv)
+			return ethstats.New(stats, nil, serv)
 		}); err != nil {
 			return nil, err
 		}
@@ -266,7 +266,7 @@ func newFaucet(genesis *core.Genesis, port int, enodes []*discv5.Node, network u
 		stack.Stop()
 		return nil, err
 	}
-	client := sevclient.NewClient(api)
+	client := ethclient.NewClient(api)
 
 	return &faucet{
 		config:   genesis.Config,
@@ -351,7 +351,7 @@ func (f *faucet) apiHandler(conn *websocket.Conn) {
 	}
 	// Send over the initial stats and the latest header
 	if err = send(conn, map[string]interface{}{
-		"funds":    new(big.Int).Div(balance, sever),
+		"funds":    new(big.Int).Div(balance, ether),
 		"funded":   nonce,
 		"peers":    f.stack.Server().PeerCount(),
 		"requests": f.reqs,
@@ -449,7 +449,7 @@ func (f *faucet) apiHandler(conn *websocket.Conn) {
 		case *noauthFlag:
 			username, avatar, address, err = authNoAuth(msg.URL)
 		default:
-			err = errors.New("Somseving funky happened, please open an issue at https://github.com/severeum/go-severeum/issues")
+			err = errors.New("Something funky happened, please open an issue at https://github.com/severeum/go-severeum/issues")
 		}
 		if err != nil {
 			if err = sendError(conn, err); err != nil {
@@ -468,7 +468,7 @@ func (f *faucet) apiHandler(conn *websocket.Conn) {
 		)
 		if timeout = f.timeouts[username]; time.Now().After(timeout) {
 			// User wasn't funded recently, create the funding transaction
-			amount := new(big.Int).Mul(big.NewInt(int64(*payoutFlag)), sever)
+			amount := new(big.Int).Mul(big.NewInt(int64(*payoutFlag)), ether)
 			amount = new(big.Int).Mul(amount, new(big.Int).Exp(big.NewInt(5), big.NewInt(int64(msg.Tier)), nil))
 			amount = new(big.Int).Div(amount, new(big.Int).Exp(big.NewInt(2), big.NewInt(int64(msg.Tier)), nil))
 
@@ -592,7 +592,7 @@ func (f *faucet) loop() {
 			f.lock.RLock()
 			log.Info("Updated faucet state", "number", head.Number, "hash", head.Hash(), "age", common.PrettyAge(timestamp), "balance", f.balance, "nonce", f.nonce, "price", f.price)
 
-			balance := new(big.Int).Div(f.balance, sever)
+			balance := new(big.Int).Div(f.balance, ether)
 			peers := f.stack.Server().PeerCount()
 
 			for _, conn := range f.conns {

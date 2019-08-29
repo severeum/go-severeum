@@ -4,7 +4,7 @@ default: build
 
 build:
 	go build -o bin/swarm    github.com/severeum/go-severeum/cmd/swarm
-	go build -o bin/ssev     github.com/severeum/go-severeum/cmd/ssev
+	go build -o bin/seth     github.com/severeum/go-severeum/cmd/seth
 	go build -o bin/bootnode github.com/severeum/go-severeum/cmd/bootnode
 
 cluster: build

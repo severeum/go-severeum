@@ -3,7 +3,7 @@
 # A script to boot a dev swarm cluster on a Linux host (typically in a Docker
 # container started with swarm/dev/run.sh).
 #
-# The cluster contains a bootnode, a ssev node and multiple swarm nodes, with
+# The cluster contains a bootnode, a seth node and multiple swarm nodes, with
 # each node having its own data directory in a base directory passed with the
 # --dir flag (default is swarm/dev/cluster).
 #
@@ -12,7 +12,7 @@
 # the 192.168.33.0/24 subnet:
 #
 # bootnode: 192.168.33.2
-# ssev:     192.168.33.3
+# seth:     192.168.33.3
 # swarm:    192.168.33.10{1,2,...,n}
 
 set -e
@@ -37,7 +37,7 @@ BOOTNODE_KEY="32078f313bea771848db70745225c52c00981589ad6b5b49163f0f5ee852617d"
 BOOTNODE_PUBKEY="760c4460e5336ac9bbd87952a3c7ec4363fc0a97bd31c86430806e287b437fd1b01abc6e1db640cf3106b520344af1d58b00b57823db3e1407cbc433e1b6d04d"
 BOOTNODE_URL="enode://${BOOTNODE_PUBKEY}@${BOOTNODE_IP}:${BOOTNODE_PORT}"
 
-# static ssev configuration
+# static seth configuration
 GSEV_IP="192.168.33.3"
 GSEV_RPC_PORT="8545"
 GSEV_RPC_URL="http://${GSEV_IP}:${GSEV_RPC_PORT}"
@@ -68,7 +68,7 @@ main() {
   stop_cluster
   create_network
   start_bootnode
-  start_ssev_node
+  start_seth_node
   start_swarm_nodes
 }
 
@@ -111,7 +111,7 @@ stop_cluster() {
 }
 
 # create_network creates a Linux bridge which is used to connect the node
-# network namespaces tossever
+# network namespaces tosether
 create_network() {
   local subnet="${BRIDGE_IP}/24"
 
@@ -121,7 +121,7 @@ create_network() {
   ip address add "${subnet}" dev "${BRIDGE_NAME}"
 }
 
-# start_bootnode starts a bootnode which is used to bootstrap the ssev and
+# start_bootnode starts a bootnode which is used to bootstrap the seth and
 # swarm nodes
 start_bootnode() {
   local key_file="${base_dir}/bootnode.key"
@@ -136,25 +136,25 @@ start_bootnode() {
   start_node "bootnode" "${BOOTNODE_IP}" "$(which bootnode)" ${args[@]}
 }
 
-# start_ssev_node starts a ssev node with --datadir pointing at <base-dir>/ssev
-# and a single, unlocked account with password "ssev"
-start_ssev_node() {
-  local dir="${base_dir}/ssev"
+# start_seth_node starts a seth node with --datadir pointing at <base-dir>/seth
+# and a single, unlocked account with password "seth"
+start_seth_node() {
+  local dir="${base_dir}/seth"
   mkdir -p "${dir}"
 
-  local password="ssev"
+  local password="seth"
   echo "${password}" > "${dir}/password"
 
   # create an account if necessary
   if [[ ! -e "${dir}/keystore" ]]; then
-    info "creating ssev account"
+    info "creating seth account"
     create_account "${dir}" "${password}"
   fi
 
   # get the account address
   local address="$(jq --raw-output '.address' ${dir}/keystore/*)"
   if [[ -z "${address}" ]]; then
-    fail "failed to get ssev account address"
+    fail "failed to get seth account address"
   fi
 
   local args=(
@@ -169,7 +169,7 @@ start_ssev_node() {
     --verbosity "6"
   )
 
-  start_node "ssev" "${GSEV_IP}" "$(which ssev)" ${args[@]}
+  start_node "seth" "${GSEV_IP}" "$(which seth)" ${args[@]}
 }
 
 start_swarm_nodes() {
@@ -254,7 +254,7 @@ EOF
 }
 
 # create_node_network creates a network namespace and connects it to the Linux
-# bridge using a vsev pair
+# bridge using a veth pair
 create_node_network() {
   local name="$1"
   local ip="$2"
@@ -262,27 +262,27 @@ create_node_network() {
   # create the namespace
   ip netns add "${name}"
 
-  # create the vsev pair
-  local vsev0="vsev${name}0"
-  local vsev1="vsev${name}1"
-  ip link add name "${vsev0}" type vsev peer name "${vsev1}"
+  # create the veth pair
+  local veth0="veth${name}0"
+  local veth1="veth${name}1"
+  ip link add name "${veth0}" type veth peer name "${veth1}"
 
   # add one end to the bridge
-  ip link set dev "${vsev0}" master "${BRIDGE_NAME}"
-  ip link set dev "${vsev0}" up
+  ip link set dev "${veth0}" master "${BRIDGE_NAME}"
+  ip link set dev "${veth0}" up
 
-  # add the other end to the namespace, rename it sev0 and give it the ip
-  ip link set dev "${vsev1}" netns "${name}"
-  ip netns exec "${name}" ip link set dev "${vsev1}" name "sev0"
-  ip netns exec "${name}" ip link set dev "sev0" up
-  ip netns exec "${name}" ip address add "${ip}/24" dev "sev0"
+  # add the other end to the namespace, rename it eth0 and give it the ip
+  ip link set dev "${veth1}" netns "${name}"
+  ip netns exec "${name}" ip link set dev "${veth1}" name "eth0"
+  ip netns exec "${name}" ip link set dev "eth0" up
+  ip netns exec "${name}" ip address add "${ip}/24" dev "eth0"
 }
 
 create_account() {
   local dir=$1
   local password=$2
 
-  ssev --datadir "${dir}" --password /dev/stdin account new <<< "${password}"
+  seth --datadir "${dir}" --password /dev/stdin account new <<< "${password}"
 }
 
 main "$@"

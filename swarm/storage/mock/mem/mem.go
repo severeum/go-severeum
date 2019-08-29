@@ -99,7 +99,7 @@ func (s *GlobalStore) Delete(addr common.Address, key []byte) error {
 	return nil
 }
 
-// HasKey returns whsever a node with addr contains the key.
+// HasKey returns whether a node with addr contains the key.
 func (s *GlobalStore) HasKey(addr common.Address, key []byte) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()

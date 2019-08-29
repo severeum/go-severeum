@@ -57,7 +57,7 @@ type Fetcher struct {
 type Request struct {
 	Addr        storage.Address // chunk address
 	Source      *enode.ID       // nodeID of peer to request from (can be nil)
-	SkipCheck   bool            // whsever to offer the chunk first or deliver directly
+	SkipCheck   bool            // whether to offer the chunk first or deliver directly
 	peersToSkip *sync.Map       // peers not to request chunk from (only makes sense if source is nil)
 	HopCount    uint8           // number of forwarded requests (hops)
 }

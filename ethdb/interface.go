@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sevdb
+package ethdb
 
 // Code using batches should try to add this much data to the batch.
 // The value was determined empirically.
@@ -30,7 +30,7 @@ type Deleter interface {
 	Delete(key []byte) error
 }
 
-// Database wraps all database operations. All msevods are safe for concurrent use.
+// Database wraps all database operations. All methods are safe for concurrent use.
 type Database interface {
 	Putter
 	Deleter

@@ -16,7 +16,7 @@
 
 // Contains a wrapper for the Whisper client.
 
-package ssev
+package seth
 
 import (
 	"github.com/severeum/go-severeum/whisper/shhclient"
@@ -142,7 +142,7 @@ type NewMessageHandler interface {
 	OnError(failure string)
 }
 
-// SubscribeMessages subscribes to messages that match the given criteria. This msevod
+// SubscribeMessages subscribes to messages that match the given criteria. This method
 // is only supported on bi-directional connections such as websockets and IPC.
 // NewMessageFilter uses polling and is supported over HTTP.
 func (wc *WhisperClient) SubscribeMessages(ctx *Context, criteria *Criteria, handler NewMessageHandler, buffer int) (*Subscription, error) {

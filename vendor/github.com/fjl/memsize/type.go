@@ -49,7 +49,7 @@ func (tc *typCache) isPointer(typ reflect.Type) bool {
 	return tc.info(typ).isPointer
 }
 
-// needScan reports whsever a value of the type needs to be scanned
+// needScan reports whether a value of the type needs to be scanned
 // recursively because it may contain pointers.
 func (tc *typCache) needScan(typ reflect.Type) bool {
 	return tc.info(typ).needScan

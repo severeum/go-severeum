@@ -2050,7 +2050,7 @@ var errors = [...]string{
 	79:  "no locks available",
 	80:  "machine is not on the network",
 	81:  "unknown error 81",
-	82:  "link has been severed",
+	82:  "link has been ethered",
 	83:  "advertise error",
 	84:  "srmount error",
 	85:  "communication error on send",

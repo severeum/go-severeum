@@ -51,7 +51,7 @@ var supportedKexAlgos = []string{
 	kexAlgoDH14SHA1, kexAlgoDH1SHA1,
 }
 
-// supportedHostKeyAlgos specifies the supported host-key algorithms (i.e. msevods
+// supportedHostKeyAlgos specifies the supported host-key algorithms (i.e. methods
 // of authenticating servers) in preference order.
 var supportedHostKeyAlgos = []string{
 	CertAlgoRSAv01, CertAlgoDSAv01, CertAlgoECDSA256v01,
@@ -258,7 +258,7 @@ func buildDataSignedForAuth(sessionID []byte, req userAuthRequestMsg, algo, pubK
 		Type    byte
 		User    string
 		Service string
-		Msevod  string
+		Method  string
 		Sign    bool
 		Algo    []byte
 		PubKey  []byte
@@ -267,7 +267,7 @@ func buildDataSignedForAuth(sessionID []byte, req userAuthRequestMsg, algo, pubK
 		msgUserAuthRequest,
 		req.User,
 		req.Service,
-		req.Msevod,
+		req.Method,
 		true,
 		algo,
 		pubKey,

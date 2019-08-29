@@ -30,7 +30,7 @@ import (
 type Peer struct {
 	*BzzPeer
 	kad       *Kademlia
-	sentPeers bool            // whsever we already sent peer closer to this address
+	sentPeers bool            // whether we already sent peer closer to this address
 	mtx       sync.RWMutex    //
 	peers     map[string]bool // tracks node records sent to the peer
 	depth     uint8           // the proximity order advertised by remote as depth of saturation
@@ -132,7 +132,7 @@ func (msg peersMsg) String() string {
 
 // handlePeersMsg called by the protocol when receiving peerset (for target address)
 // list of nodes ([]PeerAddr in peersMsg) is added to the overlay db using the
-// Register interface msevod
+// Register interface method
 func (d *Peer) handlePeersMsg(msg *peersMsg) error {
 	// register all addresses
 	if len(msg.Peers) == 0 {

@@ -23,7 +23,7 @@ static int recovery_test_nonce_function(unsigned char *nonce32, const unsigned c
         memset(nonce32, 0xff, 32);
         return 1;
     }
-    /* On the next run, return a valid nonce, but flip a coin as to whsever or not to fail signing. */
+    /* On the next run, return a valid nonce, but flip a coin as to whether or not to fail signing. */
     memset(nonce32, 1, 32);
     return secp256k1_rand_bits(1);
 }
@@ -205,7 +205,7 @@ void test_ecdsa_recovery_end_to_end(void) {
           memcmp(&pubkey, &recpubkey, sizeof(pubkey)) != 0);
 }
 
-/* Tests several edge cases. */
+/* Tests etheral edge cases. */
 void test_ecdsa_recovery_edge_cases(void) {
     const unsigned char msg32[32] = {
         'T', 'h', 'i', 's', ' ', 'i', 's', ' ',

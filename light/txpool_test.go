@@ -24,11 +24,11 @@ import (
 	"time"
 
 	"github.com/severeum/go-severeum/common"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/core/vm"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/params"
 )
 
@@ -81,15 +81,15 @@ func TestTxPool(t *testing.T) {
 	}
 
 	var (
-		sdb     = sevdb.NewMemDatabase()
-		ldb     = sevdb.NewMemDatabase()
+		sdb     = ethdb.NewMemDatabase()
+		ldb     = ethdb.NewMemDatabase()
 		gspec   = core.Genesis{Alloc: core.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}}
 		genesis = gspec.MustCommit(sdb)
 	)
 	gspec.MustCommit(ldb)
 	// Assemble the test environment
-	blockchain, _ := core.NewBlockChain(sdb, nil, params.TestChainConfig, sevash.NewFullFaker(), vm.Config{}, nil)
-	gchain, _ := core.GenerateChain(params.TestChainConfig, genesis, sevash.NewFaker(), sdb, poolTestBlocks, txPoolTestChainGen)
+	blockchain, _ := core.NewBlockChain(sdb, nil, params.TestChainConfig, ethash.NewFullFaker(), vm.Config{}, nil)
+	gchain, _ := core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), sdb, poolTestBlocks, txPoolTestChainGen)
 	if _, err := blockchain.InsertChain(gchain); err != nil {
 		panic(err)
 	}
@@ -100,7 +100,7 @@ func TestTxPool(t *testing.T) {
 		discard: make(chan int, 1),
 		mined:   make(chan int, 1),
 	}
-	lightchain, _ := NewLightChain(odr, params.TestChainConfig, sevash.NewFullFaker())
+	lightchain, _ := NewLightChain(odr, params.TestChainConfig, ethash.NewFullFaker())
 	txPermanent = 50
 	pool := NewTxPool(params.TestChainConfig, lightchain, relay)
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)

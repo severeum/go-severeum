@@ -39,7 +39,7 @@ func (ss *streamSafe) first(p Properties) {
 	*ss = streamSafe(p.nTrailingNonStarters())
 }
 
-// insert returns a ssState value to indicate whsever a rune represented by p
+// insert returns a ssState value to indicate whether a rune represented by p
 // can be inserted.
 func (ss *streamSafe) next(p Properties) ssState {
 	if *ss > maxNonStarters {
@@ -91,7 +91,7 @@ func (ss streamSafe) isMax() bool {
 const GraphemeJoiner = "\u034F"
 
 // reorderBuffer is used to normalize a single segment.  Characters inserted with
-// insert are decomposed and reordered based on CCC. The compose msevod can
+// insert are decomposed and reordered based on CCC. The compose method can
 // be used to recombine characters.  Note that the byte buffer does not hold
 // the UTF-8 characters in order.  Only the rune array is maintained in sorted
 // order. flush writes the resulting segment to a byte array.

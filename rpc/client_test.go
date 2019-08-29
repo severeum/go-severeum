@@ -57,17 +57,17 @@ func TestClientBatchRequest(t *testing.T) {
 
 	batch := []BatchElem{
 		{
-			Msevod: "service_echo",
+			Method: "service_echo",
 			Args:   []interface{}{"hello", 10, &Args{"world"}},
 			Result: new(Result),
 		},
 		{
-			Msevod: "service_echo",
+			Method: "service_echo",
 			Args:   []interface{}{"hello2", 11, &Args{"world"}},
 			Result: new(Result),
 		},
 		{
-			Msevod: "no_such_msevod",
+			Method: "no_such_method",
 			Args:   []interface{}{1, 2, 3},
 			Result: new(int),
 		},
@@ -77,20 +77,20 @@ func TestClientBatchRequest(t *testing.T) {
 	}
 	wantResult := []BatchElem{
 		{
-			Msevod: "service_echo",
+			Method: "service_echo",
 			Args:   []interface{}{"hello", 10, &Args{"world"}},
 			Result: &Result{"hello", 10, &Args{"world"}},
 		},
 		{
-			Msevod: "service_echo",
+			Method: "service_echo",
 			Args:   []interface{}{"hello2", 11, &Args{"world"}},
 			Result: &Result{"hello2", 11, &Args{"world"}},
 		},
 		{
-			Msevod: "no_such_msevod",
+			Method: "no_such_method",
 			Args:   []interface{}{1, 2, 3},
 			Result: new(int),
-			Error:  &jsonError{Code: -32601, Message: "The msevod no_such_msevod_ does not exist/is not available"},
+			Error:  &jsonError{Code: -32601, Message: "The method no_such_method_ does not exist/is not available"},
 		},
 	}
 	if !reflect.DeepEqual(batch, wantResult) {
@@ -221,7 +221,7 @@ func TestClientSubscribeInvalidArg(t *testing.T) {
 }
 
 func TestClientSubscribe(t *testing.T) {
-	server := newTestServer("sev", new(NotificationTestService))
+	server := newTestServer("eth", new(NotificationTestService))
 	defer server.Stop()
 	client := DialInProc(server)
 	defer client.Close()
@@ -290,7 +290,7 @@ func TestClientSubscribeClose(t *testing.T) {
 		gotHangSubscriptionReq:  make(chan struct{}),
 		unblockHangSubscription: make(chan struct{}),
 	}
-	server := newTestServer("sev", service)
+	server := newTestServer("eth", service)
 	defer server.Stop()
 	client := DialInProc(server)
 	defer client.Close()
@@ -327,7 +327,7 @@ func TestClientSubscribeClose(t *testing.T) {
 // client hangs during shutdown when Unsubscribe races with Client.Close.
 func TestClientCloseUnsubscribeRace(t *testing.T) {
 	service := &NotificationTestService{}
-	server := newTestServer("sev", service)
+	server := newTestServer("eth", service)
 	defer server.Stop()
 
 	for i := 0; i < 20; i++ {
@@ -350,7 +350,7 @@ func TestClientCloseUnsubscribeRace(t *testing.T) {
 // This test checks that Client doesn't lock up when a single subscriber
 // doesn't read subscription events.
 func TestClientNotificationStorm(t *testing.T) {
-	server := newTestServer("sev", new(NotificationTestService))
+	server := newTestServer("eth", new(NotificationTestService))
 	defer server.Stop()
 
 	doTest := func(count int, wantError bool) {
@@ -384,7 +384,7 @@ func TestClientNotificationStorm(t *testing.T) {
 				return
 			}
 			var r int
-			err := client.CallContext(ctx, &r, "sev_echo", i)
+			err := client.CallContext(ctx, &r, "eth_echo", i)
 			if err != nil {
 				if !wantError {
 					t.Fatalf("(%d/%d) call error: %v", i, count, err)
@@ -482,7 +482,7 @@ func TestClientReconnect(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	// Start it up again and call again. The connection should be reestablished.
-	// We spawn multiple calls here to check whsever this hangs somehow.
+	// We spawn multiple calls here to check whether this hangs somehow.
 	s2, l2 := startServer(l1.Addr().String())
 	defer l2.Close()
 	defer s2.Stop()

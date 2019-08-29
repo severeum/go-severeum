@@ -27,13 +27,13 @@ import (
 	"time"
 
 	"github.com/severeum/go-severeum/common"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/core/vm"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sev"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/eth"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/les/flowcontrol"
 	"github.com/severeum/go-severeum/light"
@@ -83,11 +83,11 @@ func testChainGen(i int, block *core.BlockGen) {
 
 	switch i {
 	case 0:
-		// In block 1, the test bank sends account #1 some sever.
+		// In block 1, the test bank sends account #1 some ether.
 		tx, _ := types.SignTx(types.NewTransaction(block.TxNonce(testBankAddress), acc1Addr, big.NewInt(10000), params.TxGas, nil, nil), signer, testBankKey)
 		block.AddTx(tx)
 	case 1:
-		// In block 2, the test bank sends some more sever to account #1.
+		// In block 2, the test bank sends some more ether to account #1.
 		// acc1Addr passes it on to account #2.
 		// acc1Addr creates a test contract.
 		// acc1Addr creates a test event.
@@ -125,9 +125,9 @@ func testChainGen(i int, block *core.BlockGen) {
 }
 
 // testIndexers creates a set of indexers with specified params for testing purpose.
-func testIndexers(db sevdb.Database, odr light.OdrBackend, iConfig *light.IndexerConfig) (*core.ChainIndexer, *core.ChainIndexer, *core.ChainIndexer) {
+func testIndexers(db ethdb.Database, odr light.OdrBackend, iConfig *light.IndexerConfig) (*core.ChainIndexer, *core.ChainIndexer, *core.ChainIndexer) {
 	chtIndexer := light.NewChtIndexer(db, odr, iConfig.ChtSize, iConfig.ChtConfirms)
-	bloomIndexer := sev.NewBloomIndexer(db, iConfig.BloomSize, iConfig.BloomConfirms)
+	bloomIndexer := eth.NewBloomIndexer(db, iConfig.BloomSize, iConfig.BloomConfirms)
 	bloomTrieIndexer := light.NewBloomTrieIndexer(db, odr, iConfig.BloomSize, iConfig.BloomTrieSize)
 	bloomIndexer.AddChildIndexer(bloomTrieIndexer)
 	return chtIndexer, bloomIndexer, bloomTrieIndexer
@@ -146,10 +146,10 @@ func testRCL() RequestCostList {
 // newTestProtocolManager creates a new protocol manager for testing purposes,
 // with the given number of blocks already known, potential notification
 // channels for different events and relative chain indexers array.
-func newTestProtocolManager(lightSync bool, blocks int, generator func(int, *core.BlockGen), odr *LesOdr, peers *peerSet, db sevdb.Database) (*ProtocolManager, error) {
+func newTestProtocolManager(lightSync bool, blocks int, generator func(int, *core.BlockGen), odr *LesOdr, peers *peerSet, db ethdb.Database) (*ProtocolManager, error) {
 	var (
 		evmux  = new(event.TypeMux)
-		engine = sevash.NewFaker()
+		engine = ethash.NewFaker()
 		gspec  = core.Genesis{
 			Config: params.TestChainConfig,
 			Alloc:  core.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
@@ -165,7 +165,7 @@ func newTestProtocolManager(lightSync bool, blocks int, generator func(int, *cor
 		chain, _ = light.NewLightChain(odr, gspec.Config, engine)
 	} else {
 		blockchain, _ := core.NewBlockChain(db, nil, gspec.Config, engine, vm.Config{}, nil)
-		gchain, _ := core.GenerateChain(gspec.Config, genesis, sevash.NewFaker(), db, blocks, generator)
+		gchain, _ := core.GenerateChain(gspec.Config, genesis, ethash.NewFaker(), db, blocks, generator)
 		if _, err := blockchain.InsertChain(gchain); err != nil {
 			panic(err)
 		}
@@ -200,7 +200,7 @@ func newTestProtocolManager(lightSync bool, blocks int, generator func(int, *cor
 // with the given number of blocks already known, potential notification
 // channels for different events and relative chain indexers array. In case of an error, the constructor force-
 // fails the test.
-func newTestProtocolManagerMust(t *testing.T, lightSync bool, blocks int, generator func(int, *core.BlockGen), odr *LesOdr, peers *peerSet, db sevdb.Database) *ProtocolManager {
+func newTestProtocolManagerMust(t *testing.T, lightSync bool, blocks int, generator func(int, *core.BlockGen), odr *LesOdr, peers *peerSet, db ethdb.Database) *ProtocolManager {
 	pm, err := newTestProtocolManager(lightSync, blocks, generator, odr, peers, db)
 	if err != nil {
 		t.Fatalf("Failed to create protocol manager: %v", err)
@@ -327,7 +327,7 @@ func (p *testPeer) close() {
 
 // TestEntity represents a network entity for testing with necessary auxiliary fields.
 type TestEntity struct {
-	db    sevdb.Database
+	db    ethdb.Database
 	rPeer *peer
 	tPeer *testPeer
 	peers *peerSet
@@ -340,7 +340,7 @@ type TestEntity struct {
 
 // newServerEnv creates a server testing environment with a connected test peer for testing purpose.
 func newServerEnv(t *testing.T, blocks int, protocol int, waitIndexers func(*core.ChainIndexer, *core.ChainIndexer, *core.ChainIndexer)) (*TestEntity, func()) {
-	db := sevdb.NewMemDatabase()
+	db := ethdb.NewMemDatabase()
 	cIndexer, bIndexer, btIndexer := testIndexers(db, nil, light.TestServerIndexerConfig)
 
 	pm := newTestProtocolManagerMust(t, false, blocks, testChainGen, nil, nil, db)
@@ -372,7 +372,7 @@ func newServerEnv(t *testing.T, blocks int, protocol int, waitIndexers func(*cor
 // newClientServerEnv creates a client/server arch environment with a connected les server and light client pair
 // for testing purpose.
 func newClientServerEnv(t *testing.T, blocks int, protocol int, waitIndexers func(*core.ChainIndexer, *core.ChainIndexer, *core.ChainIndexer), newPeer bool) (*TestEntity, *TestEntity, func()) {
-	db, ldb := sevdb.NewMemDatabase(), sevdb.NewMemDatabase()
+	db, ldb := ethdb.NewMemDatabase(), ethdb.NewMemDatabase()
 	peers, lPeers := newPeerSet(), newPeerSet()
 
 	dist := newRequestDistributor(lPeers, make(chan struct{}))

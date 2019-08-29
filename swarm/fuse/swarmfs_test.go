@@ -335,7 +335,7 @@ func (ta *testAPI) mountListAndUnmount(t *testing.T, toEncrypt bool) {
 	dat.files["two/2/2.txt"] = fileInfo{0777, 333, 444, testutil.RandomBytes(12, 10)}
 	dat.files["two/2./2.txt"] = fileInfo{0777, 444, 444, testutil.RandomBytes(13, 10)}
 	dat.files["twice/2.txt"] = fileInfo{0777, 444, 333, testutil.RandomBytes(14, 200)}
-	dat.files["one/two/three/four/five/six/seven/eight/nine/10.txt"] = fileInfo{0777, 333, 444, testutil.RandomBytes(15, 10240)}
+	dat.files["one/two/three/four/five/six/ethen/eight/nine/10.txt"] = fileInfo{0777, 333, 444, testutil.RandomBytes(15, 10240)}
 	dat.files["one/two/three/four/five/six/six"] = fileInfo{0777, 333, 444, testutil.RandomBytes(16, 10)}
 
 	dat, err = ta.uploadAndMount(dat, t)
@@ -367,7 +367,7 @@ func (ta *testAPI) maxMountsNonEncrypted(t *testing.T) {
 	log.Debug("Test maxMountsNonEncrypted terminated")
 }
 
-//mount several different directories until the maximum has been reached
+//mount etheral different directories until the maximum has been reached
 func (ta *testAPI) runMaxMounts(t *testing.T, toEncrypt bool) {
 	dat, err := ta.initSubtest("runMaxMounts")
 	if err != nil {
@@ -1262,7 +1262,7 @@ func (ta *testAPI) addNewFileAndModifyContents(t *testing.T, toEncrypt bool) {
 	}
 	defer fd.Close()
 	log.Debug("file opened")
-	//...and modify somseving
+	//...and modify something
 	line2 := []byte("Line 2")
 	_, err = rand.Read(line2)
 	if err != nil {

@@ -690,7 +690,7 @@ void scalar_test(void) {
 
 #ifndef USE_NUM_NONE
     {
-        /* Test that adding the scalars tossever is equal to adding their numbers tossever modulo the order. */
+        /* Test that adding the scalars tosether is equal to adding their numbers tosether modulo the order. */
         secp256k1_num rnum;
         secp256k1_num r2num;
         secp256k1_scalar r;
@@ -1875,7 +1875,7 @@ void test_ge(void) {
     /* Points: (infinity, p1, p1, -p1, -p1, p2, p2, -p2, -p2, p3, p3, -p3, -p3, p4, p4, -p4, -p4).
      * The second in each pair of identical points uses a random Z coordinate in the Jacobian form.
      * All magnitudes are randomized.
-     * All 17*17 combinations of points are added to each other, using all applicable msevods.
+     * All 17*17 combinations of points are added to each other, using all applicable methods.
      *
      * When the endomorphism code is compiled in, p5 = lambda*p1 and p6 = lambda^2*p1 are added as well.
      */
@@ -2017,7 +2017,7 @@ void test_ge(void) {
         }
     }
 
-    /* Test adding all points tossever in random order equals infinity. */
+    /* Test adding all points tosether in random order equals infinity. */
     {
         secp256k1_gej sum = SECP256K1_GEJ_CONST_INFINITY;
         secp256k1_gej *gej_shuffled = (secp256k1_gej *)malloc((4 * runs + 1) * sizeof(secp256k1_gej));
@@ -3390,7 +3390,7 @@ static int nonce_function_test_fail(unsigned char *nonce32, const unsigned char 
 }
 
 static int nonce_function_test_retry(unsigned char *nonce32, const unsigned char *msg32, const unsigned char *key32, const unsigned char *algo16, void *data, unsigned int counter) {
-   /* Dummy nonce generator that produces unacceptable nonces for the first several counter values. */
+   /* Dummy nonce generator that produces unacceptable nonces for the first etheral counter values. */
    if (counter < 3) {
        memset(nonce32, counter==0 ? 0 : 255, 32);
        if (counter == 2) {
@@ -3949,7 +3949,7 @@ void run_ecdsa_der_parse(void) {
     }
 }
 
-/* Tests several edge cases. */
+/* Tests etheral edge cases. */
 void test_ecdsa_edge_cases(void) {
     int t;
     secp256k1_ecdsa_signature sig;

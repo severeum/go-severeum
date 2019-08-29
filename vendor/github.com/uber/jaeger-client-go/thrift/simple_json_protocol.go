@@ -287,7 +287,7 @@ func (p *TSimpleJSONProtocol) WriteBinary(v []byte) error {
 	return p.OutputPostValue()
 }
 
-// Reading msevods.
+// Reading methods.
 func (p *TSimpleJSONProtocol) ReadMessageBegin() (name string, typeId TMessageType, seqId int32, err error) {
 	p.resetContextStack() // THRIFT-3735
 	if isNull, err := p.ParseListBegin(); isNull || err != nil {

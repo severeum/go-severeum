@@ -16,7 +16,7 @@
 
 // +build !js
 
-package sevdb
+package ethdb
 
 import (
 	"fmt"

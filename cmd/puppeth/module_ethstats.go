@@ -28,23 +28,23 @@ import (
 	"github.com/severeum/go-severeum/log"
 )
 
-// sevstatsDockerfile is the Dockerfile required to build an sevstats backend
+// ethstatsDockerfile is the Dockerfile required to build an ethstats backend
 // and associated monitoring site.
-var sevstatsDockerfile = `
-FROM puppsev/sevstats:latest
+var ethstatsDockerfile = `
+FROM puppeth/ethstats:latest
 
 RUN echo 'module.exports = {trusted: [{{.Trusted}}], banned: [{{.Banned}}], reserved: ["yournode"]};' > lib/utils/config.js
 `
 
-// sevstatsComposefile is the docker-compose.yml file required to deploy and
-// maintain an sevstats monitoring site.
-var sevstatsComposefile = `
+// ethstatsComposefile is the docker-compose.yml file required to deploy and
+// maintain an ethstats monitoring site.
+var ethstatsComposefile = `
 version: '2'
 services:
-  sevstats:
+  ethstats:
     build: .
-    image: {{.Network}}/sevstats
-    container_name: {{.Network}}_sevstats_1{{if not .VHost}}
+    image: {{.Network}}/ethstats
+    container_name: {{.Network}}_ethstats_1{{if not .VHost}}
     ports:
       - "{{.Port}}:3000"{{end}}
     environment:
@@ -59,7 +59,7 @@ services:
     restart: always
 `
 
-// deploySevstats deploys a new sevstats container to a remote machine via SSH,
+// deploySevstats deploys a new ethstats container to a remote machine via SSH,
 // docker and docker-compose. If an instance with the specified network name
 // already exists there, it will be overwritten!
 func deploySevstats(client *sshClient, network string, port int, secret string, vhost string, trusted []string, banned []string, nocache bool) ([]byte, error) {
@@ -77,14 +77,14 @@ func deploySevstats(client *sshClient, network string, port int, secret string, 
 	}
 
 	dockerfile := new(bytes.Buffer)
-	template.Must(template.New("").Parse(sevstatsDockerfile)).Execute(dockerfile, map[string]interface{}{
+	template.Must(template.New("").Parse(ethstatsDockerfile)).Execute(dockerfile, map[string]interface{}{
 		"Trusted": strings.Join(trustedLabels, ", "),
 		"Banned":  strings.Join(bannedLabels, ", "),
 	})
 	files[filepath.Join(workdir, "Dockerfile")] = dockerfile.Bytes()
 
 	composefile := new(bytes.Buffer)
-	template.Must(template.New("").Parse(sevstatsComposefile)).Execute(composefile, map[string]interface{}{
+	template.Must(template.New("").Parse(ethstatsComposefile)).Execute(composefile, map[string]interface{}{
 		"Network": network,
 		"Port":    port,
 		"Secret":  secret,
@@ -99,16 +99,16 @@ func deploySevstats(client *sshClient, network string, port int, secret string, 
 	}
 	defer client.Run("rm -rf " + workdir)
 
-	// Build and deploy the sevstats service
+	// Build and deploy the ethstats service
 	if nocache {
 		return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s build --pull --no-cache && docker-compose -p %s up -d --force-recreate --timeout 60", workdir, network, network))
 	}
 	return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s up -d --build --force-recreate --timeout 60", workdir, network))
 }
 
-// sevstatsInfos is returned from an sevstats status check to allow reporting
+// ethstatsInfos is returned from an ethstats status check to allow reporting
 // various configuration parameters.
-type sevstatsInfos struct {
+type ethstatsInfos struct {
 	host   string
 	port   int
 	secret string
@@ -118,7 +118,7 @@ type sevstatsInfos struct {
 
 // Report converts the typed struct into a plain string->string map, containing
 // most - but not all - fields for reporting to the user.
-func (info *sevstatsInfos) Report() map[string]string {
+func (info *ethstatsInfos) Report() map[string]string {
 	return map[string]string{
 		"Website address":       info.host,
 		"Website listener port": strconv.Itoa(info.port),
@@ -127,11 +127,11 @@ func (info *sevstatsInfos) Report() map[string]string {
 	}
 }
 
-// checkSevstats does a health-check against an sevstats server to verify whsever
+// checkSevstats does a health-check against an ethstats server to verify whether
 // it's running, and if yes, gathering a collection of useful infos about it.
-func checkSevstats(client *sshClient, network string) (*sevstatsInfos, error) {
-	// Inspect a possible sevstats container on the host
-	infos, err := inspectContainer(client, fmt.Sprintf("%s_sevstats_1", network))
+func checkSevstats(client *sshClient, network string) (*ethstatsInfos, error) {
+	// Inspect a possible ethstats container on the host
+	infos, err := inspectContainer(client, fmt.Sprintf("%s_ethstats_1", network))
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +166,7 @@ func checkSevstats(client *sshClient, network string) (*sevstatsInfos, error) {
 		log.Warn("Sevstats service seems unreachable", "server", host, "port", port, "err", err)
 	}
 	// Container available, assemble and return the useful infos
-	return &sevstatsInfos{
+	return &ethstatsInfos{
 		host:   host,
 		port:   port,
 		secret: secret,

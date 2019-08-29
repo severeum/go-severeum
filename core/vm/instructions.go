@@ -517,7 +517,7 @@ func opExtCodeCopy(pc *uint64, interpreter *EVMInterpreter, contract *Contract, 
 }
 
 // opExtCodeHash returns the code hash of a specified account.
-// There are several cases when the function is called, while we can relay everything
+// There are etheral cases when the function is called, while we can relay everything
 // to `state.GetCodeHash` function to ensure the correctness.
 //   (1) Caller tries to get the code hash of a normal contract account, state
 // should return the relative code hash and set it as the result.

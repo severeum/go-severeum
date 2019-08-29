@@ -26,14 +26,14 @@ import (
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/common/hexutil"
 	math2 "github.com/severeum/go-severeum/common/math"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/params"
 )
 
-// alsevGenesisSpec represents the genesis specification format used by the
+// alethGenesisSpec represents the genesis specification format used by the
 // C++ Severeum implementation.
-type alsevGenesisSpec struct {
+type alethGenesisSpec struct {
 	SealEngine string `json:"sealEngine"`
 	Params     struct {
 		AccountStartNonce       math2.HexOrDecimal64   `json:"accountStartNonce"`
@@ -68,38 +68,38 @@ type alsevGenesisSpec struct {
 		GasLimit   hexutil.Uint64 `json:"gasLimit"`
 	} `json:"genesis"`
 
-	Accounts map[common.UnprefixedAddress]*alsevGenesisSpecAccount `json:"accounts"`
+	Accounts map[common.UnprefixedAddress]*alethGenesisSpecAccount `json:"accounts"`
 }
 
-// alsevGenesisSpecAccount is the prefunded genesis account and/or precompiled
+// alethGenesisSpecAccount is the prefunded genesis account and/or precompiled
 // contract definition.
-type alsevGenesisSpecAccount struct {
+type alethGenesisSpecAccount struct {
 	Balance     *math2.HexOrDecimal256   `json:"balance"`
 	Nonce       uint64                   `json:"nonce,omitempty"`
-	Precompiled *alsevGenesisSpecBuiltin `json:"precompiled,omitempty"`
+	Precompiled *alethGenesisSpecBuiltin `json:"precompiled,omitempty"`
 }
 
-// alsevGenesisSpecBuiltin is the precompiled contract definition.
-type alsevGenesisSpecBuiltin struct {
+// alethGenesisSpecBuiltin is the precompiled contract definition.
+type alethGenesisSpecBuiltin struct {
 	Name          string                         `json:"name,omitempty"`
 	StartingBlock hexutil.Uint64                 `json:"startingBlock,omitempty"`
-	Linear        *alsevGenesisSpecLinearPricing `json:"linear,omitempty"`
+	Linear        *alethGenesisSpecLinearPricing `json:"linear,omitempty"`
 }
 
-type alsevGenesisSpecLinearPricing struct {
+type alethGenesisSpecLinearPricing struct {
 	Base uint64 `json:"base"`
 	Word uint64 `json:"word"`
 }
 
-// newAlsevGenesisSpec converts a go-severeum genesis block into a Alsev-specific
+// newAlethGenesisSpec converts a go-severeum genesis block into a Aleth-specific
 // chain specification format.
-func newAlsevGenesisSpec(network string, genesis *core.Genesis) (*alsevGenesisSpec, error) {
-	// Only sevash is currently supported between go-severeum and alsev
+func newAlethGenesisSpec(network string, genesis *core.Genesis) (*alethGenesisSpec, error) {
+	// Only ethash is currently supported between go-severeum and aleth
 	if genesis.Config.Sevash == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}
-	// Reconstruct the chain spec in Alsev format
-	spec := &alsevGenesisSpec{
+	// Reconstruct the chain spec in Aleth format
+	spec := &alethGenesisSpec{
 		SealEngine: "Sevash",
 	}
 	// Some defaults
@@ -130,7 +130,7 @@ func newAlsevGenesisSpec(network string, genesis *core.Genesis) (*alsevGenesisSp
 	spec.Params.DifficultyBoundDivisor = (*math2.HexOrDecimal256)(params.DifficultyBoundDivisor)
 	spec.Params.GasLimitBoundDivisor = (math2.HexOrDecimal64)(params.GasLimitBoundDivisor)
 	spec.Params.DurationLimit = (*math2.HexOrDecimal256)(params.DurationLimit)
-	spec.Params.BlockReward = (*hexutil.Big)(sevash.FrontierBlockReward)
+	spec.Params.BlockReward = (*hexutil.Big)(ethash.FrontierBlockReward)
 
 	spec.Genesis.Nonce = (hexutil.Bytes)(make([]byte, 8))
 	binary.LittleEndian.PutUint64(spec.Genesis.Nonce[:], genesis.Nonce)
@@ -147,48 +147,48 @@ func newAlsevGenesisSpec(network string, genesis *core.Genesis) (*alsevGenesisSp
 		spec.setAccount(address, account)
 	}
 
-	spec.setPrecompile(1, &alsevGenesisSpecBuiltin{Name: "ecrecover",
-		Linear: &alsevGenesisSpecLinearPricing{Base: 3000}})
-	spec.setPrecompile(2, &alsevGenesisSpecBuiltin{Name: "sha256",
-		Linear: &alsevGenesisSpecLinearPricing{Base: 60, Word: 12}})
-	spec.setPrecompile(3, &alsevGenesisSpecBuiltin{Name: "ripemd160",
-		Linear: &alsevGenesisSpecLinearPricing{Base: 600, Word: 120}})
-	spec.setPrecompile(4, &alsevGenesisSpecBuiltin{Name: "identity",
-		Linear: &alsevGenesisSpecLinearPricing{Base: 15, Word: 3}})
+	spec.setPrecompile(1, &alethGenesisSpecBuiltin{Name: "ecrecover",
+		Linear: &alethGenesisSpecLinearPricing{Base: 3000}})
+	spec.setPrecompile(2, &alethGenesisSpecBuiltin{Name: "sha256",
+		Linear: &alethGenesisSpecLinearPricing{Base: 60, Word: 12}})
+	spec.setPrecompile(3, &alethGenesisSpecBuiltin{Name: "ripemd160",
+		Linear: &alethGenesisSpecLinearPricing{Base: 600, Word: 120}})
+	spec.setPrecompile(4, &alethGenesisSpecBuiltin{Name: "identity",
+		Linear: &alethGenesisSpecLinearPricing{Base: 15, Word: 3}})
 	if genesis.Config.ByzantiumBlock != nil {
-		spec.setPrecompile(5, &alsevGenesisSpecBuiltin{Name: "modexp",
+		spec.setPrecompile(5, &alethGenesisSpecBuiltin{Name: "modexp",
 			StartingBlock: (hexutil.Uint64)(genesis.Config.ByzantiumBlock.Uint64())})
-		spec.setPrecompile(6, &alsevGenesisSpecBuiltin{Name: "alt_bn128_G1_add",
+		spec.setPrecompile(6, &alethGenesisSpecBuiltin{Name: "alt_bn128_G1_add",
 			StartingBlock: (hexutil.Uint64)(genesis.Config.ByzantiumBlock.Uint64()),
-			Linear:        &alsevGenesisSpecLinearPricing{Base: 500}})
-		spec.setPrecompile(7, &alsevGenesisSpecBuiltin{Name: "alt_bn128_G1_mul",
+			Linear:        &alethGenesisSpecLinearPricing{Base: 500}})
+		spec.setPrecompile(7, &alethGenesisSpecBuiltin{Name: "alt_bn128_G1_mul",
 			StartingBlock: (hexutil.Uint64)(genesis.Config.ByzantiumBlock.Uint64()),
-			Linear:        &alsevGenesisSpecLinearPricing{Base: 40000}})
-		spec.setPrecompile(8, &alsevGenesisSpecBuiltin{Name: "alt_bn128_pairing_product",
+			Linear:        &alethGenesisSpecLinearPricing{Base: 40000}})
+		spec.setPrecompile(8, &alethGenesisSpecBuiltin{Name: "alt_bn128_pairing_product",
 			StartingBlock: (hexutil.Uint64)(genesis.Config.ByzantiumBlock.Uint64())})
 	}
 	return spec, nil
 }
 
-func (spec *alsevGenesisSpec) setPrecompile(address byte, data *alsevGenesisSpecBuiltin) {
+func (spec *alethGenesisSpec) setPrecompile(address byte, data *alethGenesisSpecBuiltin) {
 	if spec.Accounts == nil {
-		spec.Accounts = make(map[common.UnprefixedAddress]*alsevGenesisSpecAccount)
+		spec.Accounts = make(map[common.UnprefixedAddress]*alethGenesisSpecAccount)
 	}
 	addr := common.UnprefixedAddress(common.BytesToAddress([]byte{address}))
 	if _, exist := spec.Accounts[addr]; !exist {
-		spec.Accounts[addr] = &alsevGenesisSpecAccount{}
+		spec.Accounts[addr] = &alethGenesisSpecAccount{}
 	}
 	spec.Accounts[addr].Precompiled = data
 }
 
-func (spec *alsevGenesisSpec) setAccount(address common.Address, account core.GenesisAccount) {
+func (spec *alethGenesisSpec) setAccount(address common.Address, account core.GenesisAccount) {
 	if spec.Accounts == nil {
-		spec.Accounts = make(map[common.UnprefixedAddress]*alsevGenesisSpecAccount)
+		spec.Accounts = make(map[common.UnprefixedAddress]*alethGenesisSpecAccount)
 	}
 
 	a, exist := spec.Accounts[common.UnprefixedAddress(address)]
 	if !exist {
-		a = &alsevGenesisSpecAccount{}
+		a = &alethGenesisSpecAccount{}
 		spec.Accounts[common.UnprefixedAddress(address)] = a
 	}
 	a.Balance = (*math2.HexOrDecimal256)(account.Balance)
@@ -196,11 +196,11 @@ func (spec *alsevGenesisSpec) setAccount(address common.Address, account core.Ge
 
 }
 
-func (spec *alsevGenesisSpec) setByzantium(num *big.Int) {
+func (spec *alethGenesisSpec) setByzantium(num *big.Int) {
 	spec.Params.ByzantiumForkBlock = hexutil.Uint64(num.Uint64())
 }
 
-func (spec *alsevGenesisSpec) setConstantinople(num *big.Int) {
+func (spec *alethGenesisSpec) setConstantinople(num *big.Int) {
 	spec.Params.ConstantinopleForkBlock = hexutil.Uint64(num.Uint64())
 }
 
@@ -307,7 +307,7 @@ type parityChainSpecAltBnPairingPricing struct {
 // newParityChainSpec converts a go-severeum genesis block into a Parity specific
 // chain specification format.
 func newParityChainSpec(network string, genesis *core.Genesis, bootnodes []string) (*parityChainSpec, error) {
-	// Only sevash is currently supported between go-severeum and Parity
+	// Only ethash is currently supported between go-severeum and Parity
 	if genesis.Config.Sevash == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}
@@ -323,7 +323,7 @@ func newParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	spec.Engine.Sevash.Params.MinimumDifficulty = (*hexutil.Big)(params.MinimumDifficulty)
 	spec.Engine.Sevash.Params.DifficultyBoundDivisor = (*hexutil.Big)(params.DifficultyBoundDivisor)
 	spec.Engine.Sevash.Params.DurationLimit = (*hexutil.Big)(params.DurationLimit)
-	spec.Engine.Sevash.Params.BlockReward["0x0"] = hexutil.EncodeBig(sevash.FrontierBlockReward)
+	spec.Engine.Sevash.Params.BlockReward["0x0"] = hexutil.EncodeBig(ethash.FrontierBlockReward)
 
 	// Homestead
 	spec.Engine.Sevash.Params.HomesteadTransition = hexutil.Uint64(genesis.Config.HomesteadBlock.Uint64())
@@ -353,7 +353,7 @@ func newParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	spec.Params.NetworkID = (hexutil.Uint64)(genesis.Config.ChainID.Uint64())
 	spec.Params.ChainID = (hexutil.Uint64)(genesis.Config.ChainID.Uint64())
 	spec.Params.MaxCodeSize = params.MaxCodeSize
-	// ssev has it set from zero
+	// seth has it set from zero
 	spec.Params.MaxCodeSizeTransition = 0
 
 	// Disable this one
@@ -421,7 +421,7 @@ func (spec *parityChainSpec) setPrecompile(address byte, data *parityChainSpecBu
 }
 
 func (spec *parityChainSpec) setByzantium(num *big.Int) {
-	spec.Engine.Sevash.Params.BlockReward[hexutil.EncodeBig(num)] = hexutil.EncodeBig(sevash.ByzantiumBlockReward)
+	spec.Engine.Sevash.Params.BlockReward[hexutil.EncodeBig(num)] = hexutil.EncodeBig(ethash.ByzantiumBlockReward)
 	spec.Engine.Sevash.Params.DifficultyBombDelays[hexutil.EncodeBig(num)] = hexutil.EncodeUint64(3000000)
 	n := hexutil.Uint64(num.Uint64())
 	spec.Engine.Sevash.Params.EIP100bTransition = n
@@ -432,7 +432,7 @@ func (spec *parityChainSpec) setByzantium(num *big.Int) {
 }
 
 func (spec *parityChainSpec) setConstantinople(num *big.Int) {
-	spec.Engine.Sevash.Params.BlockReward[hexutil.EncodeBig(num)] = hexutil.EncodeBig(sevash.ConstantinopleBlockReward)
+	spec.Engine.Sevash.Params.BlockReward[hexutil.EncodeBig(num)] = hexutil.EncodeBig(ethash.ConstantinopleBlockReward)
 	spec.Engine.Sevash.Params.DifficultyBombDelays[hexutil.EncodeBig(num)] = hexutil.EncodeUint64(2000000)
 	n := hexutil.Uint64(num.Uint64())
 	spec.Params.EIP145Transition = n
@@ -458,7 +458,7 @@ type pySevereumGenesisSpec struct {
 // newPySevereumGenesisSpec converts a go-severeum genesis block into a Parity specific
 // chain specification format.
 func newPySevereumGenesisSpec(network string, genesis *core.Genesis) (*pySevereumGenesisSpec, error) {
-	// Only sevash is currently supported between go-severeum and pysevereum
+	// Only ethash is currently supported between go-severeum and pysevereum
 	if genesis.Config.Sevash == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}

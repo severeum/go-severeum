@@ -22,7 +22,7 @@ import (
 
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/rlp"
 )
@@ -34,7 +34,7 @@ import (
 // If the trie does not contain a value for key, the returned proof contains all
 // nodes of the longest existing prefix of the key (at least the root node), ending
 // with the node that proves the absence of the key.
-func (t *Trie) Prove(key []byte, fromLevel uint, proofDb sevdb.Putter) error {
+func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.Putter) error {
 	// Collect all nodes on the path to key.
 	key = keybytesToHex(key)
 	nodes := []node{}
@@ -97,7 +97,7 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb sevdb.Putter) error {
 // If the trie does not contain a value for key, the returned proof contains all
 // nodes of the longest existing prefix of the key (at least the root node), ending
 // with the node that proves the absence of the key.
-func (t *SecureTrie) Prove(key []byte, fromLevel uint, proofDb sevdb.Putter) error {
+func (t *SecureTrie) Prove(key []byte, fromLevel uint, proofDb ethdb.Putter) error {
 	return t.trie.Prove(key, fromLevel, proofDb)
 }
 

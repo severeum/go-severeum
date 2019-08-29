@@ -12,36 +12,36 @@ import (
 // server uses a different time zone than your tokens.
 var TimeFunc = time.Now
 
-// Parse msevods use this callback function to supply
+// Parse methods use this callback function to supply
 // the key for verification.  The function receives the parsed,
 // but unverified Token.  This allows you to use properties in the
 // Header of the token (such as `kid`) to identify which key to use.
 type Keyfunc func(*Token) (interface{}, error)
 
-// A JWT Token.  Different fields will be used depending on whsever you're
+// A JWT Token.  Different fields will be used depending on whether you're
 // creating or parsing/verifying a token.
 type Token struct {
 	Raw       string                 // The raw token.  Populated when you Parse a token
-	Msevod    SigningMsevod          // The signing msevod used or to be used
+	Method    SigningMethod          // The signing method used or to be used
 	Header    map[string]interface{} // The first segment of the token
 	Claims    Claims                 // The second segment of the token
 	Signature string                 // The third segment of the token.  Populated when you Parse a token
 	Valid     bool                   // Is the token valid?  Populated when you Parse/Verify a token
 }
 
-// Create a new Token.  Takes a signing msevod
-func New(msevod SigningMsevod) *Token {
-	return NewWithClaims(msevod, MapClaims{})
+// Create a new Token.  Takes a signing method
+func New(method SigningMethod) *Token {
+	return NewWithClaims(method, MapClaims{})
 }
 
-func NewWithClaims(msevod SigningMsevod, claims Claims) *Token {
+func NewWithClaims(method SigningMethod, claims Claims) *Token {
 	return &Token{
 		Header: map[string]interface{}{
 			"typ": "JWT",
-			"alg": msevod.Alg(),
+			"alg": method.Alg(),
 		},
 		Claims: claims,
-		Msevod: msevod,
+		Method: method,
 	}
 }
 
@@ -52,7 +52,7 @@ func (t *Token) SignedString(key interface{}) (string, error) {
 	if sstr, err = t.SigningString(); err != nil {
 		return "", err
 	}
-	if sig, err = t.Msevod.Sign(sstr, key); err != nil {
+	if sig, err = t.Method.Sign(sstr, key); err != nil {
 		return "", err
 	}
 	return strings.Join([]string{sstr, sig}, "."), nil
@@ -60,7 +60,7 @@ func (t *Token) SignedString(key interface{}) (string, error) {
 
 // Generate the signing string.  This is the
 // most expensive part of the whole deal.  Unless you
-// need this for somseving special, just go straight for
+// need this for something special, just go straight for
 // the SignedString.
 func (t *Token) SigningString() (string, error) {
 	var err error

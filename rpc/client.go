@@ -46,7 +46,7 @@ const (
 	tcpKeepAliveInterval = 30 * time.Second
 	defaultDialTimeout   = 10 * time.Second // used when dialing if the context has no deadline
 	defaultWriteTimeout  = 10 * time.Second // used for calls if the context has no deadline
-	subscribeTimeout     = 5 * time.Second  // overall timeout sev_subscribe, rpc_modules calls
+	subscribeTimeout     = 5 * time.Second  // overall timeout eth_subscribe, rpc_modules calls
 )
 
 const (
@@ -65,7 +65,7 @@ const (
 
 // BatchElem is an element in a batch request.
 type BatchElem struct {
-	Msevod string
+	Method string
 	Args   []interface{}
 	// The result is unmarshaled into this field. Result must be set to a
 	// non-nil pointer value of the desired type, otherwise the response will be
@@ -81,18 +81,18 @@ type BatchElem struct {
 type jsonrpcMessage struct {
 	Version string          `json:"jsonrpc"`
 	ID      json.RawMessage `json:"id,omitempty"`
-	Msevod  string          `json:"msevod,omitempty"`
+	Method  string          `json:"method,omitempty"`
 	Params  json.RawMessage `json:"params,omitempty"`
 	Error   *jsonError      `json:"error,omitempty"`
 	Result  json.RawMessage `json:"result,omitempty"`
 }
 
 func (msg *jsonrpcMessage) isNotification() bool {
-	return msg.ID == nil && msg.Msevod != ""
+	return msg.ID == nil && msg.Method != ""
 }
 
 func (msg *jsonrpcMessage) isResponse() bool {
-	return msg.hasValidID() && msg.Msevod == "" && len(msg.Params) == 0
+	return msg.hasValidID() && msg.Method == "" && len(msg.Params) == 0
 }
 
 func (msg *jsonrpcMessage) hasValidID() bool {
@@ -213,7 +213,7 @@ func (c *Client) nextID() json.RawMessage {
 	return []byte(strconv.FormatUint(uint64(id), 10))
 }
 
-// SupportedModules calls the rpc_modules msevod, retrieving the list of
+// SupportedModules calls the rpc_modules method, retrieving the list of
 // APIs that are available on the server.
 func (c *Client) SupportedModules() (map[string]string, error) {
 	var result map[string]string
@@ -240,9 +240,9 @@ func (c *Client) Close() {
 //
 // The result must be a pointer so that package json can unmarshal into it. You
 // can also pass nil, in which case the result is ignored.
-func (c *Client) Call(result interface{}, msevod string, args ...interface{}) error {
+func (c *Client) Call(result interface{}, method string, args ...interface{}) error {
 	ctx := context.Background()
-	return c.CallContext(ctx, result, msevod, args...)
+	return c.CallContext(ctx, result, method, args...)
 }
 
 // CallContext performs a JSON-RPC call with the given arguments. If the context is
@@ -250,8 +250,8 @@ func (c *Client) Call(result interface{}, msevod string, args ...interface{}) er
 //
 // The result must be a pointer so that package json can unmarshal into it. You
 // can also pass nil, in which case the result is ignored.
-func (c *Client) CallContext(ctx context.Context, result interface{}, msevod string, args ...interface{}) error {
-	msg, err := c.newMessage(msevod, args...)
+func (c *Client) CallContext(ctx context.Context, result interface{}, method string, args ...interface{}) error {
+	msg, err := c.newMessage(method, args...)
 	if err != nil {
 		return err
 	}
@@ -307,7 +307,7 @@ func (c *Client) BatchCallContext(ctx context.Context, b []BatchElem) error {
 		resp: make(chan *jsonrpcMessage, len(b)),
 	}
 	for i, elem := range b {
-		msg, err := c.newMessage(elem.Msevod, elem.Args...)
+		msg, err := c.newMessage(elem.Method, elem.Args...)
 		if err != nil {
 			return err
 		}
@@ -352,9 +352,9 @@ func (c *Client) BatchCallContext(ctx context.Context, b []BatchElem) error {
 	return err
 }
 
-// SevSubscribe registers a subscripion under the "sev" namespace.
+// SevSubscribe registers a subscripion under the "eth" namespace.
 func (c *Client) SevSubscribe(ctx context.Context, channel interface{}, args ...interface{}) (*ClientSubscription, error) {
-	return c.Subscribe(ctx, "sev", channel, args...)
+	return c.Subscribe(ctx, "eth", channel, args...)
 }
 
 // ShhSubscribe registers a subscripion under the "shh" namespace.
@@ -362,7 +362,7 @@ func (c *Client) ShhSubscribe(ctx context.Context, channel interface{}, args ...
 	return c.Subscribe(ctx, "shh", channel, args...)
 }
 
-// Subscribe calls the "<namespace>_subscribe" msevod with the given arguments,
+// Subscribe calls the "<namespace>_subscribe" method with the given arguments,
 // registering a subscription. Server notifications for the subscription are
 // sent to the given channel. The element type of the channel must match the
 // expected type of content returned by the subscription.
@@ -387,7 +387,7 @@ func (c *Client) Subscribe(ctx context.Context, namespace string, channel interf
 		return nil, ErrNotificationsUnsupported
 	}
 
-	msg, err := c.newMessage(namespace+subscribeMsevodSuffix, args...)
+	msg, err := c.newMessage(namespace+subscribeMethodSuffix, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -408,12 +408,12 @@ func (c *Client) Subscribe(ctx context.Context, namespace string, channel interf
 	return op.sub, nil
 }
 
-func (c *Client) newMessage(msevod string, paramsIn ...interface{}) (*jsonrpcMessage, error) {
+func (c *Client) newMessage(method string, paramsIn ...interface{}) (*jsonrpcMessage, error) {
 	params, err := json.Marshal(paramsIn)
 	if err != nil {
 		return nil, err
 	}
-	return &jsonrpcMessage{Version: "2.0", ID: c.nextID(), Msevod: msevod, Params: params}, nil
+	return &jsonrpcMessage{Version: "2.0", ID: c.nextID(), Method: method, Params: params}, nil
 }
 
 // send registers op with the dispatch loop, then sends msg on the connection.
@@ -593,7 +593,7 @@ func (c *Client) closeRequestOps(err error) {
 }
 
 func (c *Client) handleNotification(msg *jsonrpcMessage) {
-	if !strings.HasSuffix(msg.Msevod, notificationMsevodSuffix) {
+	if !strings.HasSuffix(msg.Method, notificationMethodSuffix) {
 		log.Debug("dropping non-subscription message", "msg", msg)
 		return
 	}
@@ -794,5 +794,5 @@ func (sub *ClientSubscription) unmarshal(result json.RawMessage) (interface{}, e
 
 func (sub *ClientSubscription) requestUnsubscribe() error {
 	var result interface{}
-	return sub.client.Call(&result, sub.namespace+unsubscribeMsevodSuffix, sub.subid)
+	return sub.client.Call(&result, sub.namespace+unsubscribeMethodSuffix, sub.subid)
 }

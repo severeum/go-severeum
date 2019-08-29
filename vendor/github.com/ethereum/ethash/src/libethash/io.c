@@ -1,21 +1,21 @@
 /*
-  This file is part of sevash.
+  This file is part of ethash.
 
-  sevash is free software: you can redistribute it and/or modify
+  ethash is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
 
-  sevash is distributed in the hope that it will be useful,
+  ethash is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with sevash.  If not, see <http://www.gnu.org/licenses/>.
+  along with ethash.  If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file io.c
- * @author Lefteris Karapetsas <lefteris@sevdev.com>
+ * @author Lefteris Karapetsas <lefteris@ethdev.com>
  * @date 2015
  */
 #include "io.h"
@@ -23,27 +23,27 @@
 #include <stdio.h>
 #include <errno.h>
 
-enum sevash_io_rc sevash_io_prepare(
+enum ethash_io_rc ethash_io_prepare(
 	char const* dirname,
-	sevash_h256_t const seedhash,
+	ethash_h256_t const seedhash,
 	FILE** output_file,
 	uint64_t file_size,
 	bool force_create
 )
 {
 	char mutable_name[DAG_MUTABLE_NAME_MAX_SIZE];
-	enum sevash_io_rc ret = SEVASH_IO_FAIL;
+	enum ethash_io_rc ret = SEVASH_IO_FAIL;
 	// reset errno before io calls
 	errno = 0;
 
 	// assert directory exists
-	if (!sevash_mkdir(dirname)) {
-		SEVASH_CRITICAL("Could not create the sevash directory");
+	if (!ethash_mkdir(dirname)) {
+		SEVASH_CRITICAL("Could not create the ethash directory");
 		goto end;
 	}
 
-	sevash_io_mutable_name(SEVASH_REVISION, &seedhash, mutable_name);
-	char* tmpfile = sevash_io_create_filename(dirname, mutable_name, strlen(mutable_name));
+	ethash_io_mutable_name(SEVASH_REVISION, &seedhash, mutable_name);
+	char* tmpfile = ethash_io_create_filename(dirname, mutable_name, strlen(mutable_name));
 	if (!tmpfile) {
 		SEVASH_CRITICAL("Could not create the full DAG pathname");
 		goto end;
@@ -52,10 +52,10 @@ enum sevash_io_rc sevash_io_prepare(
 	FILE *f;
 	if (!force_create) {
 		// try to open the file
-		f = sevash_fopen(tmpfile, "rb+");
+		f = ethash_fopen(tmpfile, "rb+");
 		if (f) {
 			size_t found_size;
-			if (!sevash_file_size(f, &found_size)) {
+			if (!ethash_file_size(f, &found_size)) {
 				fclose(f);
 				SEVASH_CRITICAL("Could not query size of DAG file: \"%s\"", tmpfile);
 				goto free_memo;
@@ -85,7 +85,7 @@ enum sevash_io_rc sevash_io_prepare(
 	}
 	
 	// file does not exist, will need to be created
-	f = sevash_fopen(tmpfile, "wb+");
+	f = ethash_fopen(tmpfile, "wb+");
 	if (!f) {
 		SEVASH_CRITICAL("Could not create DAG file: \"%s\"", tmpfile);
 		goto free_memo;

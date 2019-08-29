@@ -17,7 +17,7 @@
 // Contains all the wrappers from the node package to support client side node
 // management on mobile platforms.
 
-package ssev
+package seth
 
 import (
 	"encoding/json"
@@ -25,10 +25,10 @@ import (
 	"path/filepath"
 
 	"github.com/severeum/go-severeum/core"
-	"github.com/severeum/go-severeum/sev"
-	"github.com/severeum/go-severeum/sev/downloader"
-	"github.com/severeum/go-severeum/sevclient"
-	"github.com/severeum/go-severeum/sevstats"
+	"github.com/severeum/go-severeum/eth"
+	"github.com/severeum/go-severeum/eth/downloader"
+	"github.com/severeum/go-severeum/ethclient"
+	"github.com/severeum/go-severeum/ethstats"
 	"github.com/severeum/go-severeum/internal/debug"
 	"github.com/severeum/go-severeum/les"
 	"github.com/severeum/go-severeum/node"
@@ -38,7 +38,7 @@ import (
 	whisper "github.com/severeum/go-severeum/whisper/whisperv6"
 )
 
-// NodeConfig represents the collection of configuration values to fine tune the Ssev
+// NodeConfig represents the collection of configuration values to fine tune the Seth
 // node embedded into a mobile process. The available values are a subset of the
 // entire API provided by go-severeum to reduce the maintenance surface and dev
 // complexity.
@@ -50,7 +50,7 @@ type NodeConfig struct {
 	// set to zero, then only the configured static and trusted peers can connect.
 	MaxPeers int
 
-	// SevereumEnabled specifies whsever the node should run the Severeum protocol.
+	// SevereumEnabled specifies whether the node should run the Severeum protocol.
 	SevereumEnabled bool
 
 	// SevereumNetworkID is the network identifier used by the Severeum protocol to
@@ -71,7 +71,7 @@ type NodeConfig struct {
 	// It has the form "nodename:secret@host:port"
 	SevereumNetStats string
 
-	// WhisperEnabled specifies whsever the node should run the Whisper protocol.
+	// WhisperEnabled specifies whether the node should run the Whisper protocol.
 	WhisperEnabled bool
 
 	// Listening address of pprof server.
@@ -94,12 +94,12 @@ func NewNodeConfig() *NodeConfig {
 	return &config
 }
 
-// Node represents a Ssev Severeum node instance.
+// Node represents a Seth Severeum node instance.
 type Node struct {
 	node *node.Node
 }
 
-// NewNode creates and configures a new Ssev node.
+// NewNode creates and configures a new Seth node.
 func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 	// If no or partial configurations were specified, use defaults
 	if config == nil {
@@ -155,13 +155,13 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 	}
 	// Register the Severeum protocol if requested
 	if config.SevereumEnabled {
-		sevConf := sev.DefaultConfig
-		sevConf.Genesis = genesis
-		sevConf.SyncMode = downloader.LightSync
-		sevConf.NetworkId = uint64(config.SevereumNetworkID)
-		sevConf.DatabaseCache = config.SevereumDatabaseCache
+		ethConf := eth.DefaultConfig
+		ethConf.Genesis = genesis
+		ethConf.SyncMode = downloader.LightSync
+		ethConf.NetworkId = uint64(config.SevereumNetworkID)
+		ethConf.DatabaseCache = config.SevereumDatabaseCache
 		if err := rawStack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
-			return les.New(ctx, &sevConf)
+			return les.New(ctx, &ethConf)
 		}); err != nil {
 			return nil, fmt.Errorf("severeum init: %v", err)
 		}
@@ -171,7 +171,7 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 				var lesServ *les.LightSevereum
 				ctx.Service(&lesServ)
 
-				return sevstats.New(config.SevereumNetStats, nil, lesServ)
+				return ethstats.New(config.SevereumNetStats, nil, lesServ)
 			}); err != nil {
 				return nil, fmt.Errorf("netstats init: %v", err)
 			}
@@ -205,7 +205,7 @@ func (n *Node) GetSevereumClient() (client *SevereumClient, _ error) {
 	if err != nil {
 		return nil, err
 	}
-	return &SevereumClient{sevclient.NewClient(rpc)}, nil
+	return &SevereumClient{ethclient.NewClient(rpc)}, nil
 }
 
 // GetNodeInfo gathers and returns a collection of metadata known about the host.

@@ -1,12 +1,12 @@
 /*
-  This file is part of sevash.
+  This file is part of ethash.
 
-  sevash is free software: you can redistribute it and/or modify
+  ethash is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
 
-  sevash is distributed in the hope that it will be useful,
+  ethash is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
   GNU General Public License for more details.
@@ -26,7 +26,7 @@
 #include <errno.h>
 #include <math.h>
 #include "mmap.h"
-#include "sevash.h"
+#include "ethash.h"
 #include "fnv.h"
 #include "endian.h"
 #include "internal.h"
@@ -41,13 +41,13 @@
 #include "sha3.h"
 #endif // WITH_CRYPTOPP
 
-uint64_t sevash_get_datasize(uint64_t const block_number)
+uint64_t ethash_get_datasize(uint64_t const block_number)
 {
 	assert(block_number / SEVASH_EPOCH_LENGTH < 2048);
 	return dag_sizes[block_number / SEVASH_EPOCH_LENGTH];
 }
 
-uint64_t sevash_get_cachesize(uint64_t const block_number)
+uint64_t ethash_get_cachesize(uint64_t const block_number)
 {
 	assert(block_number / SEVASH_EPOCH_LENGTH < 2048);
 	return cache_sizes[block_number / SEVASH_EPOCH_LENGTH];
@@ -56,10 +56,10 @@ uint64_t sevash_get_cachesize(uint64_t const block_number)
 // Follows Sergio's "STRICT MEMORY HARD HASHING FUNCTIONS" (2014)
 // https://bitslog.files.wordpress.com/2013/12/memohash-v0-3.pdf
 // SeqMemoHash(s, R, N)
-bool static sevash_compute_cache_nodes(
+bool static ethash_compute_cache_nodes(
 	node* const nodes,
 	uint64_t cache_size,
-	sevash_h256_t const* seed
+	ethash_h256_t const* seed
 )
 {
 	if (cache_size % sizeof(node) != 0) {
@@ -90,10 +90,10 @@ bool static sevash_compute_cache_nodes(
 	return true;
 }
 
-void sevash_calculate_dag_item(
+void ethash_calculate_dag_item(
 	node* const ret,
 	uint32_t node_index,
-	sevash_light_t const light
+	ethash_light_t const light
 )
 {
 	uint32_t num_parent_nodes = (uint32_t) (light->cache_size / sizeof(node));
@@ -142,11 +142,11 @@ void sevash_calculate_dag_item(
 	SHA3_512(ret->bytes, ret->bytes, sizeof(node));
 }
 
-bool sevash_compute_full_data(
+bool ethash_compute_full_data(
 	void* mem,
 	uint64_t full_size,
-	sevash_light_t const light,
-	sevash_callback_t callback
+	ethash_light_t const light,
+	ethash_callback_t callback
 )
 {
 	if (full_size % (sizeof(uint32_t) * MIX_WORDS) != 0 ||
@@ -166,17 +166,17 @@ bool sevash_compute_full_data(
 			return false;
 		}
 		progress += progress_change;
-		sevash_calculate_dag_item(&(full_nodes[n]), n, light);
+		ethash_calculate_dag_item(&(full_nodes[n]), n, light);
 	}
 	return true;
 }
 
-static bool sevash_hash(
-	sevash_return_value_t* ret,
+static bool ethash_hash(
+	ethash_return_value_t* ret,
 	node const* full_nodes,
-	sevash_light_t const light,
+	ethash_light_t const light,
 	uint64_t full_size,
-	sevash_h256_t const header_hash,
+	ethash_h256_t const header_hash,
 	uint64_t const nonce
 )
 {
@@ -184,7 +184,7 @@ static bool sevash_hash(
 		return false;
 	}
 
-	// pack hash and nonce tossever into first 40 bytes of s_mix
+	// pack hash and nonce tosether into first 40 bytes of s_mix
 	assert(sizeof(node) * 8 == 512);
 	node s_mix[MIX_NODES + 1];
 	memcpy(s_mix[0].bytes, &header_hash, 32);
@@ -211,7 +211,7 @@ static bool sevash_hash(
 				dag_node = &full_nodes[MIX_NODES * index + n];
 			} else {
 				node tmp_node;
-				sevash_calculate_dag_item(&tmp_node, index * MIX_NODES + n, light);
+				ethash_calculate_dag_item(&tmp_node, index * MIX_NODES + n, light);
 				dag_node = &tmp_node;
 			}
 
@@ -254,11 +254,11 @@ static bool sevash_hash(
 	return true;
 }
 
-void sevash_quick_hash(
-	sevash_h256_t* return_hash,
-	sevash_h256_t const* header_hash,
+void ethash_quick_hash(
+	ethash_h256_t* return_hash,
+	ethash_h256_t const* header_hash,
 	uint64_t nonce,
-	sevash_h256_t const* mix_hash
+	ethash_h256_t const* mix_hash
 )
 {
 	uint8_t buf[64 + 32];
@@ -270,32 +270,32 @@ void sevash_quick_hash(
 	SHA3_256(return_hash, buf, 64 + 32);
 }
 
-sevash_h256_t sevash_get_seedhash(uint64_t block_number)
+ethash_h256_t ethash_get_seedhash(uint64_t block_number)
 {
-	sevash_h256_t ret;
-	sevash_h256_reset(&ret);
+	ethash_h256_t ret;
+	ethash_h256_reset(&ret);
 	uint64_t const epochs = block_number / SEVASH_EPOCH_LENGTH;
 	for (uint32_t i = 0; i < epochs; ++i)
 		SHA3_256(&ret, (uint8_t*)&ret, 32);
 	return ret;
 }
 
-bool sevash_quick_check_difficulty(
-	sevash_h256_t const* header_hash,
+bool ethash_quick_check_difficulty(
+	ethash_h256_t const* header_hash,
 	uint64_t const nonce,
-	sevash_h256_t const* mix_hash,
-	sevash_h256_t const* boundary
+	ethash_h256_t const* mix_hash,
+	ethash_h256_t const* boundary
 )
 {
 
-	sevash_h256_t return_hash;
-	sevash_quick_hash(&return_hash, header_hash, nonce, mix_hash);
-	return sevash_check_difficulty(&return_hash, boundary);
+	ethash_h256_t return_hash;
+	ethash_quick_hash(&return_hash, header_hash, nonce, mix_hash);
+	return ethash_check_difficulty(&return_hash, boundary);
 }
 
-sevash_light_t sevash_light_new_internal(uint64_t cache_size, sevash_h256_t const* seed)
+ethash_light_t ethash_light_new_internal(uint64_t cache_size, ethash_h256_t const* seed)
 {
-	struct sevash_light *ret;
+	struct ethash_light *ret;
 	ret = calloc(sizeof(*ret), 1);
 	if (!ret) {
 		return NULL;
@@ -305,7 +305,7 @@ sevash_light_t sevash_light_new_internal(uint64_t cache_size, sevash_h256_t cons
 		goto fail_free_light;
 	}
 	node* nodes = (node*)ret->cache;
-	if (!sevash_compute_cache_nodes(nodes, cache_size, seed)) {
+	if (!ethash_compute_cache_nodes(nodes, cache_size, seed)) {
 		goto fail_free_cache_mem;
 	}
 	ret->cache_size = cache_size;
@@ -318,16 +318,16 @@ fail_free_light:
 	return NULL;
 }
 
-sevash_light_t sevash_light_new(uint64_t block_number)
+ethash_light_t ethash_light_new(uint64_t block_number)
 {
-	sevash_h256_t seedhash = sevash_get_seedhash(block_number);
-	sevash_light_t ret;
-	ret = sevash_light_new_internal(sevash_get_cachesize(block_number), &seedhash);
+	ethash_h256_t seedhash = ethash_get_seedhash(block_number);
+	ethash_light_t ret;
+	ret = ethash_light_new_internal(ethash_get_cachesize(block_number), &seedhash);
 	ret->block_number = block_number;
 	return ret;
 }
 
-void sevash_light_delete(sevash_light_t light)
+void ethash_light_delete(ethash_light_t light)
 {
 	if (light->cache) {
 		free(light->cache);
@@ -335,38 +335,38 @@ void sevash_light_delete(sevash_light_t light)
 	free(light);
 }
 
-sevash_return_value_t sevash_light_compute_internal(
-	sevash_light_t light,
+ethash_return_value_t ethash_light_compute_internal(
+	ethash_light_t light,
 	uint64_t full_size,
-	sevash_h256_t const header_hash,
+	ethash_h256_t const header_hash,
 	uint64_t nonce
 )
 {
-  	sevash_return_value_t ret;
+  	ethash_return_value_t ret;
 	ret.success = true;
-	if (!sevash_hash(&ret, NULL, light, full_size, header_hash, nonce)) {
+	if (!ethash_hash(&ret, NULL, light, full_size, header_hash, nonce)) {
 		ret.success = false;
 	}
 	return ret;
 }
 
-sevash_return_value_t sevash_light_compute(
-	sevash_light_t light,
-	sevash_h256_t const header_hash,
+ethash_return_value_t ethash_light_compute(
+	ethash_light_t light,
+	ethash_h256_t const header_hash,
 	uint64_t nonce
 )
 {
-	uint64_t full_size = sevash_get_datasize(light->block_number);
-	return sevash_light_compute_internal(light, full_size, header_hash, nonce);
+	uint64_t full_size = ethash_get_datasize(light->block_number);
+	return ethash_light_compute_internal(light, full_size, header_hash, nonce);
 }
 
-static bool sevash_mmap(struct sevash_full* ret, FILE* f)
+static bool ethash_mmap(struct ethash_full* ret, FILE* f)
 {
 	int fd;
 	char* mmapped_data;
 	errno = 0;
 	ret->file = f;
-	if ((fd = sevash_fileno(ret->file)) == -1) {
+	if ((fd = ethash_fileno(ret->file)) == -1) {
 		return false;
 	}
 	mmapped_data= mmap(
@@ -384,47 +384,47 @@ static bool sevash_mmap(struct sevash_full* ret, FILE* f)
 	return true;
 }
 
-sevash_full_t sevash_full_new_internal(
+ethash_full_t ethash_full_new_internal(
 	char const* dirname,
-	sevash_h256_t const seed_hash,
+	ethash_h256_t const seed_hash,
 	uint64_t full_size,
-	sevash_light_t const light,
-	sevash_callback_t callback
+	ethash_light_t const light,
+	ethash_callback_t callback
 )
 {
-	struct sevash_full* ret;
+	struct ethash_full* ret;
 	FILE *f = NULL;
 	ret = calloc(sizeof(*ret), 1);
 	if (!ret) {
 		return NULL;
 	}
 	ret->file_size = (size_t)full_size;
-	switch (sevash_io_prepare(dirname, seed_hash, &f, (size_t)full_size, false)) {
+	switch (ethash_io_prepare(dirname, seed_hash, &f, (size_t)full_size, false)) {
 	case SEVASH_IO_FAIL:
-		// sevash_io_prepare will do all SEVASH_CRITICAL() logging in fail case
+		// ethash_io_prepare will do all SEVASH_CRITICAL() logging in fail case
 		goto fail_free_full;
 	case SEVASH_IO_MEMO_MATCH:
-		if (!sevash_mmap(ret, f)) {
+		if (!ethash_mmap(ret, f)) {
 			SEVASH_CRITICAL("mmap failure()");
 			goto fail_close_file;
 		}
 		return ret;
 	case SEVASH_IO_MEMO_SIZE_MISMATCH:
 		// if a DAG of same filename but unexpected size is found, silently force new file creation
-		if (sevash_io_prepare(dirname, seed_hash, &f, (size_t)full_size, true) != SEVASH_IO_MEMO_MISMATCH) {
+		if (ethash_io_prepare(dirname, seed_hash, &f, (size_t)full_size, true) != SEVASH_IO_MEMO_MISMATCH) {
 			SEVASH_CRITICAL("Could not recreate DAG file after finding existing DAG with unexpected size.");
 			goto fail_free_full;
 		}
 		// fallthrough to the mismatch case here, DO NOT go through match
 	case SEVASH_IO_MEMO_MISMATCH:
-		if (!sevash_mmap(ret, f)) {
+		if (!ethash_mmap(ret, f)) {
 			SEVASH_CRITICAL("mmap failure()");
 			goto fail_close_file;
 		}
 		break;
 	}
 
-	if (!sevash_compute_full_data(ret->data, full_size, light, callback)) {
+	if (!ethash_compute_full_data(ret->data, full_size, light, callback)) {
 		SEVASH_CRITICAL("Failure at computing DAG data.");
 		goto fail_free_full_data;
 	}
@@ -455,18 +455,18 @@ fail_free_full:
 	return NULL;
 }
 
-sevash_full_t sevash_full_new(sevash_light_t light, sevash_callback_t callback)
+ethash_full_t ethash_full_new(ethash_light_t light, ethash_callback_t callback)
 {
 	char strbuf[256];
-	if (!sevash_get_default_dirname(strbuf, 256)) {
+	if (!ethash_get_default_dirname(strbuf, 256)) {
 		return NULL;
 	}
-	uint64_t full_size = sevash_get_datasize(light->block_number);
-	sevash_h256_t seedhash = sevash_get_seedhash(light->block_number);
-	return sevash_full_new_internal(strbuf, seedhash, full_size, light, callback);
+	uint64_t full_size = ethash_get_datasize(light->block_number);
+	ethash_h256_t seedhash = ethash_get_seedhash(light->block_number);
+	return ethash_full_new_internal(strbuf, seedhash, full_size, light, callback);
 }
 
-void sevash_full_delete(sevash_full_t full)
+void ethash_full_delete(ethash_full_t full)
 {
 	// could check that munmap(..) == 0 but even if it did not can't really do anything here
 	munmap(full->data, (size_t)full->file_size);
@@ -476,15 +476,15 @@ void sevash_full_delete(sevash_full_t full)
 	free(full);
 }
 
-sevash_return_value_t sevash_full_compute(
-	sevash_full_t full,
-	sevash_h256_t const header_hash,
+ethash_return_value_t ethash_full_compute(
+	ethash_full_t full,
+	ethash_h256_t const header_hash,
 	uint64_t nonce
 )
 {
-	sevash_return_value_t ret;
+	ethash_return_value_t ret;
 	ret.success = true;
-	if (!sevash_hash(
+	if (!ethash_hash(
 		&ret,
 		(node const*)full->data,
 		NULL,
@@ -496,12 +496,12 @@ sevash_return_value_t sevash_full_compute(
 	return ret;
 }
 
-void const* sevash_full_dag(sevash_full_t full)
+void const* ethash_full_dag(ethash_full_t full)
 {
 	return full->data;
 }
 
-uint64_t sevash_full_dag_size(sevash_full_t full)
+uint64_t ethash_full_dag_size(ethash_full_t full)
 {
 	return full->file_size;
 }

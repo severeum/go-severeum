@@ -92,8 +92,8 @@ func (h *Handler) handleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) handleScan(w http.ResponseWriter, r *http.Request) {
-	if r.Msevod != http.MsevodPost {
-		http.Error(w, "invalid HTTP msevod, want POST", http.StatusMsevodNotAllowed)
+	if r.Method != http.MethodPost {
+		http.Error(w, "invalid HTTP method, want POST", http.StatusMethodNotAllowed)
 		return
 	}
 	ti := h.templateInfo(r, "Unknown root")

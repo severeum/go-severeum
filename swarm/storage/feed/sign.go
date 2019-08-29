@@ -50,7 +50,7 @@ func NewGenericSigner(privKey *ecdsa.PrivateKey) *GenericSigner {
 }
 
 // Sign signs the supplied data
-// It wraps the severeum crypto.Sign() msevod
+// It wraps the severeum crypto.Sign() method
 func (s *GenericSigner) Sign(data common.Hash) (signature Signature, err error) {
 	signaturebytes, err := crypto.Sign(data.Bytes(), s.PrivKey)
 	if err != nil {

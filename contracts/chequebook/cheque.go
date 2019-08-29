@@ -17,8 +17,8 @@
 // Package chequebook package wraps the 'chequebook' Severeum smart contract.
 //
 // The functions in this package allow using chequebook for
-// issuing, receiving, verifying cheques in sever; (auto)cashing cheques in sever
-// as well as (auto)depositing sever to the chequebook contract.
+// issuing, receiving, verifying cheques in ether; (auto)cashing cheques in ether
+// as well as (auto)depositing ether to the chequebook contract.
 package chequebook
 
 //go:generate abigen --sol contract/chequebook.sol --exc contract/mortal.sol:mortal,contract/owned.sol:owned --pkg contract --out contract/chequebook.go
@@ -52,15 +52,15 @@ import (
 // Some functionality requires interacting with the blockchain:
 // * setting current balance on peer's chequebook
 // * sending the transaction to cash the cheque
-// * depositing sever to the chequebook
-// * watching incoming sever
+// * depositing ether to the chequebook
+// * watching incoming ether
 
 var (
 	gasToCash = uint64(2000000) // gas cost of a cash transaction using chequebook
 	// gasToDeploy = uint64(3000000)
 )
 
-// Backend wraps all msevods required for chequebook operation.
+// Backend wraps all methods required for chequebook operation.
 type Backend interface {
 	bind.ContractBackend
 	TransactionReceipt(ctx context.Context, txHash common.Hash) (*types.Receipt, error)
@@ -290,7 +290,7 @@ func (self *Chequebook) Issue(beneficiary common.Address, amount *big.Int) (ch *
 	return
 }
 
-// Cash is a convenience msevod to cash any cheque.
+// Cash is a convenience method to cash any cheque.
 func (self *Chequebook) Cash(ch *Cheque) (txhash string, err error) {
 	return ch.Cash(self.session)
 }

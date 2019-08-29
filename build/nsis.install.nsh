@@ -1,4 +1,4 @@
-Name "ssev ${MAJORVERSION}.${MINORVERSION}.${BUILDVERSION}" # VERSION variables set through command line arguments
+Name "seth ${MAJORVERSION}.${MINORVERSION}.${BUILDVERSION}" # VERSION variables set through command line arguments
 InstallDir "$InstDir"
 OutFile "${OUTPUTFILE}" # set through command line arguments
 
@@ -12,30 +12,30 @@ PageEx license
   LicenseData {{.License}}
 PageExEnd
 
-# Install ssev binary
-Section "Ssev" GSEV_IDX
+# Install seth binary
+Section "Seth" GSEV_IDX
   SetOutPath $INSTDIR
-  file {{.Ssev}}
+  file {{.Seth}}
 
   # Create start menu launcher
   createDirectory "$SMPROGRAMS\${APPNAME}"
-  createShortCut "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk" "$INSTDIR\ssev.exe" "--fast" "--cache=512"
-  createShortCut "$SMPROGRAMS\${APPNAME}\Attach.lnk" "$INSTDIR\ssev.exe" "attach" "" ""
+  createShortCut "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk" "$INSTDIR\seth.exe" "--fast" "--cache=512"
+  createShortCut "$SMPROGRAMS\${APPNAME}\Attach.lnk" "$INSTDIR\seth.exe" "attach" "" ""
   createShortCut "$SMPROGRAMS\${APPNAME}\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "" ""
 
   # Firewall - remove rules (if exists)
-  SimpleFC::AdvRemoveRule "Ssev incoming peers (TCP:30303)"
-  SimpleFC::AdvRemoveRule "Ssev outgoing peers (TCP:30303)"
-  SimpleFC::AdvRemoveRule "Ssev UDP discovery (UDP:30303)"
+  SimpleFC::AdvRemoveRule "Seth incoming peers (TCP:30303)"
+  SimpleFC::AdvRemoveRule "Seth outgoing peers (TCP:30303)"
+  SimpleFC::AdvRemoveRule "Seth UDP discovery (UDP:30303)"
 
   # Firewall - add rules
-  SimpleFC::AdvAddRule "Ssev incoming peers (TCP:30303)" ""  6 1 1 2147483647 1 "$INSTDIR\ssev.exe" "" "" "Severeum" 30303 "" "" ""
-  SimpleFC::AdvAddRule "Ssev outgoing peers (TCP:30303)" ""  6 2 1 2147483647 1 "$INSTDIR\ssev.exe" "" "" "Severeum" "" 30303 "" ""
-  SimpleFC::AdvAddRule "Ssev UDP discovery (UDP:30303)" "" 17 2 1 2147483647 1 "$INSTDIR\ssev.exe" "" "" "Severeum" "" 30303 "" ""
+  SimpleFC::AdvAddRule "Seth incoming peers (TCP:30303)" ""  6 1 1 2147483647 1 "$INSTDIR\seth.exe" "" "" "Severeum" 30303 "" "" ""
+  SimpleFC::AdvAddRule "Seth outgoing peers (TCP:30303)" ""  6 2 1 2147483647 1 "$INSTDIR\seth.exe" "" "" "Severeum" "" 30303 "" ""
+  SimpleFC::AdvAddRule "Seth UDP discovery (UDP:30303)" "" 17 2 1 2147483647 1 "$INSTDIR\seth.exe" "" "" "Severeum" "" 30303 "" ""
 
   # Set default IPC endpoint (https://github.com/severeum/EIPs/issues/147)
-  ${EnvVarUpdate} $0 "SEVEREUM_SOCKET" "R" "HKLM" "\\.\pipe\ssev.ipc"
-  ${EnvVarUpdate} $0 "SEVEREUM_SOCKET" "A" "HKLM" "\\.\pipe\ssev.ipc"
+  ${EnvVarUpdate} $0 "SEVEREUM_SOCKET" "R" "HKLM" "\\.\pipe\seth.ipc"
+  ${EnvVarUpdate} $0 "SEVEREUM_SOCKET" "A" "HKLM" "\\.\pipe\seth.ipc"
 
   # Add instdir to PATH
   Push "$INSTDIR"

@@ -241,7 +241,7 @@ func testHasherReuse(poolsize int, t *testing.T) {
 	}
 }
 
-// Tests if pool can be cleanly reused even in concurrent use by several hasher
+// Tests if pool can be cleanly reused even in concurrent use by etheral hasher
 func TestBMTConcurrentUse(t *testing.T) {
 	hasher := sha3.NewLegacyKeccak256
 	pool := NewTreePool(hasher, segmentCount, PoolSize)

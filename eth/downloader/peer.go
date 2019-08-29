@@ -75,14 +75,14 @@ type peerConnection struct {
 	lock    sync.RWMutex
 }
 
-// LightPeer encapsulates the msevods required to synchronise with a remote light peer.
+// LightPeer encapsulates the methods required to synchronise with a remote light peer.
 type LightPeer interface {
 	Head() (common.Hash, *big.Int)
 	RequestHeadersByHash(common.Hash, int, int, bool) error
 	RequestHeadersByNumber(uint64, int, int, bool) error
 }
 
-// Peer encapsulates the msevods required to synchronise with a remote full peer.
+// Peer encapsulates the methods required to synchronise with a remote full peer.
 type Peer interface {
 	LightPeer
 	RequestBodies([]common.Hash) error
@@ -90,7 +90,7 @@ type Peer interface {
 	RequestNodeData([]common.Hash) error
 }
 
-// lightPeerWrapper wraps a LightPeer struct, stubbing out the Peer-only msevods.
+// lightPeerWrapper wraps a LightPeer struct, stubbing out the Peer-only methods.
 type lightPeerWrapper struct {
 	peer LightPeer
 }
@@ -147,7 +147,7 @@ func (p *peerConnection) Reset() {
 func (p *peerConnection) FetchHeaders(from uint64, count int) error {
 	// Sanity check the protocol version
 	if p.version < 62 {
-		panic(fmt.Sprintf("header fetch [sev/62+] requested on sev/%d", p.version))
+		panic(fmt.Sprintf("header fetch [eth/62+] requested on eth/%d", p.version))
 	}
 	// Short circuit if the peer is already fetching
 	if !atomic.CompareAndSwapInt32(&p.headerIdle, 0, 1) {
@@ -165,7 +165,7 @@ func (p *peerConnection) FetchHeaders(from uint64, count int) error {
 func (p *peerConnection) FetchBodies(request *fetchRequest) error {
 	// Sanity check the protocol version
 	if p.version < 62 {
-		panic(fmt.Sprintf("body fetch [sev/62+] requested on sev/%d", p.version))
+		panic(fmt.Sprintf("body fetch [eth/62+] requested on eth/%d", p.version))
 	}
 	// Short circuit if the peer is already fetching
 	if !atomic.CompareAndSwapInt32(&p.blockIdle, 0, 1) {
@@ -187,7 +187,7 @@ func (p *peerConnection) FetchBodies(request *fetchRequest) error {
 func (p *peerConnection) FetchReceipts(request *fetchRequest) error {
 	// Sanity check the protocol version
 	if p.version < 63 {
-		panic(fmt.Sprintf("body fetch [sev/63+] requested on sev/%d", p.version))
+		panic(fmt.Sprintf("body fetch [eth/63+] requested on eth/%d", p.version))
 	}
 	// Short circuit if the peer is already fetching
 	if !atomic.CompareAndSwapInt32(&p.receiptIdle, 0, 1) {
@@ -209,7 +209,7 @@ func (p *peerConnection) FetchReceipts(request *fetchRequest) error {
 func (p *peerConnection) FetchNodeData(hashes []common.Hash) error {
 	// Sanity check the protocol version
 	if p.version < 63 {
-		panic(fmt.Sprintf("node data fetch [sev/63+] requested on sev/%d", p.version))
+		panic(fmt.Sprintf("node data fetch [eth/63+] requested on eth/%d", p.version))
 	}
 	// Short circuit if the peer is already fetching
 	if !atomic.CompareAndSwapInt32(&p.stateIdle, 0, 1) {
@@ -329,8 +329,8 @@ func (p *peerConnection) MarkLacking(hash common.Hash) {
 	p.lacking[hash] = struct{}{}
 }
 
-// Lacks retrieves whsever the hash of a blockchain item is on the peers lacking
-// list (i.e. whsever we know that the peer does not have it).
+// Lacks retrieves whether the hash of a blockchain item is on the peers lacking
+// list (i.e. whether we know that the peer does not have it).
 func (p *peerConnection) Lacks(hash common.Hash) bool {
 	p.lock.RLock()
 	defer p.lock.RUnlock()
@@ -379,7 +379,7 @@ func (ps *peerSet) Reset() {
 // Register injects a new peer into the working set, or returns an error if the
 // peer is already known.
 //
-// The msevod also sets the starting throughput values of the new peer to the
+// The method also sets the starting throughput values of the new peer to the
 // average of all existing peers, to give it a realistic chance of being used
 // for data retrievals.
 func (ps *peerSet) Register(p *peerConnection) error {

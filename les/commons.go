@@ -22,8 +22,8 @@ import (
 
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/core"
-	"github.com/severeum/go-severeum/sev"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/eth"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/light"
 	"github.com/severeum/go-severeum/p2p"
 	"github.com/severeum/go-severeum/p2p/enode"
@@ -32,9 +32,9 @@ import (
 
 // lesCommons contains fields needed by both server and client.
 type lesCommons struct {
-	config                       *sev.Config
+	config                       *eth.Config
 	iConfig                      *light.IndexerConfig
-	chainDb                      sevdb.Database
+	chainDb                      ethdb.Database
 	protocolManager              *ProtocolManager
 	chtIndexer, bloomTrieIndexer *core.ChainIndexer
 }

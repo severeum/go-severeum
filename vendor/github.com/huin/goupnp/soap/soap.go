@@ -39,7 +39,7 @@ func (client *SOAPClient) PerformAction(actionNamespace, actionName string, inAc
 	}
 
 	response, err := client.HTTPClient.Do(&http.Request{
-		Msevod: "POST",
+		Method: "POST",
 		URL:    &client.EndpointURL,
 		Header: http.Header{
 			"SOAPACTION":   []string{`"` + actionNamespace + "#" + actionName + `"`},

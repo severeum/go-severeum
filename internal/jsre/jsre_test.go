@@ -32,7 +32,7 @@ type msg struct {
 	Msg string
 }
 
-func (no *testNativeObjectBinding) TestMsevod(call otto.FunctionCall) otto.Value {
+func (no *testNativeObjectBinding) TestMethod(call otto.FunctionCall) otto.Value {
 	m, err := call.Argument(0).ToString()
 	if err != nil {
 		return otto.UndefinedValue()
@@ -107,7 +107,7 @@ func TestBind(t *testing.T) {
 
 	jsre.Bind("no", &testNativeObjectBinding{})
 
-	_, err := jsre.Run(`no.TestMsevod("testMsg")`)
+	_, err := jsre.Run(`no.TestMethod("testMsg")`)
 	if err != nil {
 		t.Errorf("expected no error, got %v", err)
 	}

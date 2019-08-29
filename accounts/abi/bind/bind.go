@@ -63,16 +63,16 @@ func Bind(types []string, abis []string, bytecodes []string, pkg string, lang La
 			return r
 		}, abis[i])
 
-		// Extract the call and transact msevods; events; and sort them alphabetically
+		// Extract the call and transact methods; events; and sort them alphabetically
 		var (
-			calls     = make(map[string]*tmplMsevod)
-			transacts = make(map[string]*tmplMsevod)
+			calls     = make(map[string]*tmplMethod)
+			transacts = make(map[string]*tmplMethod)
 			events    = make(map[string]*tmplEvent)
 		)
-		for _, original := range evmABI.Msevods {
-			// Normalize the msevod for capital cases and non-anonymous inputs/outputs
+		for _, original := range evmABI.Methods {
+			// Normalize the method for capital cases and non-anonymous inputs/outputs
 			normalized := original
-			normalized.Name = msevodNormalizer[lang](original.Name)
+			normalized.Name = methodNormalizer[lang](original.Name)
 
 			normalized.Inputs = make([]abi.Argument, len(original.Inputs))
 			copy(normalized.Inputs, original.Inputs)
@@ -88,11 +88,11 @@ func Bind(types []string, abis []string, bytecodes []string, pkg string, lang La
 					normalized.Outputs[j].Name = capitalise(output.Name)
 				}
 			}
-			// Append the msevods to the call or transact lists
+			// Append the methods to the call or transact lists
 			if original.Const {
-				calls[original.Name] = &tmplMsevod{Original: original, Normalized: normalized, Structured: structured(original.Outputs)}
+				calls[original.Name] = &tmplMethod{Original: original, Normalized: normalized, Structured: structured(original.Outputs)}
 			} else {
-				transacts[original.Name] = &tmplMsevod{Original: original, Normalized: normalized, Structured: structured(original.Outputs)}
+				transacts[original.Name] = &tmplMethod{Original: original, Normalized: normalized, Structured: structured(original.Outputs)}
 			}
 		}
 		for _, original := range evmABI.Events {
@@ -102,7 +102,7 @@ func Bind(types []string, abis []string, bytecodes []string, pkg string, lang La
 			}
 			// Normalize the event for capital cases and non-anonymous outputs
 			normalized := original
-			normalized.Name = msevodNormalizer[lang](original.Name)
+			normalized.Name = methodNormalizer[lang](original.Name)
 
 			normalized.Inputs = make([]abi.Argument, len(original.Inputs))
 			copy(normalized.Inputs, original.Inputs)
@@ -336,14 +336,14 @@ func bindTopicTypeJava(kind abi.Type) string {
 }
 
 // namedType is a set of functions that transform language specific types to
-// named versions that my be used inside msevod names.
+// named versions that my be used inside method names.
 var namedType = map[Lang]func(string, abi.Type) string{
 	LangGo:   func(string, abi.Type) string { panic("this shouldn't be needed") },
 	LangJava: namedTypeJava,
 }
 
 // namedTypeJava converts some primitive data types to named variants that can
-// be used as parts of msevod names.
+// be used as parts of method names.
 func namedTypeJava(javaKind string, solKind abi.Type) string {
 	switch javaKind {
 	case "byte[]":
@@ -378,9 +378,9 @@ func namedTypeJava(javaKind string, solKind abi.Type) string {
 	}
 }
 
-// msevodNormalizer is a name transformer that modifies Solidity msevod names to
+// methodNormalizer is a name transformer that modifies Solidity method names to
 // conform to target language naming concentions.
-var msevodNormalizer = map[Lang]func(string) string{
+var methodNormalizer = map[Lang]func(string) string{
 	LangGo:   abi.ToCamelCase,
 	LangJava: decapitalise,
 }
@@ -400,7 +400,7 @@ func decapitalise(input string) string {
 	return strings.ToLower(goForm[:1]) + goForm[1:]
 }
 
-// structured checks whsever a list of ABI data types has enough information to
+// structured checks whether a list of ABI data types has enough information to
 // operate through a proper Go struct or if flat returns are needed.
 func structured(args abi.Arguments) bool {
 	if len(args) < 2 {

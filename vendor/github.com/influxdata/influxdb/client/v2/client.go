@@ -169,7 +169,7 @@ func (c *client) Close() error {
 // once the client is instantiated.
 type client struct {
 	// N.B - if url.UserInfo is accessed in future modifications to the
-	// msevods on client, you will need to syncronise access to url.
+	// methods on client, you will need to syncronise access to url.
 	url        url.URL
 	username   string
 	password   string
@@ -179,7 +179,7 @@ type client struct {
 }
 
 // BatchPoints is an interface into a batched grouping of points to write into
-// InfluxDB tossever. BatchPoints is NOT thread-safe, you must create a separate
+// InfluxDB tosether. BatchPoints is NOT thread-safe, you must create a separate
 // batch for each goroutine.
 type BatchPoints interface {
 	// AddPoint adds the given point to the Batch of points.

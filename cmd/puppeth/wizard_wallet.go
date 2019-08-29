@@ -31,8 +31,8 @@ func (w *wizard) deployWallet() {
 		log.Error("No genesis block configured")
 		return
 	}
-	if w.conf.sevstats == "" {
-		log.Error("No sevstats server configured")
+	if w.conf.ethstats == "" {
+		log.Error("No ethstats server configured")
 		return
 	}
 	// Select the server to interact with
@@ -59,7 +59,7 @@ func (w *wizard) deployWallet() {
 	fmt.Printf("Which port should the wallet listen on? (default = %d)\n", infos.webPort)
 	infos.webPort = w.readDefaultInt(infos.webPort)
 
-	// Figure which virtual-host to deploy sevstats on
+	// Figure which virtual-host to deploy ethstats on
 	if infos.webHost, err = w.ensureVirtualHost(client, infos.webPort, infos.webHost); err != nil {
 		log.Error("Failed to decide on wallet host", "err", err)
 		return
@@ -84,12 +84,12 @@ func (w *wizard) deployWallet() {
 
 	// Set a proper name to report on the stats page
 	fmt.Println()
-	if infos.sevstats == "" {
+	if infos.ethstats == "" {
 		fmt.Printf("What should the wallet be called on the stats page?\n")
-		infos.sevstats = w.readString() + ":" + w.conf.sevstats
+		infos.ethstats = w.readString() + ":" + w.conf.ethstats
 	} else {
-		fmt.Printf("What should the wallet be called on the stats page? (default = %s)\n", infos.sevstats)
-		infos.sevstats = w.readDefaultString(infos.sevstats) + ":" + w.conf.sevstats
+		fmt.Printf("What should the wallet be called on the stats page? (default = %s)\n", infos.ethstats)
+		infos.ethstats = w.readDefaultString(infos.ethstats) + ":" + w.conf.ethstats
 	}
 	// Try to deploy the wallet on the host
 	nocache := false

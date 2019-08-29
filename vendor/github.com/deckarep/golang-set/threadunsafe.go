@@ -45,7 +45,7 @@ func newThreadUnsafeSet() threadUnsafeSet {
 	return make(threadUnsafeSet)
 }
 
-// Equal says whsever two 2-tuples contain the same values in the same order.
+// Equal says whether two 2-tuples contain the same values in the same order.
 func (pair *OrderedPair) Equal(other OrderedPair) bool {
 	if pair.First == other.First &&
 		pair.Second == other.Second {

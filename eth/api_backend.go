@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sev
+package eth
 
 import (
 	"context"
@@ -28,68 +28,68 @@ import (
 	"github.com/severeum/go-severeum/core/state"
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/core/vm"
-	"github.com/severeum/go-severeum/sev/downloader"
-	"github.com/severeum/go-severeum/sev/gasprice"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/eth/downloader"
+	"github.com/severeum/go-severeum/eth/gasprice"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/params"
 	"github.com/severeum/go-severeum/rpc"
 )
 
-// SevAPIBackend implements sevapi.Backend for full nodes
+// SevAPIBackend implements ethapi.Backend for full nodes
 type SevAPIBackend struct {
-	sev *Severeum
+	eth *Severeum
 	gpo *gasprice.Oracle
 }
 
 // ChainConfig returns the active chain configuration.
 func (b *SevAPIBackend) ChainConfig() *params.ChainConfig {
-	return b.sev.chainConfig
+	return b.eth.chainConfig
 }
 
 func (b *SevAPIBackend) CurrentBlock() *types.Block {
-	return b.sev.blockchain.CurrentBlock()
+	return b.eth.blockchain.CurrentBlock()
 }
 
 func (b *SevAPIBackend) SetHead(number uint64) {
-	b.sev.protocolManager.downloader.Cancel()
-	b.sev.blockchain.SetHead(number)
+	b.eth.protocolManager.downloader.Cancel()
+	b.eth.blockchain.SetHead(number)
 }
 
 func (b *SevAPIBackend) HeaderByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*types.Header, error) {
 	// Pending block is only known by the miner
 	if blockNr == rpc.PendingBlockNumber {
-		block := b.sev.miner.PendingBlock()
+		block := b.eth.miner.PendingBlock()
 		return block.Header(), nil
 	}
 	// Otherwise resolve and return the block
 	if blockNr == rpc.LatestBlockNumber {
-		return b.sev.blockchain.CurrentBlock().Header(), nil
+		return b.eth.blockchain.CurrentBlock().Header(), nil
 	}
-	return b.sev.blockchain.GetHeaderByNumber(uint64(blockNr)), nil
+	return b.eth.blockchain.GetHeaderByNumber(uint64(blockNr)), nil
 }
 
 func (b *SevAPIBackend) HeaderByHash(ctx context.Context, hash common.Hash) (*types.Header, error) {
-	return b.sev.blockchain.GetHeaderByHash(hash), nil
+	return b.eth.blockchain.GetHeaderByHash(hash), nil
 }
 
 func (b *SevAPIBackend) BlockByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*types.Block, error) {
 	// Pending block is only known by the miner
 	if blockNr == rpc.PendingBlockNumber {
-		block := b.sev.miner.PendingBlock()
+		block := b.eth.miner.PendingBlock()
 		return block, nil
 	}
 	// Otherwise resolve and return the block
 	if blockNr == rpc.LatestBlockNumber {
-		return b.sev.blockchain.CurrentBlock(), nil
+		return b.eth.blockchain.CurrentBlock(), nil
 	}
-	return b.sev.blockchain.GetBlockByNumber(uint64(blockNr)), nil
+	return b.eth.blockchain.GetBlockByNumber(uint64(blockNr)), nil
 }
 
 func (b *SevAPIBackend) StateAndHeaderByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*state.StateDB, *types.Header, error) {
 	// Pending state is only known by the miner
 	if blockNr == rpc.PendingBlockNumber {
-		block, state := b.sev.miner.Pending()
+		block, state := b.eth.miner.Pending()
 		return state, block.Header(), nil
 	}
 	// Otherwise resolve the block number and return its state
@@ -97,20 +97,20 @@ func (b *SevAPIBackend) StateAndHeaderByNumber(ctx context.Context, blockNr rpc.
 	if header == nil || err != nil {
 		return nil, nil, err
 	}
-	stateDb, err := b.sev.BlockChain().StateAt(header.Root)
+	stateDb, err := b.eth.BlockChain().StateAt(header.Root)
 	return stateDb, header, err
 }
 
 func (b *SevAPIBackend) GetBlock(ctx context.Context, hash common.Hash) (*types.Block, error) {
-	return b.sev.blockchain.GetBlockByHash(hash), nil
+	return b.eth.blockchain.GetBlockByHash(hash), nil
 }
 
 func (b *SevAPIBackend) GetReceipts(ctx context.Context, hash common.Hash) (types.Receipts, error) {
-	return b.sev.blockchain.GetReceiptsByHash(hash), nil
+	return b.eth.blockchain.GetReceiptsByHash(hash), nil
 }
 
 func (b *SevAPIBackend) GetLogs(ctx context.Context, hash common.Hash) ([][]*types.Log, error) {
-	receipts := b.sev.blockchain.GetReceiptsByHash(hash)
+	receipts := b.eth.blockchain.GetReceiptsByHash(hash)
 	if receipts == nil {
 		return nil, nil
 	}
@@ -122,43 +122,43 @@ func (b *SevAPIBackend) GetLogs(ctx context.Context, hash common.Hash) ([][]*typ
 }
 
 func (b *SevAPIBackend) GetTd(blockHash common.Hash) *big.Int {
-	return b.sev.blockchain.GetTdByHash(blockHash)
+	return b.eth.blockchain.GetTdByHash(blockHash)
 }
 
 func (b *SevAPIBackend) GetEVM(ctx context.Context, msg core.Message, state *state.StateDB, header *types.Header) (*vm.EVM, func() error, error) {
 	state.SetBalance(msg.From(), math.MaxBig256)
 	vmError := func() error { return nil }
 
-	context := core.NewEVMContext(msg, header, b.sev.BlockChain(), nil)
-	return vm.NewEVM(context, state, b.sev.chainConfig, *b.sev.blockchain.GetVMConfig()), vmError, nil
+	context := core.NewEVMContext(msg, header, b.eth.BlockChain(), nil)
+	return vm.NewEVM(context, state, b.eth.chainConfig, *b.eth.blockchain.GetVMConfig()), vmError, nil
 }
 
 func (b *SevAPIBackend) SubscribeRemovedLogsEvent(ch chan<- core.RemovedLogsEvent) event.Subscription {
-	return b.sev.BlockChain().SubscribeRemovedLogsEvent(ch)
+	return b.eth.BlockChain().SubscribeRemovedLogsEvent(ch)
 }
 
 func (b *SevAPIBackend) SubscribeChainEvent(ch chan<- core.ChainEvent) event.Subscription {
-	return b.sev.BlockChain().SubscribeChainEvent(ch)
+	return b.eth.BlockChain().SubscribeChainEvent(ch)
 }
 
 func (b *SevAPIBackend) SubscribeChainHeadEvent(ch chan<- core.ChainHeadEvent) event.Subscription {
-	return b.sev.BlockChain().SubscribeChainHeadEvent(ch)
+	return b.eth.BlockChain().SubscribeChainHeadEvent(ch)
 }
 
 func (b *SevAPIBackend) SubscribeChainSideEvent(ch chan<- core.ChainSideEvent) event.Subscription {
-	return b.sev.BlockChain().SubscribeChainSideEvent(ch)
+	return b.eth.BlockChain().SubscribeChainSideEvent(ch)
 }
 
 func (b *SevAPIBackend) SubscribeLogsEvent(ch chan<- []*types.Log) event.Subscription {
-	return b.sev.BlockChain().SubscribeLogsEvent(ch)
+	return b.eth.BlockChain().SubscribeLogsEvent(ch)
 }
 
 func (b *SevAPIBackend) SendTx(ctx context.Context, signedTx *types.Transaction) error {
-	return b.sev.txPool.AddLocal(signedTx)
+	return b.eth.txPool.AddLocal(signedTx)
 }
 
 func (b *SevAPIBackend) GetPoolTransactions() (types.Transactions, error) {
-	pending, err := b.sev.txPool.Pending()
+	pending, err := b.eth.txPool.Pending()
 	if err != nil {
 		return nil, err
 	}
@@ -170,56 +170,56 @@ func (b *SevAPIBackend) GetPoolTransactions() (types.Transactions, error) {
 }
 
 func (b *SevAPIBackend) GetPoolTransaction(hash common.Hash) *types.Transaction {
-	return b.sev.txPool.Get(hash)
+	return b.eth.txPool.Get(hash)
 }
 
 func (b *SevAPIBackend) GetPoolNonce(ctx context.Context, addr common.Address) (uint64, error) {
-	return b.sev.txPool.State().GetNonce(addr), nil
+	return b.eth.txPool.State().GetNonce(addr), nil
 }
 
 func (b *SevAPIBackend) Stats() (pending int, queued int) {
-	return b.sev.txPool.Stats()
+	return b.eth.txPool.Stats()
 }
 
 func (b *SevAPIBackend) TxPoolContent() (map[common.Address]types.Transactions, map[common.Address]types.Transactions) {
-	return b.sev.TxPool().Content()
+	return b.eth.TxPool().Content()
 }
 
 func (b *SevAPIBackend) SubscribeNewTxsEvent(ch chan<- core.NewTxsEvent) event.Subscription {
-	return b.sev.TxPool().SubscribeNewTxsEvent(ch)
+	return b.eth.TxPool().SubscribeNewTxsEvent(ch)
 }
 
 func (b *SevAPIBackend) Downloader() *downloader.Downloader {
-	return b.sev.Downloader()
+	return b.eth.Downloader()
 }
 
 func (b *SevAPIBackend) ProtocolVersion() int {
-	return b.sev.SevVersion()
+	return b.eth.SevVersion()
 }
 
 func (b *SevAPIBackend) SuggestPrice(ctx context.Context) (*big.Int, error) {
 	return b.gpo.SuggestPrice(ctx)
 }
 
-func (b *SevAPIBackend) ChainDb() sevdb.Database {
-	return b.sev.ChainDb()
+func (b *SevAPIBackend) ChainDb() ethdb.Database {
+	return b.eth.ChainDb()
 }
 
 func (b *SevAPIBackend) EventMux() *event.TypeMux {
-	return b.sev.EventMux()
+	return b.eth.EventMux()
 }
 
 func (b *SevAPIBackend) AccountManager() *accounts.Manager {
-	return b.sev.AccountManager()
+	return b.eth.AccountManager()
 }
 
 func (b *SevAPIBackend) BloomStatus() (uint64, uint64) {
-	sections, _, _ := b.sev.bloomIndexer.Sections()
+	sections, _, _ := b.eth.bloomIndexer.Sections()
 	return params.BloomBitsBlocks, sections
 }
 
 func (b *SevAPIBackend) ServiceFilter(ctx context.Context, session *bloombits.MatcherSession) {
 	for i := 0; i < bloomFilterThreads; i++ {
-		go session.Multiplex(bloomRetrievalBatch, bloomRetrievalWait, b.sev.bloomRequests)
+		go session.Multiplex(bloomRetrievalBatch, bloomRetrievalWait, b.eth.bloomRequests)
 	}
 }

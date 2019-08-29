@@ -89,5 +89,5 @@ type Request struct {
 
 type LogsRequest struct {
 	Name string `json:"name"` // The request handler searches for log file based on this file name.
-	Past bool   `json:"past"` // Denotes whsever the client wants the previous or the next file.
+	Past bool   `json:"past"` // Denotes whether the client wants the previous or the next file.
 }

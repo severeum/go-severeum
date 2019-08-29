@@ -123,7 +123,7 @@ type WrappedMsg struct {
 }
 
 //For accounting, the design is to allow the Spec to describe which and how its messages are priced
-//To access this functionality, we provide a Hook interface which will call accounting msevods
+//To access this functionality, we provide a Hook interface which will call accounting methods
 //NOTE: there could be more such (horizontal) hooks in the future
 type Hook interface {
 	//A hook for sending messages

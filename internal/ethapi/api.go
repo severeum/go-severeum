@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sevapi
+package ethapi
 
 import (
 	"bytes"
@@ -31,7 +31,7 @@ import (
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/common/hexutil"
 	"github.com/severeum/go-severeum/common/math"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/rawdb"
 	"github.com/severeum/go-severeum/core/types"
@@ -51,7 +51,7 @@ const (
 )
 
 // PublicSevereumAPI provides an API to access Severeum related information.
-// It offers only msevods that operate on public data that is freely available to anyone.
+// It offers only methods that operate on public data that is freely available to anyone.
 type PublicSevereumAPI struct {
 	b Backend
 }
@@ -178,7 +178,7 @@ func (s *PublicTxPoolAPI) Inspect() map[string]map[string]map[string]string {
 }
 
 // PublicAccountAPI provides an API to access accounts managed by this node.
-// It offers only msevods that can retrieve accounts.
+// It offers only methods that can retrieve accounts.
 type PublicAccountAPI struct {
 	am *accounts.Manager
 }
@@ -200,7 +200,7 @@ func (s *PublicAccountAPI) Accounts() []common.Address {
 }
 
 // PrivateAccountAPI provides an API to access accounts managed by this node.
-// It offers msevods to create, (un)lock en list accounts. Some msevods accept
+// It offers methods to create, (un)lock en list accounts. Some methods accept
 // passwords and are therefore considered private by default.
 type PrivateAccountAPI struct {
 	am        *accounts.Manager
@@ -258,7 +258,7 @@ func (s *PrivateAccountAPI) ListWallets() []rawWallet {
 
 // OpenWallet initiates a hardware wallet opening procedure, establishing a USB
 // connection and attempting to authenticate via the provided passphrase. Note,
-// the msevod may return an extra challenge requiring a second open (e.g. the
+// the method may return an extra challenge requiring a second open (e.g. the
 // Trezor PIN matrix challenge).
 func (s *PrivateAccountAPI) OpenWallet(url string, passphrase *string) error {
 	wallet, err := s.am.Wallet(url)
@@ -449,7 +449,7 @@ func (s *PrivateAccountAPI) Sign(ctx context.Context, data hexutil.Bytes, addr c
 }
 
 // EcRecover returns the address for the account that was used to create the signature.
-// Note, this function is compatible with sev_sign and personal_sign. As such it recovers
+// Note, this function is compatible with eth_sign and personal_sign. As such it recovers
 // the address of:
 // hash = keccak256("\x19Severeum Signed Message:\n"${message length}${message})
 // addr = ecrecover(hash, signature)
@@ -474,14 +474,14 @@ func (s *PrivateAccountAPI) EcRecover(ctx context.Context, data, sig hexutil.Byt
 	return crypto.PubkeyToAddress(*rpk), nil
 }
 
-// SignAndSendTransaction was renamed to SendTransaction. This msevod is deprecated
+// SignAndSendTransaction was renamed to SendTransaction. This method is deprecated
 // and will be removed in the future. It primary goal is to give clients time to update.
 func (s *PrivateAccountAPI) SignAndSendTransaction(ctx context.Context, args SendTxArgs, passwd string) (common.Hash, error) {
 	return s.SendTransaction(ctx, args, passwd)
 }
 
 // PublicBlockChainAPI provides an API to access the Severeum blockchain.
-// It offers only msevods that operate on public data that is freely available to anyone.
+// It offers only methods that operate on public data that is freely available to anyone.
 type PublicBlockChainAPI struct {
 	b Backend
 }
@@ -1011,13 +1011,13 @@ func newRPCTransactionFromBlockHash(b *types.Block, hash common.Hash) *RPCTransa
 	return nil
 }
 
-// PublicTransactionPoolAPI exposes msevods for the RPC interface
+// PublicTransactionPoolAPI exposes methods for the RPC interface
 type PublicTransactionPoolAPI struct {
 	b         Backend
 	nonceLock *AddrLocker
 }
 
-// NewPublicTransactionPoolAPI creates a new RPC service with msevods specific for the transaction pool.
+// NewPublicTransactionPoolAPI creates a new RPC service with methods specific for the transaction pool.
 func NewPublicTransactionPoolAPI(b Backend, nonceLock *AddrLocker) *PublicTransactionPoolAPI {
 	return &PublicTransactionPoolAPI{b, nonceLock}
 }
@@ -1330,7 +1330,7 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encod
 //
 // The account associated with addr must be unlocked.
 //
-// https://github.com/severeum/wiki/wiki/JSON-RPC#sev_sign
+// https://github.com/severeum/wiki/wiki/JSON-RPC#eth_sign
 func (s *PublicTransactionPoolAPI) Sign(addr common.Address, data hexutil.Bytes) (hexutil.Bytes, error) {
 	// Look up the wallet containing the requested signer
 	account := accounts.Account{Address: addr}
@@ -1457,7 +1457,7 @@ type PublicDebugAPI struct {
 	b Backend
 }
 
-// NewPublicDebugAPI creates a new API definition for the public debug msevods
+// NewPublicDebugAPI creates a new API definition for the public debug methods
 // of the Severeum service.
 func NewPublicDebugAPI(b Backend) *PublicDebugAPI {
 	return &PublicDebugAPI{b: b}
@@ -1491,7 +1491,7 @@ func (api *PublicDebugAPI) SeedHash(ctx context.Context, number uint64) (string,
 	if block == nil {
 		return "", fmt.Errorf("block #%d not found", number)
 	}
-	return fmt.Sprintf("0x%x", sevash.SeedHash(number)), nil
+	return fmt.Sprintf("0x%x", ethash.SeedHash(number)), nil
 }
 
 // PrivateDebugAPI is the collection of Severeum APIs exposed over the private
@@ -1500,7 +1500,7 @@ type PrivateDebugAPI struct {
 	b Backend
 }
 
-// NewPrivateDebugAPI creates a new API definition for the private debug msevods
+// NewPrivateDebugAPI creates a new API definition for the private debug methods
 // of the Severeum service.
 func NewPrivateDebugAPI(b Backend) *PrivateDebugAPI {
 	return &PrivateDebugAPI{b: b}
@@ -1545,7 +1545,7 @@ func (api *PrivateDebugAPI) SetHead(number hexutil.Uint64) {
 	api.b.SetHead(uint64(number))
 }
 
-// PublicNetAPI offers network related RPC msevods
+// PublicNetAPI offers network related RPC methods
 type PublicNetAPI struct {
 	net            *p2p.Server
 	networkVersion uint64

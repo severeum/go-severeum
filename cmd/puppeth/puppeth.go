@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with go-severeum. If not, see <http://www.gnu.org/licenses/>.
 
-// puppsev is a command to assemble and maintain private networks.
+// puppeth is a command to assemble and maintain private networks.
 package main
 
 import (
@@ -30,7 +30,7 @@ import (
 // main is just a boring entry point to set up the CLI app.
 func main() {
 	app := cli.NewApp()
-	app.Name = "puppsev"
+	app.Name = "puppeth"
 	app.Usage = "assemble and maintain private Severeum networks"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{

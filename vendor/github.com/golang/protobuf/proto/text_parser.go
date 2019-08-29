@@ -78,8 +78,8 @@ func (t *token) String() string {
 
 type textParser struct {
 	s            string // remaining input
-	done         bool   // whsever the parsing is finished (success or error)
-	backed       bool   // whsever back() was called
+	done         bool   // whether the parsing is finished (success or error)
+	backed       bool   // whether back() was called
 	offset, line int
 	cur          token
 }
@@ -469,8 +469,8 @@ func (p *textParser) readStruct(sv reflect.Value, terminator string) error {
 		if tok.value == "[" {
 			// Looks like an extension or an Any.
 			//
-			// TODO: Check whsever we need to handle
-			// namespace rooted names (e.g. ".somseving.Foo").
+			// TODO: Check whether we need to handle
+			// namespace rooted names (e.g. ".something.Foo").
 			extName, err := p.consumeExtName()
 			if err != nil {
 				return err
@@ -526,7 +526,7 @@ func (p *textParser) readStruct(sv reflect.Value, terminator string) error {
 
 			var desc *ExtensionDesc
 			// This could be faster, but it's functional.
-			// TODO: Do somseving smarter than a linear scan.
+			// TODO: Do something smarter than a linear scan.
 			for _, d := range RegisteredExtensions(reflect.New(st).Interface().(Message)) {
 				if d.Name == extName {
 					desc = d

@@ -18,7 +18,7 @@ package intervals
 
 import "testing"
 
-// Test tests Interval msevods Add, Next and Last for various
+// Test tests Interval methods Add, Next and Last for various
 // initial state.
 func Test(t *testing.T) {
 	for i, tc := range []struct {

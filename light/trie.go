@@ -25,7 +25,7 @@ import (
 	"github.com/severeum/go-severeum/core/state"
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/trie"
 )
 
@@ -141,7 +141,7 @@ func (t *odrTrie) GetKey(sha []byte) []byte {
 	return nil
 }
 
-func (t *odrTrie) Prove(key []byte, fromLevel uint, proofDb sevdb.Putter) error {
+func (t *odrTrie) Prove(key []byte, fromLevel uint, proofDb ethdb.Putter) error {
 	return errors.New("not implemented, needs client/server interface split")
 }
 

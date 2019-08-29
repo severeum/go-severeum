@@ -1712,7 +1712,7 @@ var errors = [...]string{
 	88: "programming error",
 	89: "bad message",
 	90: "multihop attempted",
-	91: "link has been severed",
+	91: "link has been ethered",
 	92: "protocol error",
 	93: "capabilities insufficient",
 	94: "not permitted in capability mode",

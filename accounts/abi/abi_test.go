@@ -60,7 +60,7 @@ const jsondata2 = `
 func TestReader(t *testing.T) {
 	Uint256, _ := NewType("uint256", nil)
 	exp := ABI{
-		Msevods: map[string]Msevod{
+		Methods: map[string]Method{
 			"balance": {
 				"balance", true, nil, nil,
 			},
@@ -78,23 +78,23 @@ func TestReader(t *testing.T) {
 	}
 
 	// deep equal fails for some reason
-	for name, expM := range exp.Msevods {
-		gotM, exist := abi.Msevods[name]
+	for name, expM := range exp.Methods {
+		gotM, exist := abi.Methods[name]
 		if !exist {
-			t.Errorf("Missing expected msevod %v", name)
+			t.Errorf("Missing expected method %v", name)
 		}
 		if !reflect.DeepEqual(gotM, expM) {
-			t.Errorf("\nGot abi msevod: \n%v\ndoes not match expected msevod\n%v", gotM, expM)
+			t.Errorf("\nGot abi method: \n%v\ndoes not match expected method\n%v", gotM, expM)
 		}
 	}
 
-	for name, gotM := range abi.Msevods {
-		expM, exist := exp.Msevods[name]
+	for name, gotM := range abi.Methods {
+		expM, exist := exp.Methods[name]
 		if !exist {
-			t.Errorf("Found extra msevod %v", name)
+			t.Errorf("Found extra method %v", name)
 		}
 		if !reflect.DeepEqual(gotM, expM) {
-			t.Errorf("\nGot abi msevod: \n%v\ndoes not match expected msevod\n%v", gotM, expM)
+			t.Errorf("\nGot abi method: \n%v\ndoes not match expected method\n%v", gotM, expM)
 		}
 	}
 }
@@ -178,9 +178,9 @@ func TestTestSlice(t *testing.T) {
 	}
 }
 
-func TestMsevodSignature(t *testing.T) {
+func TestMethodSignature(t *testing.T) {
 	String, _ := NewType("string", nil)
-	m := Msevod{"foo", false, []Argument{{"bar", String, false}, {"baz", String, false}}, nil}
+	m := Method{"foo", false, []Argument{{"bar", String, false}, {"baz", String, false}}, nil}
 	exp := "foo(string,string)"
 	if m.Sig() != exp {
 		t.Error("signature mismatch", exp, "!=", m.Sig())
@@ -192,13 +192,13 @@ func TestMsevodSignature(t *testing.T) {
 	}
 
 	uintt, _ := NewType("uint256", nil)
-	m = Msevod{"foo", false, []Argument{{"bar", uintt, false}}, nil}
+	m = Method{"foo", false, []Argument{{"bar", uintt, false}}, nil}
 	exp = "foo(uint256)"
 	if m.Sig() != exp {
 		t.Error("signature mismatch", exp, "!=", m.Sig())
 	}
 
-	// Msevod with tuple arguments
+	// Method with tuple arguments
 	s, _ := NewType("tuple", []ArgumentMarshaling{
 		{Name: "a", Type: "int256"},
 		{Name: "b", Type: "int256[]"},
@@ -211,7 +211,7 @@ func TestMsevodSignature(t *testing.T) {
 			{Name: "y", Type: "int256"},
 		}},
 	})
-	m = Msevod{"foo", false, []Argument{{"s", s, false}, {"bar", String, false}}, nil}
+	m = Method{"foo", false, []Argument{{"s", s, false}, {"bar", String, false}}, nil}
 	exp = "foo((int256,int256[],(int256,int256)[],(int256,int256)[2]),string)"
 	if m.Sig() != exp {
 		t.Error("signature mismatch", exp, "!=", m.Sig())
@@ -576,7 +576,7 @@ func TestDefaultFunctionParsing(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if _, ok := abi.Msevods["balance"]; !ok {
+	if _, ok := abi.Methods["balance"]; !ok {
 		t.Error("expected 'balance' to be present")
 	}
 }
@@ -694,7 +694,7 @@ func TestUnpackEvent(t *testing.T) {
 	}
 }
 
-func TestABI_MsevodById(t *testing.T) {
+func TestABI_MethodById(t *testing.T) {
 	const abiJSON = `[
 		{"type":"function","name":"receive","constant":false,"inputs":[{"name":"memo","type":"bytes"}],"outputs":[],"payable":true,"stateMutability":"payable"},
 		{"type":"event","name":"received","anonymous":false,"inputs":[{"indexed":false,"name":"sender","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"memo","type":"bytes"}]},
@@ -723,25 +723,25 @@ func TestABI_MsevodById(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for name, m := range abi.Msevods {
+	for name, m := range abi.Methods {
 		a := fmt.Sprintf("%v", m)
-		m2, err := abi.MsevodById(m.Id())
+		m2, err := abi.MethodById(m.Id())
 		if err != nil {
-			t.Fatalf("Failed to look up ABI msevod: %v", err)
+			t.Fatalf("Failed to look up ABI method: %v", err)
 		}
 		b := fmt.Sprintf("%v", m2)
 		if a != b {
-			t.Errorf("Msevod %v (id %v) not 'findable' by id in ABI", name, common.ToHex(m.Id()))
+			t.Errorf("Method %v (id %v) not 'findable' by id in ABI", name, common.ToHex(m.Id()))
 		}
 	}
 	// Also test empty
-	if _, err := abi.MsevodById([]byte{0x00}); err == nil {
+	if _, err := abi.MethodById([]byte{0x00}); err == nil {
 		t.Errorf("Expected error, too short to decode data")
 	}
-	if _, err := abi.MsevodById([]byte{}); err == nil {
+	if _, err := abi.MethodById([]byte{}); err == nil {
 		t.Errorf("Expected error, too short to decode data")
 	}
-	if _, err := abi.MsevodById(nil); err == nil {
+	if _, err := abi.MethodById(nil); err == nil {
 		t.Errorf("Expected error, nil is short to decode data")
 	}
 }

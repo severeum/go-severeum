@@ -25,7 +25,7 @@ import (
 
 	"github.com/severeum/go-severeum/common/mclock"
 	"github.com/severeum/go-severeum/common/prque"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/rlp"
 )
@@ -44,7 +44,7 @@ import (
 // value for the client. Currently the LES protocol manager uses IP addresses
 // (without port address) to identify clients.
 type freeClientPool struct {
-	db     sevdb.Database
+	db     ethdb.Database
 	lock   sync.Mutex
 	clock  mclock.Clock
 	closed bool
@@ -64,7 +64,7 @@ const (
 )
 
 // newFreeClientPool creates a new free client pool
-func newFreeClientPool(db sevdb.Database, connectedLimit, totalLimit int, clock mclock.Clock) *freeClientPool {
+func newFreeClientPool(db ethdb.Database, connectedLimit, totalLimit int, clock mclock.Clock) *freeClientPool {
 	pool := &freeClientPool{
 		db:             db,
 		clock:          clock,
@@ -110,7 +110,7 @@ func (f *freeClientPool) connect(address string, disconnectFn func()) bool {
 		recentUsage = int64(math.Exp(float64(e.logUsage-f.logOffset(now)) / fixedPointMultiplier))
 	}
 	e.linUsage = recentUsage - int64(now)
-	// check whsever (linUsage+connectedBias) is smaller than the highest entry in the connected pool
+	// check whether (linUsage+connectedBias) is smaller than the highest entry in the connected pool
 	if f.connPool.Size() == f.connectedLimit {
 		i := f.connPool.PopItem().(*freeClientPoolEntry)
 		if e.linUsage+int64(connectedBias)-i.linUsage < 0 {

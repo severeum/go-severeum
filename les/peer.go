@@ -26,7 +26,7 @@ import (
 
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sev"
+	"github.com/severeum/go-severeum/eth"
 	"github.com/severeum/go-severeum/les/flowcontrol"
 	"github.com/severeum/go-severeum/light"
 	"github.com/severeum/go-severeum/p2p"
@@ -98,8 +98,8 @@ func (p *peer) queueSend(f func()) {
 }
 
 // Info gathers and returns a collection of metadata known about a peer.
-func (p *peer) Info() *sev.PeerInfo {
-	return &sev.PeerInfo{
+func (p *peer) Info() *eth.PeerInfo {
+	return &eth.PeerInfo{
 		Version:    p.version,
 		Difficulty: p.Td(),
 		Head:       fmt.Sprintf("%x", p.Head()),

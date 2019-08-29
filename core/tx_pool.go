@@ -124,7 +124,7 @@ type blockChain interface {
 // TxPoolConfig are the configuration parameters of the transaction pool.
 type TxPoolConfig struct {
 	Locals    []common.Address // Addresses that should be treated by default as local
-	NoLocals  bool             // Whsever local transaction handling should be disabled
+	NoLocals  bool             // Whether local transaction handling should be disabled
 	Journal   string           // Journal of local transactions to survive node restarts
 	Rejournal time.Duration    // Time interval to regenerate the local transaction journal
 
@@ -363,7 +363,7 @@ func (pool *TxPool) loop() {
 }
 
 // lockedReset is a wrapper around reset to allow calling it in a thread safe
-// manner. This msevod is only ever used in the tester!
+// manner. This method is only ever used in the tester!
 func (pool *TxPool) lockedReset(oldHead, newHead *types.Header) {
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
@@ -583,7 +583,7 @@ func (pool *TxPool) local() map[common.Address]types.Transactions {
 	return txs
 }
 
-// validateTx checks whsever a transaction is valid according to the consensus
+// validateTx checks whether a transaction is valid according to the consensus
 // rules and adheres to some heuristic limits of the local node (price and size).
 func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
 	// Heuristic limit, reject transactions over 32KB to prevent DOS attacks
@@ -711,7 +711,7 @@ func (pool *TxPool) add(tx *types.Transaction, local bool) (bool, error) {
 
 // enqueueTx inserts a new transaction into the non-executable transaction queue.
 //
-// Note, this msevod assumes the pool lock is held!
+// Note, this method assumes the pool lock is held!
 func (pool *TxPool) enqueueTx(hash common.Hash, tx *types.Transaction) (bool, error) {
 	// Try to insert the transaction into the future queue
 	from, _ := types.Sender(pool.signer, tx) // already validated
@@ -750,9 +750,9 @@ func (pool *TxPool) journalTx(from common.Address, tx *types.Transaction) {
 }
 
 // promoteTx adds a transaction to the pending (processable) list of transactions
-// and returns whsever it was inserted or an older was better.
+// and returns whether it was inserted or an older was better.
 //
-// Note, this msevod assumes the pool lock is held!
+// Note, this method assumes the pool lock is held!
 func (pool *TxPool) promoteTx(addr common.Address, hash common.Hash, tx *types.Transaction) bool {
 	// Try to insert the transaction into the pending queue
 	if pool.pending[addr] == nil {
@@ -856,7 +856,7 @@ func (pool *TxPool) addTxsLocked(txs []*types.Transaction, local bool) []error {
 			dirty[from] = struct{}{}
 		}
 	}
-	// Only reprocess the internal state if somseving was actually added
+	// Only reprocess the internal state if something was actually added
 	if len(dirty) > 0 {
 		addrs := make([]common.Address, 0, len(dirty))
 		for addr := range dirty {
@@ -1193,7 +1193,7 @@ func (as *accountSet) contains(addr common.Address) bool {
 }
 
 // containsTx checks if the sender of a given tx is within the set. If the sender
-// cannot be derived, this msevod returns false.
+// cannot be derived, this method returns false.
 func (as *accountSet) containsTx(tx *types.Transaction) bool {
 	if addr, err := types.Sender(as.signer, tx); err == nil {
 		return as.contains(addr)

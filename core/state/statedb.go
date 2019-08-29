@@ -181,7 +181,7 @@ func (self *StateDB) AddRefund(gas uint64) {
 }
 
 // SubRefund removes gas from the refund counter.
-// This msevod will panic if the refund counter goes below zero
+// This method will panic if the refund counter goes below zero
 func (self *StateDB) SubRefund(gas uint64) {
 	self.journal.append(refundChange{prev: self.refund})
 	if gas > self.refund {
@@ -190,13 +190,13 @@ func (self *StateDB) SubRefund(gas uint64) {
 	self.refund -= gas
 }
 
-// Exist reports whsever the given account address exists in the state.
+// Exist reports whether the given account address exists in the state.
 // Notably this also returns true for suicided accounts.
 func (self *StateDB) Exist(addr common.Address) bool {
 	return self.getStateObject(addr) != nil
 }
 
-// Empty returns whsever the state object is either non-existent
+// Empty returns whether the state object is either non-existent
 // or empty according to the EIP161 specification (balance = nonce = code = 0)
 func (self *StateDB) Empty(addr common.Address) bool {
 	so := self.getStateObject(addr)
@@ -382,7 +382,7 @@ func (self *StateDB) Suicide(addr common.Address) bool {
 }
 
 //
-// Setting, updating & deleting state object msevods.
+// Setting, updating & deleting state object methods.
 //
 
 // updateStateObject writes the given object to the trie.
@@ -508,7 +508,7 @@ func (self *StateDB) Copy() *StateDB {
 	// Copy the dirty states, logs, and preimages
 	for addr := range self.journal.dirties {
 		// As documented [here](https://github.com/severeum/go-severeum/pull/16485#issuecomment-380438527),
-		// and in the Finalise-msevod, there is a case where an object is in the journal but not
+		// and in the Finalise-method, there is a case where an object is in the journal but not
 		// in the stateObjects: OOG after touch on ripeMD prior to Byzantium. Thus, we need to check for
 		// nil
 		if object, exist := self.stateObjects[addr]; exist {

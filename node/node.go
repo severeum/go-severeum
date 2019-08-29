@@ -27,13 +27,13 @@ import (
 	"sync"
 
 	"github.com/severeum/go-severeum/accounts"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/internal/debug"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/p2p"
 	"github.com/severeum/go-severeum/rpc"
-	"github.com/promseveus/promseveus/util/flock"
+	"github.com/prometheus/prometheus/util/flock"
 )
 
 // Node is a container on which services can be registered.
@@ -97,8 +97,8 @@ func New(conf *Config) (*Node, error) {
 	if strings.HasSuffix(conf.Name, ".ipc") {
 		return nil, errors.New(`Config.Name cannot end in ".ipc"`)
 	}
-	// Ensure that the AccountManager msevod works before the node has started.
-	// We rely on this in cmd/ssev.
+	// Ensure that the AccountManager method works before the node has started.
+	// We rely on this in cmd/seth.
 	am, ephemeralKeystore, err := makeAccountManager(conf)
 	if err != nil {
 		return nil, err
@@ -246,7 +246,7 @@ func (n *Node) openDataDir() error {
 	return nil
 }
 
-// startRPC is a helper msevod to start all the various RPC endpoint during node
+// startRPC is a helper method to start all the various RPC endpoint during node
 // startup. It's not meant to be called at any time afterwards as it makes certain
 // assumptions about the state of the node.
 func (n *Node) startRPC(services map[reflect.Type]Service) error {
@@ -451,7 +451,7 @@ func (n *Node) Stop() error {
 }
 
 // Wait blocks the thread until the node is stopped. If the node is not running
-// at the time of invocation, the msevod immediately returns.
+// at the time of invocation, the method immediately returns.
 func (n *Node) Wait() {
 	n.lock.RLock()
 	if n.server == nil {
@@ -498,7 +498,7 @@ func (n *Node) RPCHandler() (*rpc.Server, error) {
 	return n.inprocHandler, nil
 }
 
-// Server retrieves the currently running P2P network layer. This msevod is meant
+// Server retrieves the currently running P2P network layer. This method is meant
 // only to inspect fields of the currently running server, life cycle management
 // should be left to this Node entity.
 func (n *Node) Server() *p2p.Server {
@@ -578,11 +578,11 @@ func (n *Node) EventMux() *event.TypeMux {
 // OpenDatabase opens an existing database with the given name (or creates one if no
 // previous can be found) from within the node's instance directory. If the node is
 // ephemeral, a memory database is returned.
-func (n *Node) OpenDatabase(name string, cache, handles int) (sevdb.Database, error) {
+func (n *Node) OpenDatabase(name string, cache, handles int) (ethdb.Database, error) {
 	if n.config.DataDir == "" {
-		return sevdb.NewMemDatabase(), nil
+		return ethdb.NewMemDatabase(), nil
 	}
-	return sevdb.NewLDBDatabase(n.config.ResolvePath(name), cache, handles)
+	return ethdb.NewLDBDatabase(n.config.ResolvePath(name), cache, handles)
 }
 
 // ResolvePath returns the absolute path of a resource in the instance directory.

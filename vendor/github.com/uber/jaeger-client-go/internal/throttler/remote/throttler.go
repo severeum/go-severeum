@@ -110,7 +110,7 @@ func (t *Throttler) IsAllowed(operation string) bool {
 		if !ok {
 			// NOTE: This appears to be a no-op at first glance, but it stores
 			// the operation key in the map. Necessary for functionality of
-			// Throttler#operations msevod.
+			// Throttler#operations method.
 			t.credits[operation] = 0
 		}
 		if !t.synchronousInitialization {

@@ -76,7 +76,7 @@ func (h *Handler) SetStore(store *storage.NetStore) {
 	h.chunkStore = store
 }
 
-// Validate is a chunk validation msevod
+// Validate is a chunk validation method
 // If it looks like a feed update, the chunk address is checked against the userAddr of the update's signature
 // It implements the storage.ChunkValidator interface
 func (h *Handler) Validate(chunk storage.Chunk) bool {

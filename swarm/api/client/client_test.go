@@ -383,7 +383,7 @@ func TestClientBzzWithFeed(t *testing.T) {
 	swarmClient := NewClient(srv.URL)
 	defer srv.Close()
 
-	// put tossever some data for our test:
+	// put tosether some data for our test:
 	dataBytes := []byte(`
 	//
 	// Create some data our manifest will point to. Data that could be very big and wouldn't fit in a feed update.
@@ -423,7 +423,7 @@ func TestClientBzzWithFeed(t *testing.T) {
 	manifestAddress := common.FromHex(manifestAddressHex)
 
 	if len(manifestAddress) != storage.AddressLength {
-		t.Fatalf("Somseving went wrong. Got a hash of an unexpected length. Expected %d bytes. Got %d", storage.AddressLength, len(manifestAddress))
+		t.Fatalf("Something went wrong. Got a hash of an unexpected length. Expected %d bytes. Got %d", storage.AddressLength, len(manifestAddress))
 	}
 
 	// Now create a **feed manifest**. For that, we need a topic:

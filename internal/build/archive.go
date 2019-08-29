@@ -125,7 +125,7 @@ func (a *ZipArchive) Header(fi os.FileInfo) (io.Writer, error) {
 		return nil, fmt.Errorf("can't make zip header: %v", err)
 	}
 	head.Name = a.dir + head.Name
-	head.Msevod = zip.Deflate
+	head.Method = zip.Deflate
 	w, err := a.zipw.CreateHeader(head)
 	if err != nil {
 		return nil, fmt.Errorf("can't add zip header: %v", err)

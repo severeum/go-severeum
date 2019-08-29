@@ -92,7 +92,7 @@ func (p *Paragraph) SetString(s string, opts ...Option) (n int, err error) {
 	panic("unimplemented")
 }
 
-// IsLeftToRight reports whsever the principle direction of rendering for this
+// IsLeftToRight reports whether the principle direction of rendering for this
 // paragraphs is left-to-right. If this returns false, the principle direction
 // of rendering is right-to-left.
 func (p *Paragraph) IsLeftToRight() bool {
@@ -108,7 +108,7 @@ func (p *Paragraph) Direction() Direction {
 
 // RunAt reports the Run at the given position of the input text.
 //
-// This msevod can be used for computing line breaks on paragraphs.
+// This method can be used for computing line breaks on paragraphs.
 func (p *Paragraph) RunAt(pos int) Run {
 	panic("unimplemented")
 }
@@ -126,7 +126,7 @@ func (p *Paragraph) Line(start, end int) (Ordering, error) {
 
 // An Ordering holds the computed visual order of runs of a Paragraph. Calling
 // SetBytes or SetString on the originating Paragraph invalidates an Ordering.
-// The msevods of an Ordering should only be called by one goroutine at a time.
+// The methods of an Ordering should only be called by one goroutine at a time.
 type Ordering struct{}
 
 // Direction reports the directionality of the runs.
@@ -167,7 +167,7 @@ func (r *Run) Bytes() []byte {
 	panic("unimplemented")
 }
 
-// TODO: msevods for
+// TODO: methods for
 // - Display order
 // - headers and footers
 // - bracket replacement.

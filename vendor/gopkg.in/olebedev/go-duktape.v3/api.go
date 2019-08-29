@@ -199,9 +199,9 @@ func (d *Context) Call(nargs int) {
 	C.duk_call(d.duk_context, C.duk_idx_t(nargs))
 }
 
-// See: http://duktape.org/api.html#duk_call_msevod
-func (d *Context) CallMsevod(nargs int) {
-	C.duk_call_msevod(d.duk_context, C.duk_idx_t(nargs))
+// See: http://duktape.org/api.html#duk_call_method
+func (d *Context) CallMethod(nargs int) {
+	C.duk_call_method(d.duk_context, C.duk_idx_t(nargs))
 }
 
 // See: http://duktape.org/api.html#duk_call_prop
@@ -776,9 +776,9 @@ func (d *Context) Pcall(nargs int) int {
 	return int(C.duk_pcall(d.duk_context, C.duk_idx_t(nargs)))
 }
 
-// See: http://duktape.org/api.html#duk_pcall_msevod
-func (d *Context) PcallMsevod(nargs int) int {
-	return int(C.duk_pcall_msevod(d.duk_context, C.duk_idx_t(nargs)))
+// See: http://duktape.org/api.html#duk_pcall_method
+func (d *Context) PcallMethod(nargs int) int {
+	return int(C.duk_pcall_method(d.duk_context, C.duk_idx_t(nargs)))
 }
 
 // See: http://duktape.org/api.html#duk_pcall_prop

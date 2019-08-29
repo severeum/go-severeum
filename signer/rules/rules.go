@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/severeum/go-severeum/common"
-	"github.com/severeum/go-severeum/internal/sevapi"
+	"github.com/severeum/go-severeum/internal/ethapi"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/signer/core"
 	"github.com/severeum/go-severeum/signer/rules/deps"
@@ -35,7 +35,7 @@ var (
 	BigNumber_JS = deps.MustAsset("bignumber.js")
 )
 
-// consoleOutput is an override for the console.log and console.error msevods to
+// consoleOutput is an override for the console.log and console.error methods to
 // stream the output into the configured output stream instead of stdout.
 func consoleOutput(call otto.FunctionCall) otto.Value {
 	output := []string{"JS:> "}
@@ -47,7 +47,7 @@ func consoleOutput(call otto.FunctionCall) otto.Value {
 }
 
 // rulesetUI provides an implementation of SignerUI that evaluates a javascript
-// file for each defined UI-msevod
+// file for each defined UI-method
 type rulesetUI struct {
 	next        core.SignerUI // The next handler, for manual processing
 	storage     storage.Storage
@@ -241,7 +241,7 @@ func (r *rulesetUI) OnSignerStartup(info core.StartupInfo) {
 	}
 }
 
-func (r *rulesetUI) OnApprovedTx(tx sevapi.SignTransactionResult) {
+func (r *rulesetUI) OnApprovedTx(tx ethapi.SignTransactionResult) {
 	jsonTx, err := json.Marshal(tx)
 	if err != nil {
 		log.Warn("failed marshalling transaction", "tx", tx)

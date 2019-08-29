@@ -41,7 +41,7 @@ var customGenesisTests = []struct {
 			"parentHash" : "0x0000000000000000000000000000000000000000000000000000000000000000",
 			"timestamp"  : "0x00"
 		}`,
-		query:  "sev.getBlock(0).nonce",
+		query:  "eth.getBlock(0).nonce",
 		result: "0x0000000000000042",
 	},
 	// Genesis file with an empty chain configuration (ensure missing fields work)
@@ -58,7 +58,7 @@ var customGenesisTests = []struct {
 			"timestamp"  : "0x00",
 			"config"     : {}
 		}`,
-		query:  "sev.getBlock(0).nonce",
+		query:  "eth.getBlock(0).nonce",
 		result: "0x0000000000000042",
 	},
 	// Genesis file with specific chain configurations
@@ -79,12 +79,12 @@ var customGenesisTests = []struct {
 				"daoForkSupport" : true
 			}
 		}`,
-		query:  "sev.getBlock(0).nonce",
+		query:  "eth.getBlock(0).nonce",
 		result: "0x0000000000000042",
 	},
 }
 
-// Tests that initializing Ssev with a custom genesis block and chain definitions
+// Tests that initializing Seth with a custom genesis block and chain definitions
 // work properly.
 func TestCustomGenesis(t *testing.T) {
 	for i, tt := range customGenesisTests {
@@ -97,14 +97,14 @@ func TestCustomGenesis(t *testing.T) {
 		if err := ioutil.WriteFile(json, []byte(tt.genesis), 0600); err != nil {
 			t.Fatalf("test %d: failed to write genesis file: %v", i, err)
 		}
-		runSsev(t, "--datadir", datadir, "init", json).WaitExit()
+		runSeth(t, "--datadir", datadir, "init", json).WaitExit()
 
 		// Query the custom genesis block
-		ssev := runSsev(t,
+		seth := runSeth(t,
 			"--datadir", datadir, "--maxpeers", "0", "--port", "0",
 			"--nodiscover", "--nat", "none", "--ipcdisable",
 			"--exec", tt.query, "console")
-		ssev.ExpectRegexp(tt.result)
-		ssev.ExpectExit()
+		seth.ExpectRegexp(tt.result)
+		seth.ExpectExit()
 	}
 }

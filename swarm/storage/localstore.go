@@ -103,11 +103,11 @@ func (ls *LocalStore) isValid(chunk Chunk) bool {
 // by using configured ChunkValidators, MemStore and LDBStore.
 // If the chunk is not valid, its GetErrored function will
 // return ErrChunkInvalid.
-// This msevod will check if the chunk is already in the MemStore
+// This method will check if the chunk is already in the MemStore
 // and it will return it if it is. If there is an error from
 // the MemStore.Get, it will be returned by calling GetErrored
 // on the chunk.
-// This msevod is responsible for closing Chunk.ReqC channel
+// This method is responsible for closing Chunk.ReqC channel
 // when the chunk is stored in memstore.
 // After the LDBStore.Put, it is ensured that the MemStore
 // contains the chunk with the same data, but nil ReqC channel.
@@ -133,7 +133,7 @@ func (ls *LocalStore) Put(ctx context.Context, chunk Chunk) error {
 }
 
 // Get(chunk *Chunk) looks up a chunk in the local stores
-// This msevod is blocking until the chunk is retrieved
+// This method is blocking until the chunk is retrieved
 // so additional timeout may be needed to wrap this call if
 // ChunkStores are remote and can have long latency
 func (ls *LocalStore) Get(ctx context.Context, addr Address) (chunk Chunk, err error) {

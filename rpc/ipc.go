@@ -35,7 +35,7 @@ func (srv *Server) ServeListener(l net.Listener) error {
 			return err
 		}
 		log.Trace("IPC accepted connection")
-		go srv.ServeCodec(NewJSONCodec(conn), OptionMsevodInvocation|OptionSubscriptions)
+		go srv.ServeCodec(NewJSONCodec(conn), OptionMethodInvocation|OptionSubscriptions)
 	}
 }
 

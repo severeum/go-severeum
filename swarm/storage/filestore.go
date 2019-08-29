@@ -78,7 +78,7 @@ func NewFileStore(store ChunkStore, params *FileStoreParams) *FileStore {
 // FS-aware API and httpaccess
 // Chunk retrieval blocks on netStore requests with a timeout so reader will
 // report error if retrieval of chunks within requested range time out.
-// It returns a reader with the chunk data and whsever the content was encrypted
+// It returns a reader with the chunk data and whether the content was encrypted
 func (f *FileStore) Retrieve(ctx context.Context, addr Address) (reader *LazyChunkReader, isEncrypted bool) {
 	isEncrypted = len(addr) > f.hashFunc().Size()
 	getter := NewHasherStore(f.ChunkStore, f.hashFunc, isEncrypted)

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sev
+package eth
 
 import (
 	"fmt"
@@ -30,24 +30,24 @@ import (
 
 // Constants to match up protocol versions and messages
 const (
-	sev62 = 62
-	sev63 = 63
+	eth62 = 62
+	eth63 = 63
 )
 
 // ProtocolName is the official short name of the protocol used during capability negotiation.
-var ProtocolName = "sev"
+var ProtocolName = "eth"
 
-// ProtocolVersions are the supported versions of the sev protocol (first is primary).
-var ProtocolVersions = []uint{sev63, sev62}
+// ProtocolVersions are the supported versions of the eth protocol (first is primary).
+var ProtocolVersions = []uint{eth63, eth62}
 
 // ProtocolLengths are the number of implemented message corresponding to different protocol versions.
 var ProtocolLengths = []uint64{17, 8}
 
 const ProtocolMaxMsgSize = 10 * 1024 * 1024 // Maximum cap on the size of a protocol message
 
-// sev protocol message codes
+// eth protocol message codes
 const (
-	// Protocol messages belonging to sev/62
+	// Protocol messages belonging to eth/62
 	StatusMsg          = 0x00
 	NewBlockHashesMsg  = 0x01
 	TxMsg              = 0x02
@@ -57,7 +57,7 @@ const (
 	BlockBodiesMsg     = 0x06
 	NewBlockMsg        = 0x07
 
-	// Protocol messages belonging to sev/63
+	// Protocol messages belonging to eth/63
 	GetNodeDataMsg = 0x0d
 	NodeDataMsg    = 0x0e
 	GetReceiptsMsg = 0x0f

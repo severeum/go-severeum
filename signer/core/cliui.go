@@ -26,7 +26,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/severeum/go-severeum/common/hexutil"
-	"github.com/severeum/go-severeum/internal/sevapi"
+	"github.com/severeum/go-severeum/internal/ethapi"
 	"github.com/severeum/go-severeum/log"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -259,7 +259,7 @@ func (ui *CommandlineUI) ShowInfo(message string) {
 	fmt.Printf("Info: %v\n", message)
 }
 
-func (ui *CommandlineUI) OnApprovedTx(tx sevapi.SignTransactionResult) {
+func (ui *CommandlineUI) OnApprovedTx(tx ethapi.SignTransactionResult) {
 	fmt.Printf("Transaction signed:\n ")
 	spew.Dump(tx.Tx)
 }

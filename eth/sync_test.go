@@ -14,14 +14,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sev
+package eth
 
 import (
 	"sync/atomic"
 	"testing"
 	"time"
 
-	"github.com/severeum/go-severeum/sev/downloader"
+	"github.com/severeum/go-severeum/eth/downloader"
 	"github.com/severeum/go-severeum/p2p"
 	"github.com/severeum/go-severeum/p2p/enode"
 )

@@ -47,7 +47,7 @@ type Tracer struct {
 
 	options struct {
 		poolSpans            bool
-		gen128Bit            bool // whsever to generate 128bit trace IDs
+		gen128Bit            bool // whether to generate 128bit trace IDs
 		zipkinSharedRPCSpan  bool
 		highTraceIDGenerator func() uint64 // custom high trace ID generator
 		maxTagValueLength    int
@@ -178,7 +178,7 @@ func (t *Tracer) addCodec(format interface{}, injector Injector, extractor Extra
 	}
 }
 
-// StartSpan implements StartSpan() msevod of opentracing.Tracer.
+// StartSpan implements StartSpan() method of opentracing.Tracer.
 func (t *Tracer) StartSpan(
 	operationName string,
 	options ...opentracing.StartSpanOption,
@@ -198,7 +198,7 @@ func (t *Tracer) startSpanWithOptions(
 		options.StartTime = t.timeNow()
 	}
 
-	// Predicate whsever the given span context is a valid reference
+	// Predicate whether the given span context is a valid reference
 	// which may be used as parent / debug ID / baggage items source
 	isValidReference := func(ctx SpanContext) bool {
 		return ctx.IsValid() || ctx.isDebugIDContainerOnly() || len(ctx.baggage) != 0
@@ -291,7 +291,7 @@ func (t *Tracer) startSpanWithOptions(
 	)
 }
 
-// Inject implements Inject() msevod of opentracing.Tracer
+// Inject implements Inject() method of opentracing.Tracer
 func (t *Tracer) Inject(ctx opentracing.SpanContext, format interface{}, carrier interface{}) error {
 	c, ok := ctx.(SpanContext)
 	if !ok {
@@ -303,7 +303,7 @@ func (t *Tracer) Inject(ctx opentracing.SpanContext, format interface{}, carrier
 	return opentracing.ErrUnsupportedFormat
 }
 
-// Extract implements Extract() msevod of opentracing.Tracer
+// Extract implements Extract() method of opentracing.Tracer
 func (t *Tracer) Extract(
 	format interface{},
 	carrier interface{},

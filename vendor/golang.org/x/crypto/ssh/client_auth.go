@@ -34,14 +34,14 @@ func (c *connection) clientAuthenticate(config *ClientConfig) error {
 		return err
 	}
 
-	// during the authentication phase the client first attempts the "none" msevod
-	// then any untried msevods suggested by the server.
+	// during the authentication phase the client first attempts the "none" method
+	// then any untried methods suggested by the server.
 	tried := make(map[string]bool)
-	var lastMsevods []string
+	var lastMethods []string
 
 	sessionID := c.transport.getSessionID()
-	for auth := AuthMsevod(new(noneAuth)); auth != nil; {
-		ok, msevods, err := auth.auth(sessionID, config.User, c.transport, config.Rand)
+	for auth := AuthMethod(new(noneAuth)); auth != nil; {
+		ok, methods, err := auth.auth(sessionID, config.User, c.transport, config.Rand)
 		if err != nil {
 			return err
 		}
@@ -49,30 +49,30 @@ func (c *connection) clientAuthenticate(config *ClientConfig) error {
 			// success
 			return nil
 		} else if ok == authFailure {
-			tried[auth.msevod()] = true
+			tried[auth.method()] = true
 		}
-		if msevods == nil {
-			msevods = lastMsevods
+		if methods == nil {
+			methods = lastMethods
 		}
-		lastMsevods = msevods
+		lastMethods = methods
 
 		auth = nil
 
 	findNext:
 		for _, a := range config.Auth {
-			candidateMsevod := a.msevod()
-			if tried[candidateMsevod] {
+			candidateMethod := a.method()
+			if tried[candidateMethod] {
 				continue
 			}
-			for _, msev := range msevods {
-				if msev == candidateMsevod {
+			for _, meth := range methods {
+				if meth == candidateMethod {
 					auth = a
 					break findNext
 				}
 			}
 		}
 	}
-	return fmt.Errorf("ssh: unable to authenticate, attempted msevods %v, no supported msevods remain", keys(tried))
+	return fmt.Errorf("ssh: unable to authenticate, attempted methods %v, no supported methods remain", keys(tried))
 }
 
 func keys(m map[string]bool) []string {
@@ -84,17 +84,17 @@ func keys(m map[string]bool) []string {
 	return s
 }
 
-// An AuthMsevod represents an instance of an RFC 4252 authentication msevod.
-type AuthMsevod interface {
+// An AuthMethod represents an instance of an RFC 4252 authentication method.
+type AuthMethod interface {
 	// auth authenticates user over transport t.
 	// Returns true if authentication is successful.
 	// If authentication is not successful, a []string of alternative
-	// msevod names is returned. If the slice is nil, it will be ignored
-	// and the previous set of possible msevods will be reused.
+	// method names is returned. If the slice is nil, it will be ignored
+	// and the previous set of possible methods will be reused.
 	auth(session []byte, user string, p packetConn, rand io.Reader) (authResult, []string, error)
 
-	// msevod returns the RFC 4252 msevod name.
-	msevod() string
+	// method returns the RFC 4252 method name.
+	method() string
 }
 
 // "none" authentication, RFC 4252 section 5.2.
@@ -104,7 +104,7 @@ func (n *noneAuth) auth(session []byte, user string, c packetConn, rand io.Reade
 	if err := c.writePacket(Marshal(&userAuthRequestMsg{
 		User:    user,
 		Service: serviceSSH,
-		Msevod:  "none",
+		Method:  "none",
 	})); err != nil {
 		return authFailure, nil, err
 	}
@@ -112,11 +112,11 @@ func (n *noneAuth) auth(session []byte, user string, c packetConn, rand io.Reade
 	return handleAuthResponse(c)
 }
 
-func (n *noneAuth) msevod() string {
+func (n *noneAuth) method() string {
 	return "none"
 }
 
-// passwordCallback is an AuthMsevod that fetches the password through
+// passwordCallback is an AuthMethod that fetches the password through
 // a function call, e.g. by prompting the user.
 type passwordCallback func() (password string, err error)
 
@@ -124,7 +124,7 @@ func (cb passwordCallback) auth(session []byte, user string, c packetConn, rand 
 	type passwordAuthMsg struct {
 		User     string `sshtype:"50"`
 		Service  string
-		Msevod   string
+		Method   string
 		Reply    bool
 		Password string
 	}
@@ -140,7 +140,7 @@ func (cb passwordCallback) auth(session []byte, user string, c packetConn, rand 
 	if err := c.writePacket(Marshal(&passwordAuthMsg{
 		User:     user,
 		Service:  serviceSSH,
-		Msevod:   cb.msevod(),
+		Method:   cb.method(),
 		Reply:    false,
 		Password: pw,
 	})); err != nil {
@@ -150,25 +150,25 @@ func (cb passwordCallback) auth(session []byte, user string, c packetConn, rand 
 	return handleAuthResponse(c)
 }
 
-func (cb passwordCallback) msevod() string {
+func (cb passwordCallback) method() string {
 	return "password"
 }
 
-// Password returns an AuthMsevod using the given password.
-func Password(secret string) AuthMsevod {
+// Password returns an AuthMethod using the given password.
+func Password(secret string) AuthMethod {
 	return passwordCallback(func() (string, error) { return secret, nil })
 }
 
-// PasswordCallback returns an AuthMsevod that uses a callback for
+// PasswordCallback returns an AuthMethod that uses a callback for
 // fetching a password.
-func PasswordCallback(prompt func() (secret string, err error)) AuthMsevod {
+func PasswordCallback(prompt func() (secret string, err error)) AuthMethod {
 	return passwordCallback(prompt)
 }
 
 type publickeyAuthMsg struct {
 	User    string `sshtype:"50"`
 	Service string
-	Msevod  string
+	Method  string
 	// HasSig indicates to the receiver packet that the auth request is signed and
 	// should be used for authentication of the request.
 	HasSig   bool
@@ -179,11 +179,11 @@ type publickeyAuthMsg struct {
 	Sig []byte `ssh:"rest"`
 }
 
-// publicKeyCallback is an AuthMsevod that uses a set of key
+// publicKeyCallback is an AuthMethod that uses a set of key
 // pairs for authentication.
 type publicKeyCallback func() ([]Signer, error)
 
-func (cb publicKeyCallback) msevod() string {
+func (cb publicKeyCallback) method() string {
 	return "publickey"
 }
 
@@ -197,7 +197,7 @@ func (cb publicKeyCallback) auth(session []byte, user string, c packetConn, rand
 	if err != nil {
 		return authFailure, nil, err
 	}
-	var msevods []string
+	var methods []string
 	for _, signer := range signers {
 		ok, err := validateKey(signer.PublicKey(), user, c)
 		if err != nil {
@@ -212,7 +212,7 @@ func (cb publicKeyCallback) auth(session []byte, user string, c packetConn, rand
 		sign, err := signer.Sign(rand, buildDataSignedForAuth(session, userAuthRequestMsg{
 			User:    user,
 			Service: serviceSSH,
-			Msevod:  cb.msevod(),
+			Method:  cb.method(),
 		}, []byte(pub.Type()), pubKey))
 		if err != nil {
 			return authFailure, nil, err
@@ -225,7 +225,7 @@ func (cb publicKeyCallback) auth(session []byte, user string, c packetConn, rand
 		msg := publickeyAuthMsg{
 			User:     user,
 			Service:  serviceSSH,
-			Msevod:   cb.msevod(),
+			Method:   cb.method(),
 			HasSig:   true,
 			Algoname: pub.Type(),
 			PubKey:   pubKey,
@@ -236,26 +236,26 @@ func (cb publicKeyCallback) auth(session []byte, user string, c packetConn, rand
 			return authFailure, nil, err
 		}
 		var success authResult
-		success, msevods, err = handleAuthResponse(c)
+		success, methods, err = handleAuthResponse(c)
 		if err != nil {
 			return authFailure, nil, err
 		}
 
-		// If authentication succeeds or the list of available msevods does not
-		// contain the "publickey" msevod, do not attempt to authenticate with any
+		// If authentication succeeds or the list of available methods does not
+		// contain the "publickey" method, do not attempt to authenticate with any
 		// other keys.  According to RFC 4252 Section 7, the latter can occur when
-		// additional authentication msevods are required.
-		if success == authSuccess || !containsMsevod(msevods, cb.msevod()) {
-			return success, msevods, err
+		// additional authentication methods are required.
+		if success == authSuccess || !containsMethod(methods, cb.method()) {
+			return success, methods, err
 		}
 	}
 
-	return authFailure, msevods, nil
+	return authFailure, methods, nil
 }
 
-func containsMsevod(msevods []string, msevod string) bool {
-	for _, m := range msevods {
-		if m == msevod {
+func containsMethod(methods []string, method string) bool {
+	for _, m := range methods {
+		if m == method {
 			return true
 		}
 	}
@@ -269,7 +269,7 @@ func validateKey(key PublicKey, user string, c packetConn) (bool, error) {
 	msg := publickeyAuthMsg{
 		User:     user,
 		Service:  serviceSSH,
-		Msevod:   "publickey",
+		Method:   "publickey",
 		HasSig:   false,
 		Algoname: key.Type(),
 		PubKey:   pubKey,
@@ -312,20 +312,20 @@ func confirmKeyAck(key PublicKey, c packetConn) (bool, error) {
 	}
 }
 
-// PublicKeys returns an AuthMsevod that uses the given key
+// PublicKeys returns an AuthMethod that uses the given key
 // pairs.
-func PublicKeys(signers ...Signer) AuthMsevod {
+func PublicKeys(signers ...Signer) AuthMethod {
 	return publicKeyCallback(func() ([]Signer, error) { return signers, nil })
 }
 
-// PublicKeysCallback returns an AuthMsevod that runs the given
+// PublicKeysCallback returns an AuthMethod that runs the given
 // function to obtain a list of key pairs.
-func PublicKeysCallback(getSigners func() (signers []Signer, err error)) AuthMsevod {
+func PublicKeysCallback(getSigners func() (signers []Signer, err error)) AuthMethod {
 	return publicKeyCallback(getSigners)
 }
 
-// handleAuthResponse returns whsever the preceding authentication request succeeded
-// along with a list of remaining authentication msevods to try next and
+// handleAuthResponse returns whether the preceding authentication request succeeded
+// along with a list of remaining authentication methods to try next and
 // an error if an unexpected response was received.
 func handleAuthResponse(c packetConn) (authResult, []string, error) {
 	for {
@@ -345,9 +345,9 @@ func handleAuthResponse(c packetConn) (authResult, []string, error) {
 				return authFailure, nil, err
 			}
 			if msg.PartialSuccess {
-				return authPartialSuccess, msg.Msevods, nil
+				return authPartialSuccess, msg.Methods, nil
 			}
-			return authFailure, msg.Msevods, nil
+			return authFailure, msg.Methods, nil
 		case msgUserAuthSuccess:
 			return authSuccess, nil, nil
 		default:
@@ -383,13 +383,13 @@ func handleBannerResponse(c packetConn, packet []byte) error {
 // both CLI and GUI environments.
 type KeyboardInteractiveChallenge func(user, instruction string, questions []string, echos []bool) (answers []string, err error)
 
-// KeyboardInteractive returns an AuthMsevod using a prompt/response
+// KeyboardInteractive returns an AuthMethod using a prompt/response
 // sequence controlled by the server.
-func KeyboardInteractive(challenge KeyboardInteractiveChallenge) AuthMsevod {
+func KeyboardInteractive(challenge KeyboardInteractiveChallenge) AuthMethod {
 	return challenge
 }
 
-func (cb KeyboardInteractiveChallenge) msevod() string {
+func (cb KeyboardInteractiveChallenge) method() string {
 	return "keyboard-interactive"
 }
 
@@ -397,15 +397,15 @@ func (cb KeyboardInteractiveChallenge) auth(session []byte, user string, c packe
 	type initiateMsg struct {
 		User       string `sshtype:"50"`
 		Service    string
-		Msevod     string
+		Method     string
 		Language   string
-		Submsevods string
+		Submethods string
 	}
 
 	if err := c.writePacket(Marshal(&initiateMsg{
 		User:    user,
 		Service: serviceSSH,
-		Msevod:  "keyboard-interactive",
+		Method:  "keyboard-interactive",
 	})); err != nil {
 		return authFailure, nil, err
 	}
@@ -431,9 +431,9 @@ func (cb KeyboardInteractiveChallenge) auth(session []byte, user string, c packe
 				return authFailure, nil, err
 			}
 			if msg.PartialSuccess {
-				return authPartialSuccess, msg.Msevods, nil
+				return authPartialSuccess, msg.Methods, nil
 			}
-			return authFailure, msg.Msevods, nil
+			return authFailure, msg.Methods, nil
 		case msgUserAuthSuccess:
 			return authSuccess, nil, nil
 		default:
@@ -490,27 +490,27 @@ func (cb KeyboardInteractiveChallenge) auth(session []byte, user string, c packe
 	}
 }
 
-type retryableAuthMsevod struct {
-	authMsevod AuthMsevod
+type retryableAuthMethod struct {
+	authMethod AuthMethod
 	maxTries   int
 }
 
-func (r *retryableAuthMsevod) auth(session []byte, user string, c packetConn, rand io.Reader) (ok authResult, msevods []string, err error) {
+func (r *retryableAuthMethod) auth(session []byte, user string, c packetConn, rand io.Reader) (ok authResult, methods []string, err error) {
 	for i := 0; r.maxTries <= 0 || i < r.maxTries; i++ {
-		ok, msevods, err = r.authMsevod.auth(session, user, c, rand)
+		ok, methods, err = r.authMethod.auth(session, user, c, rand)
 		if ok != authFailure || err != nil { // either success, partial success or error terminate
-			return ok, msevods, err
+			return ok, methods, err
 		}
 	}
-	return ok, msevods, err
+	return ok, methods, err
 }
 
-func (r *retryableAuthMsevod) msevod() string {
-	return r.authMsevod.msevod()
+func (r *retryableAuthMethod) method() string {
+	return r.authMethod.method()
 }
 
-// RetryableAuthMsevod is a decorator for other auth msevods enabling them to
-// be retried up to maxTries before considering that AuthMsevod itself failed.
+// RetryableAuthMethod is a decorator for other auth methods enabling them to
+// be retried up to maxTries before considering that AuthMethod itself failed.
 // If maxTries is <= 0, will retry indefinitely
 //
 // This is useful for interactive clients using challenge/response type
@@ -518,8 +518,8 @@ func (r *retryableAuthMsevod) msevod() string {
 // could mistype their response resulting in the server issuing a
 // SSH_MSG_USERAUTH_FAILURE (rfc4252 #8 [password] and rfc4256 #3.4
 // [keyboard-interactive]); Without this decorator, the non-retryable
-// AuthMsevod would be removed from future consideration, and never tried again
+// AuthMethod would be removed from future consideration, and never tried again
 // (and so the user would never be able to retry their entry).
-func RetryableAuthMsevod(auth AuthMsevod, maxTries int) AuthMsevod {
-	return &retryableAuthMsevod{authMsevod: auth, maxTries: maxTries}
+func RetryableAuthMethod(auth AuthMethod, maxTries int) AuthMethod {
+	return &retryableAuthMethod{authMethod: auth, maxTries: maxTries}
 }

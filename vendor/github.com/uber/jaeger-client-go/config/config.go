@@ -137,7 +137,7 @@ type ThrottlerConfig struct {
 	// for more throttling credits.
 	RefreshInterval time.Duration `yaml:"refreshInterval"`
 
-	// SynchronousInitialization determines whsever or not the throttler should
+	// SynchronousInitialization determines whether or not the throttler should
 	// synchronously fetch credits from the agent when an operation is seen for
 	// the first time. This should be set to true if the client will be used by
 	// a short lived service that needs to ensure that credits are fetched

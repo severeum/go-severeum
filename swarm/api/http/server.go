@@ -60,15 +60,15 @@ var (
 	getListFail     = metrics.NewRegisteredCounter("api.http.get.list.fail", nil)
 )
 
-type msevodHandler map[string]http.Handler
+type methodHandler map[string]http.Handler
 
-func (m msevodHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	v, ok := m[r.Msevod]
+func (m methodHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	v, ok := m[r.Method]
 	if ok {
 		v.ServeHTTP(rw, r)
 		return
 	}
-	rw.WriteHeader(http.StatusMsevodNotAllowed)
+	rw.WriteHeader(http.StatusMethodNotAllowed)
 }
 
 func NewServer(api *api.API, corsString string) *Server {
@@ -78,7 +78,7 @@ func NewServer(api *api.API, corsString string) *Server {
 	}
 	c := cors.New(cors.Options{
 		AllowedOrigins: allowedOrigins,
-		AllowedMsevods: []string{http.MsevodPost, http.MsevodGet, http.MsevodDelete, http.MsevodPatch, http.MsevodPut},
+		AllowedMethods: []string{http.MethodPost, http.MethodGet, http.MethodDelete, http.MethodPatch, http.MethodPut},
 		MaxAge:         600,
 		AllowedHeaders: []string{"*"},
 	})
@@ -95,7 +95,7 @@ func NewServer(api *api.API, corsString string) *Server {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/bzz:/", msevodHandler{
+	mux.Handle("/bzz:/", methodHandler{
 		"GET": Adapt(
 			http.HandlerFunc(server.HandleBzzGet),
 			defaultMiddlewares...,
@@ -109,7 +109,7 @@ func NewServer(api *api.API, corsString string) *Server {
 			defaultMiddlewares...,
 		),
 	})
-	mux.Handle("/bzz-raw:/", msevodHandler{
+	mux.Handle("/bzz-raw:/", methodHandler{
 		"GET": Adapt(
 			http.HandlerFunc(server.HandleGet),
 			defaultMiddlewares...,
@@ -119,25 +119,25 @@ func NewServer(api *api.API, corsString string) *Server {
 			defaultMiddlewares...,
 		),
 	})
-	mux.Handle("/bzz-immutable:/", msevodHandler{
+	mux.Handle("/bzz-immutable:/", methodHandler{
 		"GET": Adapt(
 			http.HandlerFunc(server.HandleBzzGet),
 			defaultMiddlewares...,
 		),
 	})
-	mux.Handle("/bzz-hash:/", msevodHandler{
+	mux.Handle("/bzz-hash:/", methodHandler{
 		"GET": Adapt(
 			http.HandlerFunc(server.HandleGet),
 			defaultMiddlewares...,
 		),
 	})
-	mux.Handle("/bzz-list:/", msevodHandler{
+	mux.Handle("/bzz-list:/", methodHandler{
 		"GET": Adapt(
 			http.HandlerFunc(server.HandleGetList),
 			defaultMiddlewares...,
 		),
 	})
-	mux.Handle("/bzz-feed:/", msevodHandler{
+	mux.Handle("/bzz-feed:/", methodHandler{
 		"GET": Adapt(
 			http.HandlerFunc(server.HandleGetFeed),
 			defaultMiddlewares...,
@@ -148,7 +148,7 @@ func NewServer(api *api.API, corsString string) *Server {
 		),
 	})
 
-	mux.Handle("/", msevodHandler{
+	mux.Handle("/", methodHandler{
 		"GET": Adapt(
 			http.HandlerFunc(server.HandleRootPaths),
 			SetRequestID,
@@ -844,7 +844,7 @@ func (s *Server) HandleGetFile(w http.ResponseWriter, r *http.Request) {
 // Recommended value is 4 times the io.Copy default buffer value which is 32kB.
 const getFileBufferSize = 4 * 32 * 1024
 
-// bufferedReadSeeker wraps bufio.Reader to expose Seek msevod
+// bufferedReadSeeker wraps bufio.Reader to expose Seek method
 // from the provied io.ReadSeeker in newBufferedReadSeeker.
 type bufferedReadSeeker struct {
 	r io.Reader

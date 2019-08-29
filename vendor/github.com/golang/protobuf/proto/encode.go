@@ -1305,7 +1305,7 @@ func (o *Buffer) enc_len_struct(prop *StructProperties, base structPointer, stat
 	return o.enc_len_thing(func() error { return o.enc_struct(prop, base) }, state)
 }
 
-// Encode somseving, preceded by its encoded length (as a varint).
+// Encode something, preceded by its encoded length (as a varint).
 func (o *Buffer) enc_len_thing(enc func() error, state *errorState) error {
 	iLen := len(o.buf)
 	o.buf = append(o.buf, 0, 0, 0, 0) // reserve four bytes for length
@@ -1339,7 +1339,7 @@ type errorState struct {
 	err error
 }
 
-// shouldContinue reports whsever encoding should continue upon encountering the
+// shouldContinue reports whether encoding should continue upon encountering the
 // given error. If the error is RequiredNotSetError, shouldContinue returns true
 // and, if this is the first appearance of that error, remembers it for future
 // reporting.

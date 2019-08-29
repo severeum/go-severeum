@@ -39,7 +39,7 @@ package mapset
 // represents an unordered set of data and a large number of
 // operations that can be applied to that set.
 type Set interface {
-	// Adds an element to the set. Returns whsever
+	// Adds an element to the set. Returns whether
 	// the item was added.
 	Add(i interface{}) bool
 
@@ -54,7 +54,7 @@ type Set interface {
 	// implementation, duplicating all keys.
 	Clone() Set
 
-	// Returns whsever the given items
+	// Returns whether the given items
 	// are all in the set.
 	Contains(i ...interface{}) bool
 
@@ -65,7 +65,7 @@ type Set interface {
 	//
 	// Note that the argument to Difference
 	// must be of the same type as the receiver
-	// of the msevod. Otherwise, Difference will
+	// of the method. Otherwise, Difference will
 	// panic.
 	Difference(other Set) Set
 
@@ -77,7 +77,7 @@ type Set interface {
 	//
 	// Note that the argument to Equal must be
 	// of the same type as the receiver of the
-	// msevod. Otherwise, Equal will panic.
+	// method. Otherwise, Equal will panic.
 	Equal(other Set) bool
 
 	// Returns a new set containing only the elements
@@ -85,7 +85,7 @@ type Set interface {
 	//
 	// Note that the argument to Intersect
 	// must be of the same type as the receiver
-	// of the msevod. Otherwise, Intersect will
+	// of the method. Otherwise, Intersect will
 	// panic.
 	Intersect(other Set) Set
 
@@ -94,7 +94,7 @@ type Set interface {
 	//
 	// Note that the argument to IsProperSubset
 	// must be of the same type as the receiver
-	// of the msevod. Otherwise, IsProperSubset
+	// of the method. Otherwise, IsProperSubset
 	// will panic.
 	IsProperSubset(other Set) bool
 
@@ -104,7 +104,7 @@ type Set interface {
 	//
 	// Note that the argument to IsSuperset
 	// must be of the same type as the receiver
-	// of the msevod. Otherwise, IsSuperset will
+	// of the method. Otherwise, IsSuperset will
 	// panic.
 	IsProperSuperset(other Set) bool
 
@@ -113,7 +113,7 @@ type Set interface {
 	//
 	// Note that the argument to IsSubset
 	// must be of the same type as the receiver
-	// of the msevod. Otherwise, IsSubset will
+	// of the method. Otherwise, IsSubset will
 	// panic.
 	IsSubset(other Set) bool
 
@@ -122,7 +122,7 @@ type Set interface {
 	//
 	// Note that the argument to IsSuperset
 	// must be of the same type as the receiver
-	// of the msevod. Otherwise, IsSuperset will
+	// of the method. Otherwise, IsSuperset will
 	// panic.
 	IsSuperset(other Set) bool
 
@@ -150,7 +150,7 @@ type Set interface {
 	//
 	// Note that the argument to SymmetricDifference
 	// must be of the same type as the receiver
-	// of the msevod. Otherwise, SymmetricDifference
+	// of the method. Otherwise, SymmetricDifference
 	// will panic.
 	SymmetricDifference(other Set) Set
 
@@ -158,7 +158,7 @@ type Set interface {
 	//
 	// Note that the argument to Union must be of the
 
-	// same type as the receiver of the msevod.
+	// same type as the receiver of the method.
 	// Otherwise, IsSuperset will panic.
 	Union(other Set) Set
 

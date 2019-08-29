@@ -22,7 +22,7 @@ import (
 
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/common/math"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/params"
 )
@@ -56,7 +56,7 @@ func (test *DifficultyTest) Run(config *params.ChainConfig) error {
 		UncleHash:  test.UncleHash,
 	}
 
-	actual := sevash.CalcDifficulty(config, test.CurrentTimestamp.Uint64(), parent)
+	actual := ethash.CalcDifficulty(config, test.CurrentTimestamp.Uint64(), parent)
 	exp := test.CurrentDifficulty
 
 	if actual.Cmp(exp) != 0 {

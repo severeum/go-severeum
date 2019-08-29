@@ -120,7 +120,7 @@ type Pss struct {
 	// sending and forwarding
 	fwdPool         map[string]*protocols.Peer // keep track of all peers sitting on the pssmsg routing layer
 	fwdPoolMu       sync.RWMutex
-	fwdCache        map[pssDigest]pssCacheEntry // checksum of unique fields from pssmsg mapped to expiry, cache to determine whsever to drop msg
+	fwdCache        map[pssDigest]pssCacheEntry // checksum of unique fields from pssmsg mapped to expiry, cache to determine whether to drop msg
 	fwdCacheMu      sync.RWMutex
 	cacheTTL        time.Duration // how long to keep messages in fwdCache (not implemented)
 	msgTTL          time.Duration
@@ -287,7 +287,7 @@ func (p *Pss) APIs() []rpc.API {
 	return apis
 }
 
-// add API msevods to the pss API
+// add API methods to the pss API
 // must be run before node is started
 func (p *Pss) addAPI(api rpc.API) {
 	p.auxAPIs = append(p.auxAPIs, api)

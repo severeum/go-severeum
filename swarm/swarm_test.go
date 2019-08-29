@@ -199,8 +199,8 @@ func TestParseEnsAPIAddress(t *testing.T) {
 	}{
 		{
 			description: "IPC endpoint",
-			value:       "/data/testnet/ssev.ipc",
-			endpoint:    "/data/testnet/ssev.ipc",
+			value:       "/data/testnet/seth.ipc",
+			endpoint:    "/data/testnet/seth.ipc",
 		},
 		{
 			description: "HTTP endpoint",
@@ -214,8 +214,8 @@ func TestParseEnsAPIAddress(t *testing.T) {
 		},
 		{
 			description: "IPC Endpoint and TLD",
-			value:       "test:/data/testnet/ssev.ipc",
-			endpoint:    "/data/testnet/ssev.ipc",
+			value:       "test:/data/testnet/seth.ipc",
+			endpoint:    "/data/testnet/seth.ipc",
 			tld:         "test",
 		},
 		{
@@ -232,8 +232,8 @@ func TestParseEnsAPIAddress(t *testing.T) {
 		},
 		{
 			description: "IPC Endpoint and contract address",
-			value:       "314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/ssev.ipc",
-			endpoint:    "/data/testnet/ssev.ipc",
+			value:       "314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/seth.ipc",
+			endpoint:    "/data/testnet/seth.ipc",
 			addr:        common.HexToAddress("314159265dD8dbb310642f98f50C066173C1259b"),
 		},
 		{
@@ -250,24 +250,24 @@ func TestParseEnsAPIAddress(t *testing.T) {
 		},
 		{
 			description: "IPC Endpoint, TLD and contract address",
-			value:       "test:314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/ssev.ipc",
-			endpoint:    "/data/testnet/ssev.ipc",
+			value:       "test:314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/seth.ipc",
+			endpoint:    "/data/testnet/seth.ipc",
 			addr:        common.HexToAddress("314159265dD8dbb310642f98f50C066173C1259b"),
 			tld:         "test",
 		},
 		{
 			description: "HTTP endpoint, TLD and contract address",
-			value:       "sev:314159265dD8dbb310642f98f50C066173C1259b@http://127.0.0.1:1234",
+			value:       "eth:314159265dD8dbb310642f98f50C066173C1259b@http://127.0.0.1:1234",
 			endpoint:    "http://127.0.0.1:1234",
 			addr:        common.HexToAddress("314159265dD8dbb310642f98f50C066173C1259b"),
-			tld:         "sev",
+			tld:         "eth",
 		},
 		{
 			description: "WS endpoint, TLD and contract address",
-			value:       "sev:314159265dD8dbb310642f98f50C066173C1259b@ws://127.0.0.1:1234",
+			value:       "eth:314159265dD8dbb310642f98f50C066173C1259b@ws://127.0.0.1:1234",
 			endpoint:    "ws://127.0.0.1:1234",
 			addr:        common.HexToAddress("314159265dD8dbb310642f98f50C066173C1259b"),
-			tld:         "sev",
+			tld:         "eth",
 		},
 	} {
 		t.Run(x.description, func(t *testing.T) {
@@ -332,9 +332,9 @@ func TestLocalStoreAndRetrieve(t *testing.T) {
 // a file of length n with optional random data using API Store function,
 // and checks the output of API Retrieve function on the same instance.
 // This is a regression test for issue
-// https://github.com/seversphere/go-severeum/issues/639
+// https://github.com/ethersphere/go-severeum/issues/639
 // where pyramid chunker did not split correctly files with lengths that
-// are edge cases for chunk and tree parameters, depending whsever there
+// are edge cases for chunk and tree parameters, depending whether there
 // is a tree chunk with only one data chunk and how the compress functionality
 // changed the tree.
 func testLocalStoreAndRetrieve(t *testing.T, swarm *Swarm, n int, randomData bool) {

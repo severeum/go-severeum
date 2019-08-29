@@ -82,17 +82,17 @@ func isSubscriptionType(t reflect.Type) bool {
 	return t == subscriptionType
 }
 
-// isPubSub tests whsever the given msevod has as as first argument a context.Context
+// isPubSub tests whether the given method has as as first argument a context.Context
 // and returns the pair (Subscription, error)
-func isPubSub(msevodType reflect.Type) bool {
+func isPubSub(methodType reflect.Type) bool {
 	// numIn(0) is the receiver type
-	if msevodType.NumIn() < 2 || msevodType.NumOut() != 2 {
+	if methodType.NumIn() < 2 || methodType.NumOut() != 2 {
 		return false
 	}
 
-	return isContextType(msevodType.In(1)) &&
-		isSubscriptionType(msevodType.Out(0)) &&
-		isErrorType(msevodType.Out(1))
+	return isContextType(methodType.In(1)) &&
+		isSubscriptionType(methodType.Out(0)) &&
+		isErrorType(methodType.Out(1))
 }
 
 // formatName will convert to first character to lower case
@@ -104,7 +104,7 @@ func formatName(name string) string {
 	return string(ret)
 }
 
-// suitableCallbacks iterates over the msevods of the given type. It will determine if a msevod satisfies the criteria
+// suitableCallbacks iterates over the methods of the given type. It will determine if a method satisfies the criteria
 // for a RPC callback or a subscription callback and adds it to the collection of callbacks or subscriptions. See server
 // documentation for a summary of these criteria.
 func suitableCallbacks(rcvr reflect.Value, typ reflect.Type) (callbacks, subscriptions) {
@@ -112,18 +112,18 @@ func suitableCallbacks(rcvr reflect.Value, typ reflect.Type) (callbacks, subscri
 	subscriptions := make(subscriptions)
 
 MSEVODS:
-	for m := 0; m < typ.NumMsevod(); m++ {
-		msevod := typ.Msevod(m)
-		mtype := msevod.Type
-		mname := formatName(msevod.Name)
-		if msevod.PkgPath != "" { // msevod must be exported
+	for m := 0; m < typ.NumMethod(); m++ {
+		method := typ.Method(m)
+		mtype := method.Type
+		mname := formatName(method.Name)
+		if method.PkgPath != "" { // method must be exported
 			continue
 		}
 
 		var h callback
 		h.isSubscribe = isPubSub(mtype)
 		h.rcvr = rcvr
-		h.msevod = msevod
+		h.method = method
 		h.errPos = -1
 
 		firstArg := 1
@@ -148,7 +148,7 @@ MSEVODS:
 			continue MSEVODS
 		}
 
-		// determine msevod arguments, ignore first arg since it's the receiver type
+		// determine method arguments, ignore first arg since it's the receiver type
 		// Arguments must be exported or builtin types
 		h.argTypes = make([]reflect.Type, numIn-firstArg)
 		for i := firstArg; i < numIn; i++ {
@@ -166,7 +166,7 @@ MSEVODS:
 			}
 		}
 
-		// when a msevod returns an error it must be the last returned value
+		// when a method returns an error it must be the last returned value
 		h.errPos = -1
 		for i := 0; i < mtype.NumOut(); i++ {
 			if isErrorType(mtype.Out(i)) {
@@ -181,7 +181,7 @@ MSEVODS:
 
 		switch mtype.NumOut() {
 		case 0, 1, 2:
-			if mtype.NumOut() == 2 && h.errPos == -1 { // msevod must one return value and 1 error
+			if mtype.NumOut() == 2 && h.errPos == -1 { // method must one return value and 1 error
 				continue MSEVODS
 			}
 			callbacks[mname] = &h

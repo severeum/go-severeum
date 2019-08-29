@@ -35,7 +35,7 @@ type DB struct {
 	// Stats. Need 64-bit alignment.
 	cWriteDelay            int64 // The cumulative duration of write delays
 	cWriteDelayN           int32 // The cumulative number of write delays
-	inWritePaused          int32 // The indicator whsever write operation is paused by compaction
+	inWritePaused          int32 // The indicator whether write operation is paused by compaction
 	aliveSnaps, aliveIters int32
 
 	// Session.
@@ -163,11 +163,11 @@ func openDB(s *session) (*DB, error) {
 // os.ErrExist error.
 //
 // Open will return an error with type of ErrCorrupted if corruption
-// detected in the DB. Use errors.IsCorrupted to test whsever an error is
+// detected in the DB. Use errors.IsCorrupted to test whether an error is
 // due to corruption. Corrupted DB can be recovered with Recover function.
 //
 // The returned DB instance is safe for concurrent use.
-// The DB must be closed after use, by calling Close msevod.
+// The DB must be closed after use, by calling Close method.
 func Open(stor storage.Storage, o *opt.Options) (db *DB, err error) {
 	s, err := newSession(stor, o)
 	if err != nil {
@@ -206,11 +206,11 @@ func Open(stor storage.Storage, o *opt.Options) (db *DB, err error) {
 // described in the leveldb/storage package.
 //
 // OpenFile will return an error with type of ErrCorrupted if corruption
-// detected in the DB. Use errors.IsCorrupted to test whsever an error is
+// detected in the DB. Use errors.IsCorrupted to test whether an error is
 // due to corruption. Corrupted DB can be recovered with Recover function.
 //
 // The returned DB instance is safe for concurrent use.
-// The DB must be closed after use, by calling Close msevod.
+// The DB must be closed after use, by calling Close method.
 func OpenFile(path string, o *opt.Options) (db *DB, err error) {
 	stor, err := storage.OpenFile(path, o.GetReadOnly())
 	if err != nil {
@@ -231,7 +231,7 @@ func OpenFile(path string, o *opt.Options) (db *DB, err error) {
 // Also, Recover will ignore ErrorIfMissing and ErrorIfExist options.
 //
 // The returned DB instance is safe for concurrent use.
-// The DB must be closed after use, by calling Close msevod.
+// The DB must be closed after use, by calling Close method.
 func Recover(stor storage.Storage, o *opt.Options) (db *DB, err error) {
 	s, err := newSession(stor, o)
 	if err != nil {
@@ -260,7 +260,7 @@ func Recover(stor storage.Storage, o *opt.Options) (db *DB, err error) {
 // in the leveldb/storage package.
 //
 // The returned DB instance is safe for concurrent use.
-// The DB must be closed after use, by calling Close msevod.
+// The DB must be closed after use, by calling Close method.
 func RecoverFile(path string, o *opt.Options) (db *DB, err error) {
 	stor, err := storage.OpenFile(path, false)
 	if err != nil {
@@ -872,7 +872,7 @@ func (db *DB) Has(key []byte, ro *opt.ReadOptions) (ret bool, err error) {
 // DB. And a nil Range.Limit is treated as a key after all keys in
 // the DB.
 //
-// The iterator must be released after use, by calling Release msevod.
+// The iterator must be released after use, by calling Release method.
 //
 // Also read Iterator documentation of the leveldb/iterator package.
 func (db *DB) NewIterator(slice *util.Range, ro *opt.ReadOptions) iterator.Iterator {
@@ -891,7 +891,7 @@ func (db *DB) NewIterator(slice *util.Range, ro *opt.ReadOptions) iterator.Itera
 // is a frozen snapshot of a DB state at a particular point in time. The
 // content of snapshot are guaranteed to be consistent.
 //
-// The snapshot must be released after use, by calling Release msevod.
+// The snapshot must be released after use, by calling Release method.
 func (db *DB) GetSnapshot() (*Snapshot, error) {
 	if err := db.ok(); err != nil {
 		return nil, err
@@ -1107,7 +1107,7 @@ func (db *DB) SizeOf(ranges []util.Range) (Sizes, error) {
 // abort any in-flight compaction and discard open transaction.
 //
 // It is not safe to close a DB until all outstanding iterators are released.
-// It is valid to call Close multiple times. Other msevods should not be
+// It is valid to call Close multiple times. Other methods should not be
 // called after the DB has been closed.
 func (db *DB) Close() error {
 	if !db.setClosed() {

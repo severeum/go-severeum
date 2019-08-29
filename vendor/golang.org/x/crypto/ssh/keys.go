@@ -39,7 +39,7 @@ const (
 )
 
 // These constants represent non-default signature algorithms that are supported
-// as algorithm parameters to AlgorithmSigner.SignWithAlgorithm msevods. See
+// as algorithm parameters to AlgorithmSigner.SignWithAlgorithm methods. See
 // [PROTOCOL.agent] section 4.5.1 and
 // https://tools.ietf.org/html/draft-ietf-curdle-rsa-sha2-10
 const (
@@ -306,7 +306,7 @@ type Signer interface {
 	// PublicKey returns an associated PublicKey instance.
 	PublicKey() PublicKey
 
-	// Sign returns raw signature for the given data. This msevod
+	// Sign returns raw signature for the given data. This method
 	// will apply the hash specified for the keytype to the data.
 	Sign(rand io.Reader, data []byte) (*Signature, error)
 }
@@ -859,7 +859,7 @@ func ParsePrivateKeyWithPassphrase(pemBytes, passPhrase []byte) (Signer, error) 
 	return NewSignerFromKey(key)
 }
 
-// encryptedBlock tells whsever a private key is
+// encryptedBlock tells whether a private key is
 // encrypted by examining its Proc-Type header
 // for a mention of ENCRYPTED
 // according to RFC 1421 Section 4.6.1.1.

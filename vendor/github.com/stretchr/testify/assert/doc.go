@@ -8,7 +8,7 @@
 //      "github.com/stretchr/testify/assert"
 //    )
 //
-//    func TestSomseving(t *testing.T) {
+//    func TestSomething(t *testing.T) {
 //
 //      var a string = "Hello"
 //      var b string = "Hello"
@@ -24,7 +24,7 @@
 //      "github.com/stretchr/testify/assert"
 //    )
 //
-//    func TestSomseving(t *testing.T) {
+//    func TestSomething(t *testing.T) {
 //      assert := assert.New(t)
 //
 //      var a string = "Hello"
@@ -41,5 +41,5 @@
 // the correct place.
 //
 // Every assertion function also takes an optional string message as the final argument,
-// allowing custom error messages to be appended to the message the assertion msevod outputs.
+// allowing custom error messages to be appended to the message the assertion method outputs.
 package assert

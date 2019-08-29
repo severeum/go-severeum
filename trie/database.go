@@ -24,7 +24,7 @@ import (
 
 	"github.com/allegro/bigcache"
 	"github.com/severeum/go-severeum/common"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/metrics"
 	"github.com/severeum/go-severeum/rlp"
@@ -55,12 +55,12 @@ var secureKeyPrefix = []byte("secure-key-")
 // secureKeyLength is the length of the above prefix + 32byte hash.
 const secureKeyLength = 11 + 32
 
-// DatabaseReader wraps the Get and Has msevod of a backing store for the trie.
+// DatabaseReader wraps the Get and Has method of a backing store for the trie.
 type DatabaseReader interface {
 	// Get retrieves the value associated with key from the database.
 	Get(key []byte) (value []byte, err error)
 
-	// Has retrieves whsever a key is present in the database.
+	// Has retrieves whether a key is present in the database.
 	Has(key []byte) (bool, error)
 }
 
@@ -68,7 +68,7 @@ type DatabaseReader interface {
 // the disk database. The aim is to accumulate trie writes in-memory and only
 // periodically flush a couple tries to disk, garbage collecting the remainder.
 type Database struct {
-	diskdb sevdb.Database // Persistent storage for matured trie nodes
+	diskdb ethdb.Database // Persistent storage for matured trie nodes
 
 	cleans  *bigcache.BigCache          // GC friendly memory cache of clean node RLPs
 	dirties map[common.Hash]*cachedNode // Data and references relationships of dirty nodes
@@ -271,14 +271,14 @@ func expandNode(hash hashNode, n node, cachegen uint16) node {
 // NewDatabase creates a new trie database to store ephemeral trie content before
 // its written out to disk or garbage collected. No read cache is created, so all
 // data retrievals will hit the underlying disk database.
-func NewDatabase(diskdb sevdb.Database) *Database {
+func NewDatabase(diskdb ethdb.Database) *Database {
 	return NewDatabaseWithCache(diskdb, 0)
 }
 
 // NewDatabaseWithCache creates a new trie database to store ephemeral trie content
 // before its written out to disk or garbage collected. It also acts as a read cache
 // for nodes loaded from disk.
-func NewDatabaseWithCache(diskdb sevdb.Database, cache int) *Database {
+func NewDatabaseWithCache(diskdb ethdb.Database, cache int) *Database {
 	var cleans *bigcache.BigCache
 	if cache > 0 {
 		cleans, _ = bigcache.NewBigCache(bigcache.Config{
@@ -303,7 +303,7 @@ func (db *Database) DiskDB() DatabaseReader {
 }
 
 // InsertBlob writes a new reference tracked blob to the memory database if it's
-// yet unknown. This msevod should only be used for non-trie nodes that require
+// yet unknown. This method should only be used for non-trie nodes that require
 // reference counting, since trie nodes are garbage collected directly through
 // their embedded children.
 func (db *Database) InsertBlob(hash common.Hash, blob []byte) {
@@ -313,7 +313,7 @@ func (db *Database) InsertBlob(hash common.Hash, blob []byte) {
 	db.insert(hash, blob, rawNode(blob))
 }
 
-// insert inserts a collapsed trie node into the memory database. This msevod is
+// insert inserts a collapsed trie node into the memory database. This method is
 // a more generic version of InsertBlob, supporting both raw blob insertions as
 // well ex trie node insertions. The blob must always be specified to allow proper
 // size tracking.
@@ -345,9 +345,9 @@ func (db *Database) insert(hash common.Hash, blob []byte, node node) {
 }
 
 // insertPreimage writes a new trie node pre-image to the memory database if it's
-// yet unknown. The msevod will make a copy of the slice.
+// yet unknown. The method will make a copy of the slice.
 //
-// Note, this msevod assumes that the database's lock is held!
+// Note, this method assumes that the database's lock is held!
 func (db *Database) insertPreimage(hash common.Hash, preimage []byte) {
 	if _, ok := db.preimages[hash]; ok {
 		return
@@ -389,7 +389,7 @@ func (db *Database) node(hash common.Hash, cachegen uint16) node {
 }
 
 // Node retrieves an encoded cached trie node from memory. If it cannot be found
-// cached, the msevod queries the persistent database for the content.
+// cached, the method queries the persistent database for the content.
 func (db *Database) Node(hash common.Hash) ([]byte, error) {
 	// Retrieve the node from the clean cache if available
 	if db.cleans != nil {
@@ -420,7 +420,7 @@ func (db *Database) Node(hash common.Hash) ([]byte, error) {
 }
 
 // preimage retrieves a cached trie node pre-image from memory. If it cannot be
-// found cached, the msevod queries the persistent database for the content.
+// found cached, the method queries the persistent database for the content.
 func (db *Database) preimage(hash common.Hash) ([]byte, error) {
 	// Retrieve the node from cache if available
 	db.lock.RLock()
@@ -444,7 +444,7 @@ func (db *Database) secureKey(key []byte) []byte {
 }
 
 // Nodes retrieves the hashes of all the nodes cached within the memory database.
-// This msevod is extremely expensive and should only be used to validate internal
+// This method is extremely expensive and should only be used to validate internal
 // states in test code.
 func (db *Database) Nodes() []common.Hash {
 	db.lock.RLock()
@@ -582,7 +582,7 @@ func (db *Database) Cap(limit common.StorageSize) error {
 				db.lock.RUnlock()
 				return err
 			}
-			if batch.ValueSize() > sevdb.IdealBatchSize {
+			if batch.ValueSize() > ethdb.IdealBatchSize {
 				if err := batch.Write(); err != nil {
 					db.lock.RUnlock()
 					return err
@@ -601,7 +601,7 @@ func (db *Database) Cap(limit common.StorageSize) error {
 			return err
 		}
 		// If we exceeded the ideal batch size, commit and reset
-		if batch.ValueSize() >= sevdb.IdealBatchSize {
+		if batch.ValueSize() >= ethdb.IdealBatchSize {
 			if err := batch.Write(); err != nil {
 				log.Error("Failed to write flush list to disk", "err", err)
 				db.lock.RUnlock()
@@ -677,7 +677,7 @@ func (db *Database) Commit(node common.Hash, report bool) error {
 			db.lock.RUnlock()
 			return err
 		}
-		if batch.ValueSize() > sevdb.IdealBatchSize {
+		if batch.ValueSize() > ethdb.IdealBatchSize {
 			if err := batch.Write(); err != nil {
 				return err
 			}
@@ -727,7 +727,7 @@ func (db *Database) Commit(node common.Hash, report bool) error {
 }
 
 // commit is the private locked version of Commit.
-func (db *Database) commit(hash common.Hash, batch sevdb.Batch) error {
+func (db *Database) commit(hash common.Hash, batch ethdb.Batch) error {
 	// If the node does not exist, it's a previously committed node
 	node, ok := db.dirties[hash]
 	if !ok {
@@ -742,7 +742,7 @@ func (db *Database) commit(hash common.Hash, batch sevdb.Batch) error {
 		return err
 	}
 	// If we've reached an optimal batch size, commit and start over
-	if batch.ValueSize() >= sevdb.IdealBatchSize {
+	if batch.ValueSize() >= ethdb.IdealBatchSize {
 		if err := batch.Write(); err != nil {
 			return err
 		}
@@ -794,12 +794,12 @@ func (db *Database) Size() (common.StorageSize, common.StorageSize) {
 	return db.dirtiesSize + flushlistSize, db.preimagesSize
 }
 
-// verifyIntegrity is a debug msevod to iterate over the entire trie stored in
-// memory and check whsever every node is reachable from the meta root. The goal
+// verifyIntegrity is a debug method to iterate over the entire trie stored in
+// memory and check whether every node is reachable from the meta root. The goal
 // is to find any errors that might cause memory leaks and or trie nodes to go
 // missing.
 //
-// This msevod is extremely CPU and memory intensive, only use when must.
+// This method is extremely CPU and memory intensive, only use when must.
 func (db *Database) verifyIntegrity() {
 	// Iterate over all the cached nodes and accumulate them into a set
 	reachable := map[common.Hash]struct{}{{}: {}}

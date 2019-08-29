@@ -41,9 +41,9 @@ func (c ContainerURL) WithPipeline(p pipeline.Pipeline) ContainerURL {
 
 // NewBlobURL creates a new BlobURL object by concatenating blobName to the end of
 // ContainerURL's URL. The new BlobURL uses the same request policy pipeline as the ContainerURL.
-// To change the pipeline, create the BlobURL and then call its WithPipeline msevod passing in the
+// To change the pipeline, create the BlobURL and then call its WithPipeline method passing in the
 // desired pipeline object. Or, call this package's NewBlobURL instead of calling this object's
-// NewBlobURL msevod.
+// NewBlobURL method.
 func (c ContainerURL) NewBlobURL(blobName string) BlobURL {
 	blobURL := appendToURLPath(c.URL(), blobName)
 	return NewBlobURL(blobURL, c.client.Pipeline())
@@ -51,9 +51,9 @@ func (c ContainerURL) NewBlobURL(blobName string) BlobURL {
 
 // NewAppendBlobURL creates a new AppendBlobURL object by concatenating blobName to the end of
 // ContainerURL's URL. The new AppendBlobURL uses the same request policy pipeline as the ContainerURL.
-// To change the pipeline, create the AppendBlobURL and then call its WithPipeline msevod passing in the
+// To change the pipeline, create the AppendBlobURL and then call its WithPipeline method passing in the
 // desired pipeline object. Or, call this package's NewAppendBlobURL instead of calling this object's
-// NewAppendBlobURL msevod.
+// NewAppendBlobURL method.
 func (c ContainerURL) NewAppendBlobURL(blobName string) AppendBlobURL {
 	blobURL := appendToURLPath(c.URL(), blobName)
 	return NewAppendBlobURL(blobURL, c.client.Pipeline())
@@ -61,9 +61,9 @@ func (c ContainerURL) NewAppendBlobURL(blobName string) AppendBlobURL {
 
 // NewBlockBlobURL creates a new BlockBlobURL object by concatenating blobName to the end of
 // ContainerURL's URL. The new BlockBlobURL uses the same request policy pipeline as the ContainerURL.
-// To change the pipeline, create the BlockBlobURL and then call its WithPipeline msevod passing in the
+// To change the pipeline, create the BlockBlobURL and then call its WithPipeline method passing in the
 // desired pipeline object. Or, call this package's NewBlockBlobURL instead of calling this object's
-// NewBlockBlobURL msevod.
+// NewBlockBlobURL method.
 func (c ContainerURL) NewBlockBlobURL(blobName string) BlockBlobURL {
 	blobURL := appendToURLPath(c.URL(), blobName)
 	return NewBlockBlobURL(blobURL, c.client.Pipeline())
@@ -71,9 +71,9 @@ func (c ContainerURL) NewBlockBlobURL(blobName string) BlockBlobURL {
 
 // NewPageBlobURL creates a new PageBlobURL object by concatenating blobName to the end of
 // ContainerURL's URL. The new PageBlobURL uses the same request policy pipeline as the ContainerURL.
-// To change the pipeline, create the PageBlobURL and then call its WithPipeline msevod passing in the
+// To change the pipeline, create the PageBlobURL and then call its WithPipeline method passing in the
 // desired pipeline object. Or, call this package's NewPageBlobURL instead of calling this object's
-// NewPageBlobURL msevod.
+// NewPageBlobURL method.
 func (c ContainerURL) NewPageBlobURL(blobName string) PageBlobURL {
 	blobURL := appendToURLPath(c.URL(), blobName)
 	return NewPageBlobURL(blobURL, c.client.Pipeline())
@@ -101,7 +101,7 @@ func (c ContainerURL) Delete(ctx context.Context, ac ContainerAccessConditions) 
 // For more information, see https://docs.microsoft.com/rest/api/storageservices/get-container-metadata.
 func (c ContainerURL) GetProperties(ctx context.Context, ac LeaseAccessConditions) (*ContainerGetPropertiesResponse, error) {
 	// NOTE: GetMetadata actually calls GetProperties internally because GetProperties returns the metadata AND the properties.
-	// This allows us to not expose a GetProperties msevod at all simplifying the API.
+	// This allows us to not expose a GetProperties method at all simplifying the API.
 	return c.client.GetProperties(ctx, nil, ac.pointers(), nil)
 }
 
@@ -115,20 +115,20 @@ func (c ContainerURL) SetMetadata(ctx context.Context, metadata Metadata, ac Con
 	return c.client.SetMetadata(ctx, nil, ac.LeaseAccessConditions.pointers(), metadata, ifModifiedSince, nil)
 }
 
-// GetAccessPolicy returns the container's access policy. The access policy indicates whsever container's blobs may be accessed publicly.
+// GetAccessPolicy returns the container's access policy. The access policy indicates whether container's blobs may be accessed publicly.
 // For more information, see https://docs.microsoft.com/rest/api/storageservices/get-container-acl.
 func (c ContainerURL) GetAccessPolicy(ctx context.Context, ac LeaseAccessConditions) (*SignedIdentifiers, error) {
 	return c.client.GetAccessPolicy(ctx, nil, ac.pointers(), nil)
 }
 
 // The AccessPolicyPermission type simplifies creating the permissions string for a container's access policy.
-// Initialize an instance of this type and then call its String msevod to set AccessPolicy's Permission field.
+// Initialize an instance of this type and then call its String method to set AccessPolicy's Permission field.
 type AccessPolicyPermission struct {
 	Read, Add, Create, Write, Delete, List bool
 }
 
 // String produces the access policy permission string for an Azure Storage container.
-// Call this msevod to set AccessPolicy's Permission field.
+// Call this method to set AccessPolicy's Permission field.
 func (p AccessPolicyPermission) String() string {
 	var b bytes.Buffer
 	if p.Read {
@@ -176,7 +176,7 @@ func (p *AccessPolicyPermission) Parse(s string) error {
 	return nil
 }
 
-// SetAccessPolicy sets the container's permissions. The access policy indicates whsever blobs in a container may be accessed publicly.
+// SetAccessPolicy sets the container's permissions. The access policy indicates whether blobs in a container may be accessed publicly.
 // For more information, see https://docs.microsoft.com/rest/api/storageservices/set-container-acl.
 func (c ContainerURL) SetAccessPolicy(ctx context.Context, accessType PublicAccessType, si []SignedIdentifier,
 	ac ContainerAccessConditions) (*ContainerSetAccessPolicyResponse, error) {

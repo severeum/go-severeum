@@ -41,13 +41,13 @@ func init() {
 	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(*loglevel), log.StreamHandler(colorable.NewColorableStderr(), log.TerminalFormat(true))))
 }
 
-// TestRun tests if Run msevod calls RunFunc and if it handles context properly.
+// TestRun tests if Run method calls RunFunc and if it handles context properly.
 func TestRun(t *testing.T) {
 	sim := New(noopServiceFuncMap)
 	defer sim.Close()
 
 	t.Run("call", func(t *testing.T) {
-		expect := "somseving"
+		expect := "something"
 		var got string
 		r := sim.Run(context.Background(), func(ctx context.Context, sim *Simulation) error {
 			got = expect
@@ -97,7 +97,7 @@ func TestRun(t *testing.T) {
 	})
 }
 
-// TestClose tests are Close msevod triggers all close functions and are all nodes not up anymore.
+// TestClose tests are Close method triggers all close functions and are all nodes not up anymore.
 func TestClose(t *testing.T) {
 	var mu sync.Mutex
 	var cleanupCount int
@@ -149,7 +149,7 @@ func TestClose(t *testing.T) {
 	}
 }
 
-// TestDone checks if Close msevod triggers the closing of done channel.
+// TestDone checks if Close method triggers the closing of done channel.
 func TestDone(t *testing.T) {
 	sim := New(noopServiceFuncMap)
 	sleep := 50 * time.Millisecond

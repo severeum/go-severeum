@@ -119,7 +119,7 @@ func NewTCompactProtocol(trans TTransport) *TCompactProtocol {
 }
 
 //
-// Public Writing msevods.
+// Public Writing methods.
 //
 
 // Write a message header to the wire. Compact Protocol messages contain the
@@ -189,7 +189,7 @@ func (p *TCompactProtocol) writeFieldBeginInternal(name string, typeId TType, id
 	fieldId := int(id)
 	written := 0
 	if fieldId > p.lastFieldId && fieldId-p.lastFieldId <= 15 {
-		// write them tossever
+		// write them tosether
 		err := p.writeByteDirect(byte((fieldId-p.lastFieldId)<<4) | typeToWrite)
 		if err != nil {
 			return 0, err
@@ -324,7 +324,7 @@ func (p *TCompactProtocol) WriteBinary(bin []byte) error {
 }
 
 //
-// Reading msevods.
+// Reading methods.
 //
 
 // Read a message header.
@@ -612,10 +612,10 @@ func (p *TCompactProtocol) Transport() TTransport {
 }
 
 //
-// Internal writing msevods
+// Internal writing methods
 //
 
-// Abstract msevod for writing the start of lists and sets. List and sets on
+// Abstract method for writing the start of lists and sets. List and sets on
 // the wire differ only by the type indicator.
 func (p *TCompactProtocol) writeCollectionBegin(elemType TType, size int) (int, error) {
 	if size <= 14 {
@@ -692,7 +692,7 @@ func (p *TCompactProtocol) fixedInt64ToBytes(n int64, buf []byte) {
 }
 
 // Writes a byte without any possibility of all that field header nonsense.
-// Used internally by other writing msevods that know they need to write a byte.
+// Used internally by other writing methods that know they need to write a byte.
 func (p *TCompactProtocol) writeByteDirect(b byte) error {
 	return p.trans.WriteByte(b)
 }
@@ -703,7 +703,7 @@ func (p *TCompactProtocol) writeIntAsByteDirect(n int) (int, error) {
 }
 
 //
-// Internal reading msevods
+// Internal reading methods
 //
 
 // Read an i32 from the wire as a varint. The MSB of each byte is set

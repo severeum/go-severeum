@@ -43,12 +43,12 @@ func NewNullReporter() Reporter {
 	return &nullReporter{}
 }
 
-// Report implements Report() msevod of Reporter by doing nothing.
+// Report implements Report() method of Reporter by doing nothing.
 func (r *nullReporter) Report(span *Span) {
 	// no-op
 }
 
-// Close implements Close() msevod of Reporter by doing nothing.
+// Close implements Close() method of Reporter by doing nothing.
 func (r *nullReporter) Close() {
 	// no-op
 }
@@ -64,12 +64,12 @@ func NewLoggingReporter(logger Logger) Reporter {
 	return &loggingReporter{logger}
 }
 
-// Report implements Report() msevod of Reporter by logging the span to the logger.
+// Report implements Report() method of Reporter by logging the span to the logger.
 func (r *loggingReporter) Report(span *Span) {
 	r.logger.Infof("Reporting span %+v", span)
 }
 
-// Close implements Close() msevod of Reporter by doing nothing.
+// Close implements Close() method of Reporter by doing nothing.
 func (r *loggingReporter) Close() {
 	// no-op
 }
@@ -90,14 +90,14 @@ func NewInMemoryReporter() *InMemoryReporter {
 	}
 }
 
-// Report implements Report() msevod of Reporter by storing the span in the buffer.
+// Report implements Report() method of Reporter by storing the span in the buffer.
 func (r *InMemoryReporter) Report(span *Span) {
 	r.lock.Lock()
 	r.spans = append(r.spans, span)
 	r.lock.Unlock()
 }
 
-// Close implements Close() msevod of Reporter by doing nothing.
+// Close implements Close() method of Reporter by doing nothing.
 func (r *InMemoryReporter) Close() {
 	// no-op
 }
@@ -136,14 +136,14 @@ func NewCompositeReporter(reporters ...Reporter) Reporter {
 	return &compositeReporter{reporters: reporters}
 }
 
-// Report implements Report() msevod of Reporter by delegating to each underlying reporter.
+// Report implements Report() method of Reporter by delegating to each underlying reporter.
 func (r *compositeReporter) Report(span *Span) {
 	for _, reporter := range r.reporters {
 		reporter.Report(span)
 	}
 }
 
-// Close implements Close() msevod of Reporter by closing each underlying reporter.
+// Close implements Close() method of Reporter by closing each underlying reporter.
 func (r *compositeReporter) Close() {
 	for _, reporter := range r.reporters {
 		reporter.Close()
@@ -210,7 +210,7 @@ func NewRemoteReporter(sender Transport, opts ...ReporterOption) Reporter {
 	return reporter
 }
 
-// Report implements Report() msevod of Reporter.
+// Report implements Report() method of Reporter.
 // It passes the span to a background go-routine for submission to Jaeger backend.
 // If the internal queue is full, the span is dropped and metrics.ReporterDropped counter is incremented.
 // If Report() is called after the reporter has been Close()-ed, the additional spans will not be
@@ -225,7 +225,7 @@ func (r *remoteReporter) Report(span *Span) {
 	}
 }
 
-// Close implements Close() msevod of Reporter by waiting for the queue to be drained.
+// Close implements Close() method of Reporter by waiting for the queue to be drained.
 func (r *remoteReporter) Close() {
 	if swapped := atomic.CompareAndSwapInt64(&r.closed, 0, 1); !swapped {
 		r.logger.Error("Repeated attempt to close the reporter is ignored")

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sev
+package eth
 
 import (
 	"github.com/severeum/go-severeum/metrics"
@@ -22,38 +22,38 @@ import (
 )
 
 var (
-	propTxnInPacketsMeter     = metrics.NewRegisteredMeter("sev/prop/txns/in/packets", nil)
-	propTxnInTrafficMeter     = metrics.NewRegisteredMeter("sev/prop/txns/in/traffic", nil)
-	propTxnOutPacketsMeter    = metrics.NewRegisteredMeter("sev/prop/txns/out/packets", nil)
-	propTxnOutTrafficMeter    = metrics.NewRegisteredMeter("sev/prop/txns/out/traffic", nil)
-	propHashInPacketsMeter    = metrics.NewRegisteredMeter("sev/prop/hashes/in/packets", nil)
-	propHashInTrafficMeter    = metrics.NewRegisteredMeter("sev/prop/hashes/in/traffic", nil)
-	propHashOutPacketsMeter   = metrics.NewRegisteredMeter("sev/prop/hashes/out/packets", nil)
-	propHashOutTrafficMeter   = metrics.NewRegisteredMeter("sev/prop/hashes/out/traffic", nil)
-	propBlockInPacketsMeter   = metrics.NewRegisteredMeter("sev/prop/blocks/in/packets", nil)
-	propBlockInTrafficMeter   = metrics.NewRegisteredMeter("sev/prop/blocks/in/traffic", nil)
-	propBlockOutPacketsMeter  = metrics.NewRegisteredMeter("sev/prop/blocks/out/packets", nil)
-	propBlockOutTrafficMeter  = metrics.NewRegisteredMeter("sev/prop/blocks/out/traffic", nil)
-	reqHeaderInPacketsMeter   = metrics.NewRegisteredMeter("sev/req/headers/in/packets", nil)
-	reqHeaderInTrafficMeter   = metrics.NewRegisteredMeter("sev/req/headers/in/traffic", nil)
-	reqHeaderOutPacketsMeter  = metrics.NewRegisteredMeter("sev/req/headers/out/packets", nil)
-	reqHeaderOutTrafficMeter  = metrics.NewRegisteredMeter("sev/req/headers/out/traffic", nil)
-	reqBodyInPacketsMeter     = metrics.NewRegisteredMeter("sev/req/bodies/in/packets", nil)
-	reqBodyInTrafficMeter     = metrics.NewRegisteredMeter("sev/req/bodies/in/traffic", nil)
-	reqBodyOutPacketsMeter    = metrics.NewRegisteredMeter("sev/req/bodies/out/packets", nil)
-	reqBodyOutTrafficMeter    = metrics.NewRegisteredMeter("sev/req/bodies/out/traffic", nil)
-	reqStateInPacketsMeter    = metrics.NewRegisteredMeter("sev/req/states/in/packets", nil)
-	reqStateInTrafficMeter    = metrics.NewRegisteredMeter("sev/req/states/in/traffic", nil)
-	reqStateOutPacketsMeter   = metrics.NewRegisteredMeter("sev/req/states/out/packets", nil)
-	reqStateOutTrafficMeter   = metrics.NewRegisteredMeter("sev/req/states/out/traffic", nil)
-	reqReceiptInPacketsMeter  = metrics.NewRegisteredMeter("sev/req/receipts/in/packets", nil)
-	reqReceiptInTrafficMeter  = metrics.NewRegisteredMeter("sev/req/receipts/in/traffic", nil)
-	reqReceiptOutPacketsMeter = metrics.NewRegisteredMeter("sev/req/receipts/out/packets", nil)
-	reqReceiptOutTrafficMeter = metrics.NewRegisteredMeter("sev/req/receipts/out/traffic", nil)
-	miscInPacketsMeter        = metrics.NewRegisteredMeter("sev/misc/in/packets", nil)
-	miscInTrafficMeter        = metrics.NewRegisteredMeter("sev/misc/in/traffic", nil)
-	miscOutPacketsMeter       = metrics.NewRegisteredMeter("sev/misc/out/packets", nil)
-	miscOutTrafficMeter       = metrics.NewRegisteredMeter("sev/misc/out/traffic", nil)
+	propTxnInPacketsMeter     = metrics.NewRegisteredMeter("eth/prop/txns/in/packets", nil)
+	propTxnInTrafficMeter     = metrics.NewRegisteredMeter("eth/prop/txns/in/traffic", nil)
+	propTxnOutPacketsMeter    = metrics.NewRegisteredMeter("eth/prop/txns/out/packets", nil)
+	propTxnOutTrafficMeter    = metrics.NewRegisteredMeter("eth/prop/txns/out/traffic", nil)
+	propHashInPacketsMeter    = metrics.NewRegisteredMeter("eth/prop/hashes/in/packets", nil)
+	propHashInTrafficMeter    = metrics.NewRegisteredMeter("eth/prop/hashes/in/traffic", nil)
+	propHashOutPacketsMeter   = metrics.NewRegisteredMeter("eth/prop/hashes/out/packets", nil)
+	propHashOutTrafficMeter   = metrics.NewRegisteredMeter("eth/prop/hashes/out/traffic", nil)
+	propBlockInPacketsMeter   = metrics.NewRegisteredMeter("eth/prop/blocks/in/packets", nil)
+	propBlockInTrafficMeter   = metrics.NewRegisteredMeter("eth/prop/blocks/in/traffic", nil)
+	propBlockOutPacketsMeter  = metrics.NewRegisteredMeter("eth/prop/blocks/out/packets", nil)
+	propBlockOutTrafficMeter  = metrics.NewRegisteredMeter("eth/prop/blocks/out/traffic", nil)
+	reqHeaderInPacketsMeter   = metrics.NewRegisteredMeter("eth/req/headers/in/packets", nil)
+	reqHeaderInTrafficMeter   = metrics.NewRegisteredMeter("eth/req/headers/in/traffic", nil)
+	reqHeaderOutPacketsMeter  = metrics.NewRegisteredMeter("eth/req/headers/out/packets", nil)
+	reqHeaderOutTrafficMeter  = metrics.NewRegisteredMeter("eth/req/headers/out/traffic", nil)
+	reqBodyInPacketsMeter     = metrics.NewRegisteredMeter("eth/req/bodies/in/packets", nil)
+	reqBodyInTrafficMeter     = metrics.NewRegisteredMeter("eth/req/bodies/in/traffic", nil)
+	reqBodyOutPacketsMeter    = metrics.NewRegisteredMeter("eth/req/bodies/out/packets", nil)
+	reqBodyOutTrafficMeter    = metrics.NewRegisteredMeter("eth/req/bodies/out/traffic", nil)
+	reqStateInPacketsMeter    = metrics.NewRegisteredMeter("eth/req/states/in/packets", nil)
+	reqStateInTrafficMeter    = metrics.NewRegisteredMeter("eth/req/states/in/traffic", nil)
+	reqStateOutPacketsMeter   = metrics.NewRegisteredMeter("eth/req/states/out/packets", nil)
+	reqStateOutTrafficMeter   = metrics.NewRegisteredMeter("eth/req/states/out/traffic", nil)
+	reqReceiptInPacketsMeter  = metrics.NewRegisteredMeter("eth/req/receipts/in/packets", nil)
+	reqReceiptInTrafficMeter  = metrics.NewRegisteredMeter("eth/req/receipts/in/traffic", nil)
+	reqReceiptOutPacketsMeter = metrics.NewRegisteredMeter("eth/req/receipts/out/packets", nil)
+	reqReceiptOutTrafficMeter = metrics.NewRegisteredMeter("eth/req/receipts/out/traffic", nil)
+	miscInPacketsMeter        = metrics.NewRegisteredMeter("eth/misc/in/packets", nil)
+	miscInTrafficMeter        = metrics.NewRegisteredMeter("eth/misc/in/traffic", nil)
+	miscOutPacketsMeter       = metrics.NewRegisteredMeter("eth/misc/out/packets", nil)
+	miscOutTrafficMeter       = metrics.NewRegisteredMeter("eth/misc/out/traffic", nil)
 )
 
 // meteredMsgReadWriter is a wrapper around a p2p.MsgReadWriter, capable of
@@ -92,9 +92,9 @@ func (rw *meteredMsgReadWriter) ReadMsg() (p2p.Msg, error) {
 	case msg.Code == BlockBodiesMsg:
 		packets, traffic = reqBodyInPacketsMeter, reqBodyInTrafficMeter
 
-	case rw.version >= sev63 && msg.Code == NodeDataMsg:
+	case rw.version >= eth63 && msg.Code == NodeDataMsg:
 		packets, traffic = reqStateInPacketsMeter, reqStateInTrafficMeter
-	case rw.version >= sev63 && msg.Code == ReceiptsMsg:
+	case rw.version >= eth63 && msg.Code == ReceiptsMsg:
 		packets, traffic = reqReceiptInPacketsMeter, reqReceiptInTrafficMeter
 
 	case msg.Code == NewBlockHashesMsg:
@@ -119,9 +119,9 @@ func (rw *meteredMsgReadWriter) WriteMsg(msg p2p.Msg) error {
 	case msg.Code == BlockBodiesMsg:
 		packets, traffic = reqBodyOutPacketsMeter, reqBodyOutTrafficMeter
 
-	case rw.version >= sev63 && msg.Code == NodeDataMsg:
+	case rw.version >= eth63 && msg.Code == NodeDataMsg:
 		packets, traffic = reqStateOutPacketsMeter, reqStateOutTrafficMeter
-	case rw.version >= sev63 && msg.Code == ReceiptsMsg:
+	case rw.version >= eth63 && msg.Code == ReceiptsMsg:
 		packets, traffic = reqReceiptOutPacketsMeter, reqReceiptOutTrafficMeter
 
 	case msg.Code == NewBlockHashesMsg:

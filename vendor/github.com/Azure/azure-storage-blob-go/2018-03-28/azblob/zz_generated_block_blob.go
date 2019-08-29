@@ -17,7 +17,7 @@ import (
 	"time"
 )
 
-// blockBlobClient is the client for the BlockBlob msevods of the Azblob service.
+// blockBlobClient is the client for the BlockBlob methods of the Azblob service.
 type blockBlobClient struct {
 	managementClient
 }
@@ -30,7 +30,7 @@ func newBlockBlobClient(url url.URL, p pipeline.Pipeline) blockBlobClient {
 // CommitBlockList the Commit Block List operation writes a blob by specifying the list of block IDs that make up the
 // blob. In order to be written as part of a blob, a block must have been successfully written to the server in a prior
 // Put Block operation. You can call Put Block List to update a blob by uploading only those blocks that have changed,
-// then committing the new and existing blocks tossever. You can do this by specifying whsever to commit a block from
+// then committing the new and existing blocks tosether. You can do this by specifying whether to commit a block from
 // the committed block list or from the uncommitted block list, or to commit the most recently uploaded version of the
 // block, whichever list it may belong to.
 //
@@ -157,8 +157,8 @@ func (client blockBlobClient) commitBlockListResponder(resp pipeline.Response) (
 // GetBlockList the Get Block List operation retrieves the list of blocks that have been uploaded as part of a block
 // blob
 //
-// listType is specifies whsever to return the list of committed blocks, the list of uncommitted blocks, or both lists
-// tossever. snapshot is the snapshot parameter is an opaque DateTime value that, when present, specifies the blob
+// listType is specifies whether to return the list of committed blocks, the list of uncommitted blocks, or both lists
+// tosether. snapshot is the snapshot parameter is an opaque DateTime value that, when present, specifies the blob
 // snapshot to retrieve. For more information on working with blob snapshots, see <a
 // href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/creating-a-snapshot-of-a-blob">Creating
 // a Snapshot of a Blob.</a> timeout is the timeout parameter is expressed in seconds. For more information, see <a

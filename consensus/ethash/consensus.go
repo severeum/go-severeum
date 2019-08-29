@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sevash
+package ethash
 
 import (
 	"bytes"
@@ -76,15 +76,15 @@ var (
 
 // Author implements consensus.Engine, returning the header's coinbase as the
 // proof-of-work verified author of the block.
-func (sevash *Sevash) Author(header *types.Header) (common.Address, error) {
+func (ethash *Sevash) Author(header *types.Header) (common.Address, error) {
 	return header.Coinbase, nil
 }
 
-// VerifyHeader checks whsever a header conforms to the consensus rules of the
-// stock Severeum sevash engine.
-func (sevash *Sevash) VerifyHeader(chain consensus.ChainReader, header *types.Header, seal bool) error {
+// VerifyHeader checks whether a header conforms to the consensus rules of the
+// stock Severeum ethash engine.
+func (ethash *Sevash) VerifyHeader(chain consensus.ChainReader, header *types.Header, seal bool) error {
 	// If we're running a full engine faking, accept any input as valid
-	if sevash.config.PowMode == ModeFullFake {
+	if ethash.config.PowMode == ModeFullFake {
 		return nil
 	}
 	// Short circuit if the header is known, or it's parent not
@@ -97,15 +97,15 @@ func (sevash *Sevash) VerifyHeader(chain consensus.ChainReader, header *types.He
 		return consensus.ErrUnknownAncestor
 	}
 	// Sanity checks passed, do a proper verification
-	return sevash.verifyHeader(chain, header, parent, false, seal)
+	return ethash.verifyHeader(chain, header, parent, false, seal)
 }
 
 // VerifyHeaders is similar to VerifyHeader, but verifies a batch of headers
-// concurrently. The msevod returns a quit channel to abort the operations and
+// concurrently. The method returns a quit channel to abort the operations and
 // a results channel to retrieve the async verifications.
-func (sevash *Sevash) VerifyHeaders(chain consensus.ChainReader, headers []*types.Header, seals []bool) (chan<- struct{}, <-chan error) {
+func (ethash *Sevash) VerifyHeaders(chain consensus.ChainReader, headers []*types.Header, seals []bool) (chan<- struct{}, <-chan error) {
 	// If we're running a full engine faking, accept any input as valid
-	if sevash.config.PowMode == ModeFullFake || len(headers) == 0 {
+	if ethash.config.PowMode == ModeFullFake || len(headers) == 0 {
 		abort, results := make(chan struct{}), make(chan error, len(headers))
 		for i := 0; i < len(headers); i++ {
 			results <- nil
@@ -129,7 +129,7 @@ func (sevash *Sevash) VerifyHeaders(chain consensus.ChainReader, headers []*type
 	for i := 0; i < workers; i++ {
 		go func() {
 			for index := range inputs {
-				errors[index] = sevash.verifyHeaderWorker(chain, headers, seals, index)
+				errors[index] = ethash.verifyHeaderWorker(chain, headers, seals, index)
 				done <- index
 			}
 		}()
@@ -165,7 +165,7 @@ func (sevash *Sevash) VerifyHeaders(chain consensus.ChainReader, headers []*type
 	return abort, errorsOut
 }
 
-func (sevash *Sevash) verifyHeaderWorker(chain consensus.ChainReader, headers []*types.Header, seals []bool, index int) error {
+func (ethash *Sevash) verifyHeaderWorker(chain consensus.ChainReader, headers []*types.Header, seals []bool, index int) error {
 	var parent *types.Header
 	if index == 0 {
 		parent = chain.GetHeader(headers[0].ParentHash, headers[0].Number.Uint64()-1)
@@ -178,14 +178,14 @@ func (sevash *Sevash) verifyHeaderWorker(chain consensus.ChainReader, headers []
 	if chain.GetHeader(headers[index].Hash(), headers[index].Number.Uint64()) != nil {
 		return nil // known block
 	}
-	return sevash.verifyHeader(chain, headers[index], parent, false, seals[index])
+	return ethash.verifyHeader(chain, headers[index], parent, false, seals[index])
 }
 
 // VerifyUncles verifies that the given block's uncles conform to the consensus
-// rules of the stock Severeum sevash engine.
-func (sevash *Sevash) VerifyUncles(chain consensus.ChainReader, block *types.Block) error {
+// rules of the stock Severeum ethash engine.
+func (ethash *Sevash) VerifyUncles(chain consensus.ChainReader, block *types.Block) error {
 	// If we're running a full engine faking, accept any input as valid
-	if sevash.config.PowMode == ModeFullFake {
+	if ethash.config.PowMode == ModeFullFake {
 		return nil
 	}
 	// Verify that there are at most 2 uncles included in this block
@@ -226,17 +226,17 @@ func (sevash *Sevash) VerifyUncles(chain consensus.ChainReader, block *types.Blo
 		if ancestors[uncle.ParentHash] == nil || uncle.ParentHash == block.ParentHash() {
 			return errDanglingUncle
 		}
-		if err := sevash.verifyHeader(chain, uncle, ancestors[uncle.ParentHash], true, true); err != nil {
+		if err := ethash.verifyHeader(chain, uncle, ancestors[uncle.ParentHash], true, true); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-// verifyHeader checks whsever a header conforms to the consensus rules of the
-// stock Severeum sevash engine.
+// verifyHeader checks whether a header conforms to the consensus rules of the
+// stock Severeum ethash engine.
 // See YP section 4.3.4. "Block Header Validity"
-func (sevash *Sevash) verifyHeader(chain consensus.ChainReader, header, parent *types.Header, uncle bool, seal bool) error {
+func (ethash *Sevash) verifyHeader(chain consensus.ChainReader, header, parent *types.Header, uncle bool, seal bool) error {
 	// Ensure that the header's extra-data section is of a reasonable size
 	if uint64(len(header.Extra)) > params.MaximumExtraDataSize {
 		return fmt.Errorf("extra-data too long: %d > %d", len(header.Extra), params.MaximumExtraDataSize)
@@ -255,7 +255,7 @@ func (sevash *Sevash) verifyHeader(chain consensus.ChainReader, header, parent *
 		return errZeroBlockTime
 	}
 	// Verify the block's difficulty based in it's timestamp and parent's difficulty
-	expected := sevash.CalcDifficulty(chain, header.Time.Uint64(), parent)
+	expected := ethash.CalcDifficulty(chain, header.Time.Uint64(), parent)
 
 	if expected.Cmp(header.Difficulty) != 0 {
 		return fmt.Errorf("invalid difficulty: have %v, want %v", header.Difficulty, expected)
@@ -286,7 +286,7 @@ func (sevash *Sevash) verifyHeader(chain consensus.ChainReader, header, parent *
 	}
 	// Verify the engine specific seal securing the block
 	if seal {
-		if err := sevash.VerifySeal(chain, header); err != nil {
+		if err := ethash.VerifySeal(chain, header); err != nil {
 			return err
 		}
 	}
@@ -303,7 +303,7 @@ func (sevash *Sevash) verifyHeader(chain consensus.ChainReader, header, parent *
 // CalcDifficulty is the difficulty adjustment algorithm. It returns
 // the difficulty that a new block should have when created at time
 // given the parent block's time and difficulty.
-func (sevash *Sevash) CalcDifficulty(chain consensus.ChainReader, time uint64, parent *types.Header) *big.Int {
+func (ethash *Sevash) CalcDifficulty(chain consensus.ChainReader, time uint64, parent *types.Header) *big.Int {
 	return CalcDifficulty(chain.Config(), time, parent)
 }
 
@@ -479,27 +479,27 @@ func calcDifficultyFrontier(time uint64, parent *types.Header) *big.Int {
 	return diff
 }
 
-// VerifySeal implements consensus.Engine, checking whsever the given block satisfies
+// VerifySeal implements consensus.Engine, checking whether the given block satisfies
 // the PoW difficulty requirements.
-func (sevash *Sevash) VerifySeal(chain consensus.ChainReader, header *types.Header) error {
-	return sevash.verifySeal(chain, header, false)
+func (ethash *Sevash) VerifySeal(chain consensus.ChainReader, header *types.Header) error {
+	return ethash.verifySeal(chain, header, false)
 }
 
-// verifySeal checks whsever a block satisfies the PoW difficulty requirements,
-// either using the usual sevash cache for it, or alternatively using a full DAG
+// verifySeal checks whether a block satisfies the PoW difficulty requirements,
+// either using the usual ethash cache for it, or alternatively using a full DAG
 // to make remote mining fast.
-func (sevash *Sevash) verifySeal(chain consensus.ChainReader, header *types.Header, fulldag bool) error {
+func (ethash *Sevash) verifySeal(chain consensus.ChainReader, header *types.Header, fulldag bool) error {
 	// If we're running a fake PoW, accept any seal as valid
-	if sevash.config.PowMode == ModeFake || sevash.config.PowMode == ModeFullFake {
-		time.Sleep(sevash.fakeDelay)
-		if sevash.fakeFail == header.Number.Uint64() {
+	if ethash.config.PowMode == ModeFake || ethash.config.PowMode == ModeFullFake {
+		time.Sleep(ethash.fakeDelay)
+		if ethash.fakeFail == header.Number.Uint64() {
 			return errInvalidPoW
 		}
 		return nil
 	}
 	// If we're running a shared PoW, delegate verification to it
-	if sevash.shared != nil {
-		return sevash.shared.verifySeal(chain, header, fulldag)
+	if ethash.shared != nil {
+		return ethash.shared.verifySeal(chain, header, fulldag)
 	}
 	// Ensure that we have a valid difficulty for the block
 	if header.Difficulty.Sign() <= 0 {
@@ -512,11 +512,11 @@ func (sevash *Sevash) verifySeal(chain consensus.ChainReader, header *types.Head
 		digest []byte
 		result []byte
 	)
-	// If fast-but-heavy PoW verification was requested, use an sevash dataset
+	// If fast-but-heavy PoW verification was requested, use an ethash dataset
 	if fulldag {
-		dataset := sevash.dataset(number, true)
+		dataset := ethash.dataset(number, true)
 		if dataset.generated() {
-			digest, result = hashimotoFull(dataset.dataset, sevash.SealHash(header).Bytes(), header.Nonce.Uint64())
+			digest, result = hashimotoFull(dataset.dataset, ethash.SealHash(header).Bytes(), header.Nonce.Uint64())
 
 			// Datasets are unmapped in a finalizer. Ensure that the dataset stays alive
 			// until after the call to hashimotoFull so it's not unmapped while being used.
@@ -526,15 +526,15 @@ func (sevash *Sevash) verifySeal(chain consensus.ChainReader, header *types.Head
 			fulldag = false
 		}
 	}
-	// If slow-but-light PoW verification was requested (or DAG not yet ready), use an sevash cache
+	// If slow-but-light PoW verification was requested (or DAG not yet ready), use an ethash cache
 	if !fulldag {
-		cache := sevash.cache(number)
+		cache := ethash.cache(number)
 
 		size := datasetSize(number)
-		if sevash.config.PowMode == ModeTest {
+		if ethash.config.PowMode == ModeTest {
 			size = 32 * 1024
 		}
-		digest, result = hashimotoLight(size, cache.cache, sevash.SealHash(header).Bytes(), header.Nonce.Uint64())
+		digest, result = hashimotoLight(size, cache.cache, ethash.SealHash(header).Bytes(), header.Nonce.Uint64())
 
 		// Caches are unmapped in a finalizer. Ensure that the cache stays alive
 		// until after the call to hashimotoLight so it's not unmapped while being used.
@@ -552,19 +552,19 @@ func (sevash *Sevash) verifySeal(chain consensus.ChainReader, header *types.Head
 }
 
 // Prepare implements consensus.Engine, initializing the difficulty field of a
-// header to conform to the sevash protocol. The changes are done inline.
-func (sevash *Sevash) Prepare(chain consensus.ChainReader, header *types.Header) error {
+// header to conform to the ethash protocol. The changes are done inline.
+func (ethash *Sevash) Prepare(chain consensus.ChainReader, header *types.Header) error {
 	parent := chain.GetHeader(header.ParentHash, header.Number.Uint64()-1)
 	if parent == nil {
 		return consensus.ErrUnknownAncestor
 	}
-	header.Difficulty = sevash.CalcDifficulty(chain, header.Time.Uint64(), parent)
+	header.Difficulty = ethash.CalcDifficulty(chain, header.Time.Uint64(), parent)
 	return nil
 }
 
 // Finalize implements consensus.Engine, accumulating the block and uncle rewards,
 // setting the final state and assembling the block.
-func (sevash *Sevash) Finalize(chain consensus.ChainReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt) (*types.Block, error) {
+func (ethash *Sevash) Finalize(chain consensus.ChainReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt) (*types.Block, error) {
 	// Accumulate any block and uncle rewards and commit the final state root
 	accumulateRewards(chain.Config(), state, header, uncles)
 	header.Root = state.IntermediateRoot(chain.Config().IsEIP158(header.Number))
@@ -574,7 +574,7 @@ func (sevash *Sevash) Finalize(chain consensus.ChainReader, header *types.Header
 }
 
 // SealHash returns the hash of a block prior to it being sealed.
-func (sevash *Sevash) SealHash(header *types.Header) (hash common.Hash) {
+func (ethash *Sevash) SealHash(header *types.Header) (hash common.Hash) {
 	hasher := sha3.NewLegacyKeccak256()
 
 	rlp.Encode(hasher, []interface{}{

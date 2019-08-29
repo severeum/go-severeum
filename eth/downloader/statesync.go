@@ -25,13 +25,13 @@ import (
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/core/rawdb"
 	"github.com/severeum/go-severeum/core/state"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/trie"
 	"golang.org/x/crypto/sha3"
 )
 
-// stateReq represents a batch of state fetch requests grouped tossever into
+// stateReq represents a batch of state fetch requests grouped tosether into
 // a single data retrieval network packet.
 type stateReq struct {
 	items    []common.Hash              // Hashes of the state items to download
@@ -40,7 +40,7 @@ type stateReq struct {
 	timer    *time.Timer                // Timer to fire when the RTT timeout expires
 	peer     *peerConnection            // Peer that we're requesting from
 	response [][]byte                   // Response data of the peer (nil for timeouts)
-	dropped  bool                       // Flag whsever the peer dropped off early
+	dropped  bool                       // Flag whether the peer dropped off early
 }
 
 // timedOut returns if this request timed out.
@@ -168,7 +168,7 @@ func (d *Downloader) runStateSync(s *stateSync) *stateSync {
 
 		// Handle timed-out requests:
 		case req := <-timeout:
-			// If the peer is already requesting somseving else, ignore the stale timeout.
+			// If the peer is already requesting something else, ignore the stale timeout.
 			// This can happen when the timeout and the delivery happens simultaneously,
 			// causing both pathways to trigger.
 			if active[req.peer.id] != req {
@@ -234,7 +234,7 @@ type stateTask struct {
 	attempts map[string]struct{}
 }
 
-// newStateSync creates a new state trie download scheduler. This msevod does not
+// newStateSync creates a new state trie download scheduler. This method does not
 // yet start the sync. The user needs to call run to initiate.
 func newStateSync(d *Downloader, root common.Hash) *stateSync {
 	return &stateSync{
@@ -292,7 +292,7 @@ func (s *stateSync) loop() (err error) {
 			return err
 		}
 		s.assignTasks()
-		// Tasks assigned, wait for somseving to happen
+		// Tasks assigned, wait for something to happen
 		select {
 		case <-newPeer:
 			// New peer arrived, try to assign it download tasks
@@ -325,7 +325,7 @@ func (s *stateSync) loop() (err error) {
 }
 
 func (s *stateSync) commit(force bool) error {
-	if !force && s.bytesUncommitted < sevdb.IdealBatchSize {
+	if !force && s.bytesUncommitted < ethdb.IdealBatchSize {
 		return nil
 	}
 	start := time.Now()
@@ -398,7 +398,7 @@ func (s *stateSync) fillTasks(n int, req *stateReq) {
 
 // process iterates over a batch of delivered state data, injecting each item
 // into a running state sync, re-queuing any items that were requested but not
-// delivered. Returns whsever the peer actually managed to deliver anything of
+// delivered. Returns whether the peer actually managed to deliver anything of
 // value, and any error that occurred.
 func (s *stateSync) process(req *stateReq) (int, error) {
 	// Collect processing stats and update progress if valid data was received
@@ -432,7 +432,7 @@ func (s *stateSync) process(req *stateReq) (int, error) {
 	// Put unfulfilled tasks back into the retry queue
 	npeers := s.d.peers.Len()
 	for hash, task := range req.tasks {
-		// If the node did deliver somseving, missing items may be due to a protocol
+		// If the node did deliver something, missing items may be due to a protocol
 		// limit or a previous timeout + delayed delivery. Both cases should permit
 		// the node to retry the missing items (to avoid single-peer stalls).
 		if len(req.response) > 0 || req.timedOut() {
@@ -450,7 +450,7 @@ func (s *stateSync) process(req *stateReq) (int, error) {
 }
 
 // processNodeData tries to inject a trie node data blob delivered from a remote
-// peer into the state trie, returning whsever anything useful was written or any
+// peer into the state trie, returning whether anything useful was written or any
 // error occurred.
 func (s *stateSync) processNodeData(blob []byte) (bool, common.Hash, error) {
 	res := trie.SyncResult{Data: blob}

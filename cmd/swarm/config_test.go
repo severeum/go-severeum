@@ -473,7 +473,7 @@ func TestConfigValidate(t *testing.T) {
 	}{
 		{
 			cfg: &api.Config{EnsAPIs: []string{
-				"/data/testnet/ssev.ipc",
+				"/data/testnet/seth.ipc",
 			}},
 		},
 		{
@@ -488,7 +488,7 @@ func TestConfigValidate(t *testing.T) {
 		},
 		{
 			cfg: &api.Config{EnsAPIs: []string{
-				"test:/data/testnet/ssev.ipc",
+				"test:/data/testnet/seth.ipc",
 			}},
 		},
 		{
@@ -498,7 +498,7 @@ func TestConfigValidate(t *testing.T) {
 		},
 		{
 			cfg: &api.Config{EnsAPIs: []string{
-				"314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/ssev.ipc",
+				"314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/seth.ipc",
 			}},
 		},
 		{
@@ -513,24 +513,24 @@ func TestConfigValidate(t *testing.T) {
 		},
 		{
 			cfg: &api.Config{EnsAPIs: []string{
-				"test:314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/ssev.ipc",
+				"test:314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/seth.ipc",
 			}},
 		},
 		{
 			cfg: &api.Config{EnsAPIs: []string{
-				"sev:314159265dD8dbb310642f98f50C066173C1259b@http://127.0.0.1:1234",
+				"eth:314159265dD8dbb310642f98f50C066173C1259b@http://127.0.0.1:1234",
 			}},
 		},
 		{
 			cfg: &api.Config{EnsAPIs: []string{
-				"sev:314159265dD8dbb310642f98f50C066173C1259b@ws://127.0.0.1:12344",
+				"eth:314159265dD8dbb310642f98f50C066173C1259b@ws://127.0.0.1:12344",
 			}},
 		},
 		{
 			cfg: &api.Config{EnsAPIs: []string{
-				"sev:",
+				"eth:",
 			}},
-			err: "invalid format [tld:][contract-addr@]url for ENS API endpoint configuration \"sev:\": missing url",
+			err: "invalid format [tld:][contract-addr@]url for ENS API endpoint configuration \"eth:\": missing url",
 		},
 		{
 			cfg: &api.Config{EnsAPIs: []string{
@@ -546,9 +546,9 @@ func TestConfigValidate(t *testing.T) {
 		},
 		{
 			cfg: &api.Config{EnsAPIs: []string{
-				"@/data/testnet/ssev.ipc",
+				"@/data/testnet/seth.ipc",
 			}},
-			err: "invalid format [tld:][contract-addr@]url for ENS API endpoint configuration \"@/data/testnet/ssev.ipc\": missing contract address",
+			err: "invalid format [tld:][contract-addr@]url for ENS API endpoint configuration \"@/data/testnet/seth.ipc\": missing contract address",
 		},
 	} {
 		err := validateConfig(c.cfg)

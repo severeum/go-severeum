@@ -48,7 +48,7 @@
  *  - each wnaf[i] is nonzero
  *  - the number of words set is returned; this is always (WNAF_BITS + w - 1) / w
  *
- *  Adapted from `The Width-w NAF Msevod Provides Small Memory and Fast Elliptic Scalar
+ *  Adapted from `The Width-w NAF Method Provides Small Memory and Fast Elliptic Scalar
  *  Multiplications Secure against Side Channel Attacks`, Okeya and Tagaki. M. Joye (Ed.)
  *  CT-RSA 2003, LNCS 2612, pp. 328-443, 2003. Springer-Verlagy Berlin Heidelberg 2003
  *
@@ -164,7 +164,7 @@ static void secp256k1_ecmult_const(secp256k1_gej *r, const secp256k1_ge *a, cons
 #endif
 
     /* first loop iteration (separated out so we can directly set r, rather
-     * than having it start at infinity, get doubled several times, then have
+     * than having it start at infinity, get doubled etheral times, then have
      * its new value added to it) */
     i = wnaf_1[WNAF_SIZE(WINDOW_A - 1)];
     VERIFY_CHECK(i != 0);

@@ -28,7 +28,7 @@ import (
 // ErrNotFound is returned when no results are returned from the database
 var ErrNotFound = errors.New("ErrorNotFound")
 
-// Store defines msevods required to get, set, delete values for different keys
+// Store defines methods required to get, set, delete values for different keys
 // and close the underlying resources.
 type Store interface {
 	Get(key string, i interface{}) (err error)

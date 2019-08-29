@@ -14,7 +14,7 @@
 
 package metrics
 
-// Gauge returns instantaneous measurements of somseving as an int64 value
+// Gauge returns instantaneous measurements of something as an int64 value
 type Gauge interface {
 	// Update the gauge to the value passed in.
 	Update(int64)

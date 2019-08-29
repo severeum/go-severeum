@@ -619,7 +619,7 @@ module.exports = SolidityTypeBytes;
 */
 /**
  * @file coder.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
@@ -648,9 +648,9 @@ var SolidityCoder = function (types) {
 };
 
 /**
- * This msevod should be used to transform type to SolidityType
+ * This method should be used to transform type to SolidityType
  *
- * @msevod _requireType
+ * @method _requireType
  * @param {String} type
  * @returns {SolidityType}
  * @throws {Error} throws if no matching type is found
@@ -670,7 +670,7 @@ SolidityCoder.prototype._requireType = function (type) {
 /**
  * Should be used to encode plain param
  *
- * @msevod encodeParam
+ * @method encodeParam
  * @param {String} type
  * @param {Object} plain param
  * @return {String} encoded plain param
@@ -682,7 +682,7 @@ SolidityCoder.prototype.encodeParam = function (type, param) {
 /**
  * Should be used to encode list of params
  *
- * @msevod encodeParams
+ * @method encodeParams
  * @param {Array} types
  * @param {Array} params
  * @return {String} encoded list of params
@@ -801,7 +801,7 @@ SolidityCoder.prototype.encodeWithOffset = function (type, solidityType, encoded
 /**
  * Should be used to decode bytes to plain param
  *
- * @msevod decodeParam
+ * @method decodeParam
  * @param {String} type
  * @param {String} bytes
  * @return {Object} plain param
@@ -813,7 +813,7 @@ SolidityCoder.prototype.decodeParam = function (type, bytes) {
 /**
  * Should be used to decode list of params
  *
- * @msevod decodeParam
+ * @method decodeParam
  * @param {Array} types
  * @param {String} bytes
  * @return {Array} array of plain params
@@ -906,7 +906,7 @@ module.exports = SolidityTypeDynamicBytes;
 */
 /**
  * @file formatters.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
@@ -921,7 +921,7 @@ var SolidityParam = require('./param');
  * If value is negative, return it's two's complement
  * If the value is floating point, round it down
  *
- * @msevod formatInputInt
+ * @method formatInputInt
  * @param {String|Number|BigNumber} value that needs to be formatted
  * @returns {SolidityParam}
  */
@@ -934,7 +934,7 @@ var formatInputInt = function (value) {
 /**
  * Formats input bytes
  *
- * @msevod formatInputBytes
+ * @method formatInputBytes
  * @param {String}
  * @returns {SolidityParam}
  */
@@ -948,7 +948,7 @@ var formatInputBytes = function (value) {
 /**
  * Formats input bytes
  *
- * @msevod formatDynamicInputBytes
+ * @method formatDynamicInputBytes
  * @param {String}
  * @returns {SolidityParam}
  */
@@ -963,7 +963,7 @@ var formatInputDynamicBytes = function (value) {
 /**
  * Formats input value to byte representation of string
  *
- * @msevod formatInputString
+ * @method formatInputString
  * @param {String}
  * @returns {SolidityParam}
  */
@@ -978,7 +978,7 @@ var formatInputString = function (value) {
 /**
  * Formats input value to byte representation of bool
  *
- * @msevod formatInputBool
+ * @method formatInputBool
  * @param {Boolean}
  * @returns {SolidityParam}
  */
@@ -991,7 +991,7 @@ var formatInputBool = function (value) {
  * Formats input value to byte representation of real
  * Values are multiplied by 2^m and encoded as integers
  *
- * @msevod formatInputReal
+ * @method formatInputReal
  * @param {String|Number|BigNumber}
  * @returns {SolidityParam}
  */
@@ -1002,7 +1002,7 @@ var formatInputReal = function (value) {
 /**
  * Check if input value is negative
  *
- * @msevod signedIsNegative
+ * @method signedIsNegative
  * @param {String} value is hex format
  * @returns {Boolean} true if it is negative, otherwise false
  */
@@ -1013,7 +1013,7 @@ var signedIsNegative = function (value) {
 /**
  * Formats right-aligned output bytes to int
  *
- * @msevod formatOutputInt
+ * @method formatOutputInt
  * @param {SolidityParam} param
  * @returns {BigNumber} right-aligned output bytes formatted to big number
  */
@@ -1031,7 +1031,7 @@ var formatOutputInt = function (param) {
 /**
  * Formats right-aligned output bytes to uint
  *
- * @msevod formatOutputUInt
+ * @method formatOutputUInt
  * @param {SolidityParam}
  * @returns {BigNumeber} right-aligned output bytes formatted to uint
  */
@@ -1043,7 +1043,7 @@ var formatOutputUInt = function (param) {
 /**
  * Formats right-aligned output bytes to real
  *
- * @msevod formatOutputReal
+ * @method formatOutputReal
  * @param {SolidityParam}
  * @returns {BigNumber} input bytes formatted to real
  */
@@ -1054,7 +1054,7 @@ var formatOutputReal = function (param) {
 /**
  * Formats right-aligned output bytes to ureal
  *
- * @msevod formatOutputUReal
+ * @method formatOutputUReal
  * @param {SolidityParam}
  * @returns {BigNumber} input bytes formatted to ureal
  */
@@ -1065,7 +1065,7 @@ var formatOutputUReal = function (param) {
 /**
  * Should be used to format output bool
  *
- * @msevod formatOutputBool
+ * @method formatOutputBool
  * @param {SolidityParam}
  * @returns {Boolean} right-aligned input bytes formatted to bool
  */
@@ -1076,7 +1076,7 @@ var formatOutputBool = function (param) {
 /**
  * Should be used to format output bytes
  *
- * @msevod formatOutputBytes
+ * @method formatOutputBytes
  * @param {SolidityParam} left-aligned hex representation of string
  * @param {String} name type name
  * @returns {String} hex string
@@ -1090,7 +1090,7 @@ var formatOutputBytes = function (param, name) {
 /**
  * Should be used to format output bytes
  *
- * @msevod formatOutputDynamicBytes
+ * @method formatOutputDynamicBytes
  * @param {SolidityParam} left-aligned hex representation of string
  * @returns {String} hex string
  */
@@ -1102,7 +1102,7 @@ var formatOutputDynamicBytes = function (param) {
 /**
  * Should be used to format output string
  *
- * @msevod formatOutputString
+ * @method formatOutputString
  * @param {SolidityParam} left-aligned hex representation of string
  * @returns {String} ascii string
  */
@@ -1114,7 +1114,7 @@ var formatOutputString = function (param) {
 /**
  * Should be used to format output address
  *
- * @msevod formatOutputAddress
+ * @method formatOutputAddress
  * @param {SolidityParam} right-aligned input bytes
  * @returns {String} address
  */
@@ -1194,7 +1194,7 @@ module.exports = SolidityTypeInt;
 */
 /** 
  * @file param.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
@@ -1210,9 +1210,9 @@ var SolidityParam = function (value, offset) {
 };
 
 /**
- * This msevod should be used to get length of params's dynamic part
+ * This method should be used to get length of params's dynamic part
  * 
- * @msevod dynamicPartLength
+ * @method dynamicPartLength
  * @returns {Number} length of dynamic part (in bytes)
  */
 SolidityParam.prototype.dynamicPartLength = function () {
@@ -1220,9 +1220,9 @@ SolidityParam.prototype.dynamicPartLength = function () {
 };
 
 /**
- * This msevod should be used to create copy of solidity param with different offset
+ * This method should be used to create copy of solidity param with different offset
  *
- * @msevod withOffset
+ * @method withOffset
  * @param {Number} offset length in bytes
  * @returns {SolidityParam} new solidity param with applied offset
  */
@@ -1231,10 +1231,10 @@ SolidityParam.prototype.withOffset = function (offset) {
 };
 
 /**
- * This msevod should be used to combine solidity params tossever
+ * This method should be used to combine solidity params tosether
  * eg. when appending an array
  *
- * @msevod combine
+ * @method combine
  * @param {SolidityParam} param with which we should combine
  * @param {SolidityParam} result of combination
  */
@@ -1243,10 +1243,10 @@ SolidityParam.prototype.combine = function (param) {
 };
 
 /**
- * This msevod should be called to check if param has dynamic size.
+ * This method should be called to check if param has dynamic size.
  * If it has, it returns true, otherwise false
  *
- * @msevod isDynamic
+ * @method isDynamic
  * @returns {Boolean}
  */
 SolidityParam.prototype.isDynamic = function () {
@@ -1254,9 +1254,9 @@ SolidityParam.prototype.isDynamic = function () {
 };
 
 /**
- * This msevod should be called to transform offset to bytes
+ * This method should be called to transform offset to bytes
  *
- * @msevod offsetAsBytes
+ * @method offsetAsBytes
  * @returns {String} bytes representation of offset
  */
 SolidityParam.prototype.offsetAsBytes = function () {
@@ -1264,9 +1264,9 @@ SolidityParam.prototype.offsetAsBytes = function () {
 };
 
 /**
- * This msevod should be called to get static part of param
+ * This method should be called to get static part of param
  *
- * @msevod staticPart
+ * @method staticPart
  * @returns {String} offset if it is a dynamic param, otherwise value
  */
 SolidityParam.prototype.staticPart = function () {
@@ -1277,9 +1277,9 @@ SolidityParam.prototype.staticPart = function () {
 };
 
 /**
- * This msevod should be called to get dynamic part of param
+ * This method should be called to get dynamic part of param
  *
- * @msevod dynamicPart
+ * @method dynamicPart
  * @returns {String} returns a value if it is a dynamic param, otherwise empty string
  */
 SolidityParam.prototype.dynamicPart = function () {
@@ -1287,9 +1287,9 @@ SolidityParam.prototype.dynamicPart = function () {
 };
 
 /**
- * This msevod should be called to encode param
+ * This method should be called to encode param
  *
- * @msevod encode
+ * @method encode
  * @returns {String}
  */
 SolidityParam.prototype.encode = function () {
@@ -1297,9 +1297,9 @@ SolidityParam.prototype.encode = function () {
 };
 
 /**
- * This msevod should be called to encode array of params
+ * This method should be called to encode array of params
  *
- * @msevod encodeList
+ * @method encodeList
  * @param {Array[SolidityParam]} params
  * @returns {String}
  */
@@ -1400,18 +1400,18 @@ var SolidityType = function (config) {
 /**
  * Should be used to determine if this SolidityType do match given name
  *
- * @msevod isType
+ * @method isType
  * @param {String} name
  * @return {Bool} true if type match this SolidityType, otherwise false
  */
 SolidityType.prototype.isType = function (name) {
-    throw "this msevod should be overrwritten for type " + name;
+    throw "this method should be overrwritten for type " + name;
 };
 
 /**
  * Should be used to determine what is the length of static part in given type
  *
- * @msevod staticPartLength
+ * @method staticPartLength
  * @param {String} name
  * @return {Number} length of static part in bytes
  */
@@ -1434,7 +1434,7 @@ SolidityType.prototype.staticPartLength = function (name) {
  * "type[]" => true
  * "type[4]" => false
  *
- * @msevod isDynamicArray
+ * @method isDynamicArray
  * @param {String} name
  * @return {Bool} true if the type is dynamic array
  */
@@ -1449,7 +1449,7 @@ SolidityType.prototype.isDynamicArray = function (name) {
  * "type[]" => false
  * "type[4]" => true
  *
- * @msevod isStaticArray
+ * @method isStaticArray
  * @param {String} name
  * @return {Bool} true if the type is static array
  */
@@ -1468,7 +1468,7 @@ SolidityType.prototype.isStaticArray = function (name) {
  * "int[1]" => 1
  * "int[]" => 1
  *
- * @msevod staticArrayLength
+ * @method staticArrayLength
  * @param {String} name
  * @return {Number} static array length
  */
@@ -1489,7 +1489,7 @@ SolidityType.prototype.staticArrayLength = function (name) {
  * "int" => "int"
  * "int[]" => "int"
  *
- * @msevod nestedName
+ * @method nestedName
  * @param {String} name
  * @return {String} nested name
  */
@@ -1507,7 +1507,7 @@ SolidityType.prototype.nestedName = function (name) {
  * Should return true if type has dynamic size by default
  * such types are "string", "bytes"
  *
- * @msevod isDynamicType
+ * @method isDynamicType
  * @param {String} name
  * @return {Bool} true if is dynamic, otherwise false
  */
@@ -1522,7 +1522,7 @@ SolidityType.prototype.isDynamicType = function () {
  * "int[] => ["[]"]
  * "int" => null
  *
- * @msevod nestedTypes
+ * @method nestedTypes
  * @param {String} name
  * @return {Array} array of nested types
  */
@@ -1534,7 +1534,7 @@ SolidityType.prototype.nestedTypes = function (name) {
 /**
  * Should be used to encode the value
  *
- * @msevod encode
+ * @method encode
  * @param {Object} value
  * @param {String} name
  * @return {String} encoded value
@@ -1579,7 +1579,7 @@ SolidityType.prototype.encode = function (value, name) {
 /**
  * Should be used to decode value from bytes
  *
- * @msevod decode
+ * @method decode
  * @param {String} bytes
  * @param {Number} offset in bytes
  * @param {String} name type name
@@ -1740,7 +1740,7 @@ if (typeof XMLHttpRequest === 'undefined') {
 */
 /** @file config.js
  * @authors:
- *   Marek Kotewicz <marek@sevdev.com>
+ *   Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
@@ -1768,27 +1768,27 @@ var SEV_UNITS = [
     'Gwei',
     'szabo',
     'finney',
-    'femtosever',
-    'picosever',
-    'nanosever',
-    'microsever',
-    'millisever',
+    'femtoether',
+    'picoether',
+    'nanoether',
+    'microether',
+    'milliether',
     'nano',
     'micro',
     'milli',
-    'sever',
+    'ether',
     'grand',
-    'Msever',
-    'Ssever',
-    'Tsever',
-    'Psever',
-    'Esever',
-    'Zsever',
-    'Ysever',
-    'Nsever',
-    'Dsever',
-    'Vsever',
-    'Usever'
+    'Mether',
+    'Sether',
+    'Tether',
+    'Pether',
+    'Eether',
+    'Zether',
+    'Yether',
+    'Nether',
+    'Dether',
+    'Vether',
+    'Uether'
 ];
 
 module.exports = {
@@ -1821,7 +1821,7 @@ module.exports = {
 */
 /** 
  * @file sha3.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
@@ -1861,7 +1861,7 @@ module.exports = function (value, options) {
 */
 /**
  * @file utils.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
@@ -1884,39 +1884,39 @@ var sha3 = require('./sha3.js');
 var utf8 = require('utf8');
 
 var unitMap = {
-    'nosever':      '0',
+    'noether':      '0',
     'wei':          '1',
     'kwei':         '1000',
     'Kwei':         '1000',
     'babbage':      '1000',
-    'femtosever':   '1000',
+    'femtoether':   '1000',
     'mwei':         '1000000',
     'Mwei':         '1000000',
     'lovelace':     '1000000',
-    'picosever':    '1000000',
+    'picoether':    '1000000',
     'gwei':         '1000000000',
     'Gwei':         '1000000000',
     'shannon':      '1000000000',
-    'nanosever':    '1000000000',
+    'nanoether':    '1000000000',
     'nano':         '1000000000',
     'szabo':        '1000000000000',
-    'microsever':   '1000000000000',
+    'microether':   '1000000000000',
     'micro':        '1000000000000',
     'finney':       '1000000000000000',
-    'millisever':    '1000000000000000',
+    'milliether':    '1000000000000000',
     'milli':         '1000000000000000',
-    'sever':        '1000000000000000000',
-    'ksever':       '1000000000000000000000',
+    'ether':        '1000000000000000000',
+    'kether':       '1000000000000000000000',
     'grand':        '1000000000000000000000',
-    'msever':       '1000000000000000000000000',
-    'ssever':       '1000000000000000000000000000',
-    'tsever':       '1000000000000000000000000000000'
+    'mether':       '1000000000000000000000000',
+    'sether':       '1000000000000000000000000000',
+    'tether':       '1000000000000000000000000000000'
 };
 
 /**
  * Should be called to pad string to expected length
  *
- * @msevod padLeft
+ * @method padLeft
  * @param {String} string to be padded
  * @param {Number} characters that result string should have
  * @param {String} sign, by default 0
@@ -1929,7 +1929,7 @@ var padLeft = function (string, chars, sign) {
 /**
  * Should be called to pad string to expected length
  *
- * @msevod padRight
+ * @method padRight
  * @param {String} string to be padded
  * @param {Number} characters that result string should have
  * @param {String} sign, by default 0
@@ -1942,7 +1942,7 @@ var padRight = function (string, chars, sign) {
 /**
  * Should be called to get utf8 from it's hex representation
  *
- * @msevod toUtf8
+ * @method toUtf8
  * @param {String} string in hex
  * @returns {String} ascii string representation of hex value
  */
@@ -1966,7 +1966,7 @@ var toUtf8 = function(hex) {
 /**
  * Should be called to get ascii from it's hex representation
  *
- * @msevod toAscii
+ * @method toAscii
  * @param {String} string in hex
  * @returns {String} ascii string representation of hex value
  */
@@ -1988,7 +1988,7 @@ var toAscii = function(hex) {
 /**
  * Should be called to get hex representation (prefixed by 0x) of utf8 string
  *
- * @msevod fromUtf8
+ * @method fromUtf8
  * @param {String} string
  * @param {Number} optional padding
  * @returns {String} hex representation of input string
@@ -2010,7 +2010,7 @@ var fromUtf8 = function(str) {
 /**
  * Should be called to get hex representation (prefixed by 0x) of ascii string
  *
- * @msevod fromAscii
+ * @method fromAscii
  * @param {String} string
  * @param {Number} optional padding
  * @returns {String} hex representation of input string
@@ -2029,7 +2029,7 @@ var fromAscii = function(str) {
 /**
  * Should be used to create full function/event name from json abi
  *
- * @msevod transformToFullName
+ * @method transformToFullName
  * @param {Object} json-abi
  * @return {String} full fnction/event name
  */
@@ -2045,7 +2045,7 @@ var transformToFullName = function (json) {
 /**
  * Should be called to get display name of contract function
  *
- * @msevod extractDisplayName
+ * @method extractDisplayName
  * @param {String} name of function/event
  * @returns {String} display name for function/event eg. multiply(uint256) -> multiply
  */
@@ -2064,7 +2064,7 @@ var extractTypeName = function (name) {
 /**
  * Converts value to it's decimal representation in string
  *
- * @msevod toDecimal
+ * @method toDecimal
  * @param {String|Number|BigNumber}
  * @return {String}
  */
@@ -2075,7 +2075,7 @@ var toDecimal = function (value) {
 /**
  * Converts value to it's hex representation
  *
- * @msevod fromDecimal
+ * @method fromDecimal
  * @param {String|Number|BigNumber}
  * @return {String}
  */
@@ -2091,7 +2091,7 @@ var fromDecimal = function (value) {
  *
  * And even stringifys objects before.
  *
- * @msevod toHex
+ * @method toHex
  * @param {String|Number|BigNumber|Object}
  * @return {String}
  */
@@ -2123,13 +2123,13 @@ var toHex = function (val) {
 /**
  * Returns value of unit in Wei
  *
- * @msevod getValueOfUnit
- * @param {String} unit the unit to convert to, default sever
+ * @method getValueOfUnit
+ * @param {String} unit the unit to convert to, default ether
  * @returns {BigNumber} value of the unit (in Wei)
  * @throws error if the unit is not correct:w
  */
 var getValueOfUnit = function (unit) {
-    unit = unit ? unit.toLowerCase() : 'sever';
+    unit = unit ? unit.toLowerCase() : 'ether';
     var unitValue = unitMap[unit];
     if (unitValue === undefined) {
         throw new Error('This unit doesn\'t exists, please use the one of the following units' + JSON.stringify(unitMap, null, 2));
@@ -2138,24 +2138,24 @@ var getValueOfUnit = function (unit) {
 };
 
 /**
- * Takes a number of wei and converts it to any other sever unit.
+ * Takes a number of wei and converts it to any other ether unit.
  *
  * Possible units are:
  *   SI Short   SI Full        Effigy       Other
- * - kwei       femtosever     babbage
- * - mwei       picosever      lovelace
- * - gwei       nanosever      shannon      nano
- * - --         microsever     szabo        micro
- * - --         millisever     finney       milli
- * - sever      --             --
- * - ksever                    --           grand
- * - msever
- * - ssever
- * - tsever
+ * - kwei       femtoether     babbage
+ * - mwei       picoether      lovelace
+ * - gwei       nanoether      shannon      nano
+ * - --         microether     szabo        micro
+ * - --         milliether     finney       milli
+ * - ether      --             --
+ * - kether                    --           grand
+ * - mether
+ * - sether
+ * - tether
  *
- * @msevod fromWei
+ * @method fromWei
  * @param {Number|String} number can be a number, number string or a HEX of a decimal
- * @param {String} unit the unit to convert to, default sever
+ * @param {String} unit the unit to convert to, default ether
  * @return {String|Object} When given a BigNumber object it returns one as well, otherwise a number
 */
 var fromWei = function(number, unit) {
@@ -2169,21 +2169,21 @@ var fromWei = function(number, unit) {
  *
  * Possible units are:
  *   SI Short   SI Full        Effigy       Other
- * - kwei       femtosever     babbage
- * - mwei       picosever      lovelace
- * - gwei       nanosever      shannon      nano
- * - --         microsever     szabo        micro
- * - --         microsever     szabo        micro
- * - --         millisever     finney       milli
- * - sever      --             --
- * - ksever                    --           grand
- * - msever
- * - ssever
- * - tsever
+ * - kwei       femtoether     babbage
+ * - mwei       picoether      lovelace
+ * - gwei       nanoether      shannon      nano
+ * - --         microether     szabo        micro
+ * - --         microether     szabo        micro
+ * - --         milliether     finney       milli
+ * - ether      --             --
+ * - kether                    --           grand
+ * - mether
+ * - sether
+ * - tether
  *
- * @msevod toWei
+ * @method toWei
  * @param {Number|String|BigNumber} number can be a number, number string or a HEX of a decimal
- * @param {String} unit the unit to convert from, default sever
+ * @param {String} unit the unit to convert from, default ether
  * @return {String|Object} When given a BigNumber object it returns one as well, otherwise a number
 */
 var toWei = function(number, unit) {
@@ -2195,7 +2195,7 @@ var toWei = function(number, unit) {
 /**
  * Takes an input and transforms it into a bignumber
  *
- * @msevod toBigNumber
+ * @method toBigNumber
  * @param {Number|String|BigNumber} a number, string, HEX string or BigNumber
  * @return {BigNumber} BigNumber
 */
@@ -2215,7 +2215,7 @@ var toBigNumber = function(number) {
 /**
  * Takes and input transforms it into bignumber and if it is negative value, into two's complement
  *
- * @msevod toTwosComplement
+ * @method toTwosComplement
  * @param {Number|String|BigNumber}
  * @return {BigNumber}
  */
@@ -2230,7 +2230,7 @@ var toTwosComplement = function (number) {
 /**
  * Checks if the given string is strictly an address
  *
- * @msevod isStrictAddress
+ * @method isStrictAddress
  * @param {String} address the given HEX adress
  * @return {Boolean}
 */
@@ -2241,7 +2241,7 @@ var isStrictAddress = function (address) {
 /**
  * Checks if the given string is an address
  *
- * @msevod isAddress
+ * @method isAddress
  * @param {String} address the given HEX adress
  * @return {Boolean}
 */
@@ -2261,7 +2261,7 @@ var isAddress = function (address) {
 /**
  * Checks if the given string is a checksummed address
  *
- * @msevod isChecksumAddress
+ * @method isChecksumAddress
  * @param {String} address the given HEX adress
  * @return {Boolean}
 */
@@ -2284,7 +2284,7 @@ var isChecksumAddress = function (address) {
 /**
  * Makes a checksum address
  *
- * @msevod toChecksumAddress
+ * @method toChecksumAddress
  * @param {String} address the given HEX adress
  * @return {String}
 */
@@ -2309,7 +2309,7 @@ var toChecksumAddress = function (address) {
 /**
  * Transforms given string to valid 20 bytes-length addres with 0x prefix
  *
- * @msevod toAddress
+ * @method toAddress
  * @param {String} address
  * @return {String} formatted address
  */
@@ -2328,7 +2328,7 @@ var toAddress = function (address) {
 /**
  * Returns true if object is BigNumber, otherwise false
  *
- * @msevod isBigNumber
+ * @method isBigNumber
  * @param {Object}
  * @return {Boolean}
  */
@@ -2340,7 +2340,7 @@ var isBigNumber = function (object) {
 /**
  * Returns true if object is string, otherwise false
  *
- * @msevod isString
+ * @method isString
  * @param {Object}
  * @return {Boolean}
  */
@@ -2352,7 +2352,7 @@ var isString = function (object) {
 /**
  * Returns true if object is function, otherwise false
  *
- * @msevod isFunction
+ * @method isFunction
  * @param {Object}
  * @return {Boolean}
  */
@@ -2363,7 +2363,7 @@ var isFunction = function (object) {
 /**
  * Returns true if object is Objet, otherwise false
  *
- * @msevod isObject
+ * @method isObject
  * @param {Object}
  * @return {Boolean}
  */
@@ -2374,7 +2374,7 @@ var isObject = function (object) {
 /**
  * Returns true if object is boolean, otherwise false
  *
- * @msevod isBoolean
+ * @method isBoolean
  * @param {Object}
  * @return {Boolean}
  */
@@ -2385,7 +2385,7 @@ var isBoolean = function (object) {
 /**
  * Returns true if object is array, otherwise false
  *
- * @msevod isArray
+ * @method isArray
  * @param {Object}
  * @return {Boolean}
  */
@@ -2396,7 +2396,7 @@ var isArray = function (object) {
 /**
  * Returns true if given string is valid json object
  *
- * @msevod isJson
+ * @method isJson
  * @param {String}
  * @return {Boolean}
  */
@@ -2411,7 +2411,7 @@ var isJson = function (str) {
 /**
  * Returns true if given string is a valid Severeum block header bloom.
  *
- * @msevod isBloom
+ * @method isBloom
  * @param {String} hex encoded bloom filter
  * @return {Boolean}
  */
@@ -2427,7 +2427,7 @@ var isBloom = function (bloom) {
 /**
  * Returns true if given string is a valid log topic.
  *
- * @msevod isTopic
+ * @method isTopic
  * @param {String} hex encoded topic
  * @return {Boolean}
  */
@@ -2498,22 +2498,22 @@ module.exports={
 /**
  * @file web3.js
  * @authors:
- *   Jeffrey Wilcke <jeff@sevdev.com>
- *   Marek Kotewicz <marek@sevdev.com>
- *   Marian Oancea <marian@sevdev.com>
- *   Fabian Vogelsteller <fabian@sevdev.com>
- *   Gav Wood <g@sevdev.com>
+ *   Jeffrey Wilcke <jeff@ethdev.com>
+ *   Marek Kotewicz <marek@ethdev.com>
+ *   Marian Oancea <marian@ethdev.com>
+ *   Fabian Vogelsteller <fabian@ethdev.com>
+ *   Gav Wood <g@ethdev.com>
  * @date 2014
  */
 
 var RequestManager = require('./web3/requestmanager');
 var Iban = require('./web3/iban');
-var Sev = require('./web3/msevods/sev');
-var DB = require('./web3/msevods/db');
-var Shh = require('./web3/msevods/shh');
-var Net = require('./web3/msevods/net');
-var Personal = require('./web3/msevods/personal');
-var Swarm = require('./web3/msevods/swarm');
+var Sev = require('./web3/methods/eth');
+var DB = require('./web3/methods/db');
+var Shh = require('./web3/methods/shh');
+var Net = require('./web3/methods/net');
+var Personal = require('./web3/methods/personal');
+var Swarm = require('./web3/methods/swarm');
 var Settings = require('./web3/settings');
 var version = require('./version.json');
 var utils = require('./utils/utils');
@@ -2530,7 +2530,7 @@ var BigNumber = require('bignumber.js');
 function Web3 (provider) {
     this._requestManager = new RequestManager(provider);
     this.currentProvider = provider;
-    this.sev = new Sev(this);
+    this.eth = new Sev(this);
     this.db = new DB(this);
     this.shh = new Shh(this);
     this.net = new Net(this);
@@ -2610,7 +2610,7 @@ var properties = function () {
         }),
         new Property({
             name: 'version.severeum',
-            getter: 'sev_protocolVersion',
+            getter: 'eth_protocolVersion',
             inputFormatter: utils.toDecimal
         }),
         new Property({
@@ -2632,7 +2632,7 @@ Web3.prototype.createBatch = function () {
 module.exports = Web3;
 
 
-},{"./utils/sha3":19,"./utils/utils":20,"./version.json":21,"./web3/batch":24,"./web3/extend":28,"./web3/httpprovider":32,"./web3/iban":33,"./web3/ipcprovider":34,"./web3/msevods/db":37,"./web3/msevods/sev":38,"./web3/msevods/net":39,"./web3/msevods/personal":40,"./web3/msevods/shh":41,"./web3/msevods/swarm":42,"./web3/property":45,"./web3/requestmanager":46,"./web3/settings":47,"bignumber.js":"bignumber.js"}],23:[function(require,module,exports){
+},{"./utils/sha3":19,"./utils/utils":20,"./version.json":21,"./web3/batch":24,"./web3/extend":28,"./web3/httpprovider":32,"./web3/iban":33,"./web3/ipcprovider":34,"./web3/methods/db":37,"./web3/methods/eth":38,"./web3/methods/net":39,"./web3/methods/personal":40,"./web3/methods/shh":41,"./web3/methods/swarm":42,"./web3/property":45,"./web3/requestmanager":46,"./web3/settings":47,"bignumber.js":"bignumber.js"}],23:[function(require,module,exports){
 /*
     This file is part of web3.js.
 
@@ -2651,7 +2651,7 @@ module.exports = Web3;
 */
 /**
  * @file allevents.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2014
  */
 
@@ -2660,7 +2660,7 @@ var SolidityEvent = require('./event');
 var formatters = require('./formatters');
 var utils = require('../utils/utils');
 var Filter = require('./filter');
-var watches = require('./msevods/watches');
+var watches = require('./methods/watches');
 
 var AllSolidityEvents = function (requestManager, json, address) {
     this._requestManager = requestManager;
@@ -2711,7 +2711,7 @@ AllSolidityEvents.prototype.execute = function (options, callback) {
 
     var o = this.encode(options);
     var formatter = this.decode.bind(this);
-    return new Filter(o, 'sev', this._requestManager, watches.sev(), formatter, callback);
+    return new Filter(o, 'eth', this._requestManager, watches.eth(), formatter, callback);
 };
 
 AllSolidityEvents.prototype.attachToContract = function (contract) {
@@ -2722,7 +2722,7 @@ AllSolidityEvents.prototype.attachToContract = function (contract) {
 module.exports = AllSolidityEvents;
 
 
-},{"../utils/sha3":19,"../utils/utils":20,"./event":27,"./filter":29,"./formatters":30,"./msevods/watches":43}],24:[function(require,module,exports){
+},{"../utils/sha3":19,"../utils/utils":20,"./event":27,"./filter":29,"./formatters":30,"./methods/watches":43}],24:[function(require,module,exports){
 /*
     This file is part of web3.js.
 
@@ -2741,7 +2741,7 @@ module.exports = AllSolidityEvents;
 */
 /** 
  * @file batch.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
@@ -2756,7 +2756,7 @@ var Batch = function (web3) {
 /**
  * Should be called to add create new request to batch request
  *
- * @msevod add
+ * @method add
  * @param {Object} jsonrpc requet object
  */
 Batch.prototype.add = function (request) {
@@ -2766,7 +2766,7 @@ Batch.prototype.add = function (request) {
 /**
  * Should be called to execute batch request
  *
- * @msevod execute
+ * @method execute
  */
 Batch.prototype.execute = function () {
     var requests = this.requests;
@@ -2809,7 +2809,7 @@ module.exports = Batch;
 */
 /**
  * @file contract.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2014
  */
 
@@ -2822,7 +2822,7 @@ var AllEvents = require('./allevents');
 /**
  * Should be called to encode constructor params
  *
- * @msevod encodeConstructorParams
+ * @method encodeConstructorParams
  * @param {Array} abi
  * @param {Array} constructor params
  */
@@ -2841,7 +2841,7 @@ var encodeConstructorParams = function (abi, params) {
 /**
  * Should be called to add functions to contract object
  *
- * @msevod addFunctionsToContract
+ * @method addFunctionsToContract
  * @param {Contract} contract
  * @param {Array} abi
  */
@@ -2849,7 +2849,7 @@ var addFunctionsToContract = function (contract) {
     contract.abi.filter(function (json) {
         return json.type === 'function';
     }).map(function (json) {
-        return new SolidityFunction(contract._sev, json, contract.address);
+        return new SolidityFunction(contract._eth, json, contract.address);
     }).forEach(function (f) {
         f.attachToContract(contract);
     });
@@ -2858,7 +2858,7 @@ var addFunctionsToContract = function (contract) {
 /**
  * Should be called to add events to contract object
  *
- * @msevod addEventsToContract
+ * @method addEventsToContract
  * @param {Contract} contract
  * @param {Array} abi
  */
@@ -2867,11 +2867,11 @@ var addEventsToContract = function (contract) {
         return json.type === 'event';
     });
 
-    var All = new AllEvents(contract._sev._requestManager, events, contract.address);
+    var All = new AllEvents(contract._eth._requestManager, events, contract.address);
     All.attachToContract(contract);
 
     events.map(function (json) {
-        return new SolidityEvent(contract._sev._requestManager, json, contract.address);
+        return new SolidityEvent(contract._eth._requestManager, json, contract.address);
     }).forEach(function (e) {
         e.attachToContract(contract);
     });
@@ -2881,7 +2881,7 @@ var addEventsToContract = function (contract) {
 /**
  * Should be called to check if the contract gets properly deployed on the blockchain.
  *
- * @msevod checkForContractAddress
+ * @method checkForContractAddress
  * @param {Object} contract
  * @param {Function} callback
  * @returns {Undefined}
@@ -2891,7 +2891,7 @@ var checkForContractAddress = function(contract, callback){
         callbackFired = false;
 
     // wait for receipt
-    var filter = contract._sev.filter('latest', function(e){
+    var filter = contract._eth.filter('latest', function(e){
         if (!e && !callbackFired) {
             count++;
 
@@ -2909,10 +2909,10 @@ var checkForContractAddress = function(contract, callback){
 
             } else {
 
-                contract._sev.getTransactionReceipt(contract.transactionHash, function(e, receipt){
+                contract._eth.getTransactionReceipt(contract.transactionHash, function(e, receipt){
                     if(receipt && !callbackFired) {
 
-                        contract._sev.getCode(receipt.contractAddress, function(e, code){
+                        contract._eth.getCode(receipt.contractAddress, function(e, code){
                             /*jshint maxcomplexity: 6 */
 
                             if(callbackFired || !code)
@@ -2927,7 +2927,7 @@ var checkForContractAddress = function(contract, callback){
 
                                 contract.address = receipt.contractAddress;
 
-                                // attach events and msevods again after we have
+                                // attach events and methods again after we have
                                 addFunctionsToContract(contract);
                                 addEventsToContract(contract);
 
@@ -2952,17 +2952,17 @@ var checkForContractAddress = function(contract, callback){
 /**
  * Should be called to create new ContractFactory instance
  *
- * @msevod ContractFactory
+ * @method ContractFactory
  * @param {Array} abi
  */
-var ContractFactory = function (sev, abi) {
-    this.sev = sev;
+var ContractFactory = function (eth, abi) {
+    this.eth = eth;
     this.abi = abi;
 
     /**
      * Should be called to create new contract on a blockchain
      *
-     * @msevod new
+     * @method new
      * @param {Any} contract constructor param1 (optional)
      * @param {Any} contract constructor param2 (optional)
      * @param {Object} contract transaction object (required)
@@ -2972,7 +2972,7 @@ var ContractFactory = function (sev, abi) {
     this.new = function () {
         /*jshint maxcomplexity: 7 */
         
-        var contract = new Contract(this.sev, this.abi);
+        var contract = new Contract(this.eth, this.abi);
 
         // parse arguments
         var options = {}; // required!
@@ -3004,7 +3004,7 @@ var ContractFactory = function (sev, abi) {
         if (callback) {
 
             // wait for the contract address adn check if the code was deployed
-            this.sev.sendTransaction(options, function (err, hash) {
+            this.eth.sendTransaction(options, function (err, hash) {
                 if (err) {
                     callback(err);
                 } else {
@@ -3018,7 +3018,7 @@ var ContractFactory = function (sev, abi) {
                 }
             });
         } else {
-            var hash = this.sev.sendTransaction(options);
+            var hash = this.eth.sendTransaction(options);
             // add the transaction hash
             contract.transactionHash = hash;
             checkForContractAddress(contract);
@@ -3033,7 +3033,7 @@ var ContractFactory = function (sev, abi) {
 /**
  * Should be called to create new ContractFactory
  *
- * @msevod contract
+ * @method contract
  * @param {Array} abi
  * @returns {ContractFactory} new contract factory
  */
@@ -3046,14 +3046,14 @@ var ContractFactory = function (sev, abi) {
 /**
  * Should be called to get access to existing contract on a blockchain
  *
- * @msevod at
+ * @method at
  * @param {Address} contract address (required)
  * @param {Function} callback {optional)
  * @returns {Contract} returns contract if no callback was passed,
  * otherwise calls callback function (err, contract)
  */
 ContractFactory.prototype.at = function (address, callback) {
-    var contract = new Contract(this.sev, this.abi, address);
+    var contract = new Contract(this.eth, this.abi, address);
 
     // this functions are not part of prototype,
     // because we dont want to spoil the interface
@@ -3069,7 +3069,7 @@ ContractFactory.prototype.at = function (address, callback) {
 /**
  * Gets the data, which is data to deploy plus constructor params
  *
- * @msevod getData
+ * @method getData
  */
 ContractFactory.prototype.getData = function () {
     var options = {}; // required!
@@ -3089,12 +3089,12 @@ ContractFactory.prototype.getData = function () {
 /**
  * Should be called to create new contract instance
  *
- * @msevod Contract
+ * @method Contract
  * @param {Array} abi
  * @param {Address} contract address
  */
-var Contract = function (sev, abi, address) {
-    this._sev = sev;
+var Contract = function (eth, abi, address) {
+    this._eth = eth;
     this.transactionHash = null;
     this.address = address;
     this.abi = abi;
@@ -3121,7 +3121,7 @@ module.exports = ContractFactory;
 */
 /** 
  * @file errors.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
@@ -3130,7 +3130,7 @@ module.exports = {
         return new Error('Invalid number of arguments to Solidity function');
     },
     InvalidNumberOfRPCParams: function () {
-        return new Error('Invalid number of input parameters to RPC msevod');
+        return new Error('Invalid number of input parameters to RPC method');
     },
     InvalidConnection: function (host){
         return new Error('CONNECTION ERROR: Couldn\'t connect to node '+ host +'.');
@@ -3166,7 +3166,7 @@ module.exports = {
 */
 /**
  * @file event.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2014
  */
 
@@ -3175,7 +3175,7 @@ var coder = require('../solidity/coder');
 var formatters = require('./formatters');
 var sha3 = require('../utils/sha3');
 var Filter = require('./filter');
-var watches = require('./msevods/watches');
+var watches = require('./methods/watches');
 
 /**
  * This prototype should be used to create event filters
@@ -3191,7 +3191,7 @@ var SolidityEvent = function (requestManager, json, address) {
 /**
  * Should be used to get filtered param types
  *
- * @msevod types
+ * @method types
  * @param {Bool} decide if returned typed should be indexed
  * @return {Array} array of types
  */
@@ -3206,7 +3206,7 @@ SolidityEvent.prototype.types = function (indexed) {
 /**
  * Should be used to get event display name
  *
- * @msevod displayName
+ * @method displayName
  * @return {String} event display name
  */
 SolidityEvent.prototype.displayName = function () {
@@ -3216,7 +3216,7 @@ SolidityEvent.prototype.displayName = function () {
 /**
  * Should be used to get event type name
  *
- * @msevod typeName
+ * @method typeName
  * @return {String} event type name
  */
 SolidityEvent.prototype.typeName = function () {
@@ -3226,7 +3226,7 @@ SolidityEvent.prototype.typeName = function () {
 /**
  * Should be used to get event signature
  *
- * @msevod signature
+ * @method signature
  * @return {String} event signature
  */
 SolidityEvent.prototype.signature = function () {
@@ -3236,10 +3236,10 @@ SolidityEvent.prototype.signature = function () {
 /**
  * Should be used to encode indexed params and options to one final object
  *
- * @msevod encode
+ * @method encode
  * @param {Object} indexed
  * @param {Object} options
- * @return {Object} everything combined tossever and encoded
+ * @return {Object} everything combined tosether and encoded
  */
 SolidityEvent.prototype.encode = function (indexed, options) {
     indexed = indexed || {};
@@ -3283,7 +3283,7 @@ SolidityEvent.prototype.encode = function (indexed, options) {
 /**
  * Should be used to decode indexed params and options
  *
- * @msevod decode
+ * @method decode
  * @param {Object} data
  * @return {Object} result object with decoded indexed && not indexed params
  */
@@ -3317,7 +3317,7 @@ SolidityEvent.prototype.decode = function (data) {
 /**
  * Should be used to create new filter object from event
  *
- * @msevod execute
+ * @method execute
  * @param {Object} indexed
  * @param {Object} options
  * @return {Object} filter object
@@ -3336,13 +3336,13 @@ SolidityEvent.prototype.execute = function (indexed, options, callback) {
 
     var o = this.encode(indexed, options);
     var formatter = this.decode.bind(this);
-    return new Filter(o, 'sev', this._requestManager, watches.sev(), formatter, callback);
+    return new Filter(o, 'eth', this._requestManager, watches.eth(), formatter, callback);
 };
 
 /**
  * Should be used to attach event to contract object
  *
- * @msevod attachToContract
+ * @method attachToContract
  * @param {Contract}
  */
 SolidityEvent.prototype.attachToContract = function (contract) {
@@ -3357,10 +3357,10 @@ SolidityEvent.prototype.attachToContract = function (contract) {
 module.exports = SolidityEvent;
 
 
-},{"../solidity/coder":7,"../utils/sha3":19,"../utils/utils":20,"./filter":29,"./formatters":30,"./msevods/watches":43}],28:[function(require,module,exports){
+},{"../solidity/coder":7,"../utils/sha3":19,"../utils/utils":20,"./filter":29,"./formatters":30,"./methods/watches":43}],28:[function(require,module,exports){
 var formatters = require('./formatters');
 var utils = require('./../utils/utils');
-var Msevod = require('./msevod');
+var Method = require('./method');
 var Property = require('./property');
 
 // TODO: refactor, so the input params are not altered.
@@ -3379,10 +3379,10 @@ var extend = function (web3) {
             extendedObject = web3;
         }
 
-        if (extension.msevods) {
-            extension.msevods.forEach(function (msevod) {
-                msevod.attachToObject(extendedObject);
-                msevod.setRequestManager(web3._requestManager);
+        if (extension.methods) {
+            extension.methods.forEach(function (method) {
+                method.attachToObject(extendedObject);
+                method.setRequestManager(web3._requestManager);
             });
         }
 
@@ -3396,7 +3396,7 @@ var extend = function (web3) {
 
     ex.formatters = formatters; 
     ex.utils = utils;
-    ex.Msevod = Msevod;
+    ex.Method = Method;
     ex.Property = Property;
 
     return ex;
@@ -3407,7 +3407,7 @@ var extend = function (web3) {
 module.exports = extend;
 
 
-},{"./../utils/utils":20,"./formatters":30,"./msevod":36,"./property":45}],29:[function(require,module,exports){
+},{"./../utils/utils":20,"./formatters":30,"./method":36,"./property":45}],29:[function(require,module,exports){
 /*
     This file is part of web3.js.
 
@@ -3426,11 +3426,11 @@ module.exports = extend;
 */
 /** @file filter.js
  * @authors:
- *   Jeffrey Wilcke <jeff@sevdev.com>
- *   Marek Kotewicz <marek@sevdev.com>
- *   Marian Oancea <marian@sevdev.com>
- *   Fabian Vogelsteller <fabian@sevdev.com>
- *   Gav Wood <g@sevdev.com>
+ *   Jeffrey Wilcke <jeff@ethdev.com>
+ *   Marek Kotewicz <marek@ethdev.com>
+ *   Marian Oancea <marian@ethdev.com>
+ *   Fabian Vogelsteller <fabian@ethdev.com>
+ *   Gav Wood <g@ethdev.com>
  * @date 2014
  */
 
@@ -3456,7 +3456,7 @@ var toTopic = function(value){
         return utils.fromUtf8(value);
 };
 
-/// This msevod should be called on options object, to verify deprecated properties && lazy load dynamic ones
+/// This method should be called on options object, to verify deprecated properties && lazy load dynamic ones
 /// @param should be string or object
 /// @returns options string or object
 var getOptions = function (options, type) {
@@ -3470,7 +3470,7 @@ var getOptions = function (options, type) {
 
 
     switch(type) {
-        case 'sev':
+        case 'eth':
 
             // make sure topics, get converted to hex
             options.topics = options.topics || [];
@@ -3492,9 +3492,9 @@ var getOptions = function (options, type) {
 };
 
 /**
-Adds the callback and sets up the msevods, to iterate over the results.
+Adds the callback and sets up the methods, to iterate over the results.
 
-@msevod getLogsAtStart
+@method getLogsAtStart
 @param {Object} self
 @param {function} callback
 */
@@ -3517,9 +3517,9 @@ var getLogsAtStart = function(self, callback){
 };
 
 /**
-Adds the callback and sets up the msevods, to iterate over the results.
+Adds the callback and sets up the methods, to iterate over the results.
 
-@msevod pollFilter
+@method pollFilter
 @param {Object} self
 */
 var pollFilter = function(self) {
@@ -3542,18 +3542,18 @@ var pollFilter = function(self) {
     };
 
     self.requestManager.startPolling({
-        msevod: self.implementation.poll.call,
+        method: self.implementation.poll.call,
         params: [self.filterId],
     }, self.filterId, onMessage, self.stopWatching.bind(self));
 
 };
 
-var Filter = function (options, type, requestManager, msevods, formatter, callback, filterCreationErrorCallback) {
+var Filter = function (options, type, requestManager, methods, formatter, callback, filterCreationErrorCallback) {
     var self = this;
     var implementation = {};
-    msevods.forEach(function (msevod) {
-        msevod.setRequestManager(requestManager);
-        msevod.attachToObject(implementation);
+    methods.forEach(function (method) {
+        method.setRequestManager(requestManager);
+        method.attachToObject(implementation);
     });
     this.requestManager = requestManager;
     this.options = getOptions(options, type);
@@ -3640,7 +3640,7 @@ Filter.prototype.get = function (callback) {
         }
     } else {
         if (this.filterId === null) {
-            throw new Error('Filter ID Error: filter().get() can\'t be chained synchronous, please provide a callback for the get() msevod.');
+            throw new Error('Filter ID Error: filter().get() can\'t be chained synchronous, please provide a callback for the get() method.');
         }
         var logs = this.implementation.getLogs(this.filterId);
         return logs.map(function (log) {
@@ -3675,8 +3675,8 @@ module.exports = Filter;
 */
 /**
  * @file formatters.js
- * @author Marek Kotewicz <marek@sevdev.com>
- * @author Fabian Vogelsteller <fabian@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
+ * @author Fabian Vogelsteller <fabian@ethdev.com>
  * @date 2015
  */
 
@@ -3687,7 +3687,7 @@ var Iban = require('./iban');
 /**
  * Should the format output to a big number
  *
- * @msevod outputBigNumberFormatter
+ * @method outputBigNumberFormatter
  * @param {String|Number|BigNumber}
  * @returns {BigNumber} object
  */
@@ -3718,7 +3718,7 @@ var inputBlockNumberFormatter = function (blockNumber) {
 /**
  * Formats the input of a transaction and converts all values to HEX
  *
- * @msevod inputCallFormatter
+ * @method inputCallFormatter
  * @param {Object} transaction options
  * @returns object
 */
@@ -3746,7 +3746,7 @@ var inputCallFormatter = function (options){
 /**
  * Formats the input of a transaction and converts all values to HEX
  *
- * @msevod inputTransactionFormatter
+ * @method inputTransactionFormatter
  * @param {Object} transaction options
  * @returns object
 */
@@ -3771,7 +3771,7 @@ var inputTransactionFormatter = function (options){
 /**
  * Formats the output of a transaction to its proper values
  *
- * @msevod outputTransactionFormatter
+ * @method outputTransactionFormatter
  * @param {Object} tx
  * @returns {Object}
 */
@@ -3790,7 +3790,7 @@ var outputTransactionFormatter = function (tx){
 /**
  * Formats the output of a transaction receipt to its proper values
  *
- * @msevod outputTransactionReceiptFormatter
+ * @method outputTransactionReceiptFormatter
  * @param {Object} receipt
  * @returns {Object}
 */
@@ -3814,7 +3814,7 @@ var outputTransactionReceiptFormatter = function (receipt){
 /**
  * Formats the output of a block to its proper values
  *
- * @msevod outputBlockFormatter
+ * @method outputBlockFormatter
  * @param {Object} block
  * @returns {Object}
 */
@@ -3844,7 +3844,7 @@ var outputBlockFormatter = function(block) {
 /**
  * Formats the output of a log
  *
- * @msevod outputLogFormatter
+ * @method outputLogFormatter
  * @param {Object} log object
  * @returns {Object} log
 */
@@ -3862,7 +3862,7 @@ var outputLogFormatter = function(log) {
 /**
  * Formats the input of a whisper post and converts all values to HEX
  *
- * @msevod inputPostFormatter
+ * @method inputPostFormatter
  * @param {Object} transaction object
  * @returns {Object}
 */
@@ -3890,7 +3890,7 @@ var inputPostFormatter = function(post) {
 /**
  * Formats the output of a received post message
  *
- * @msevod outputPostFormatter
+ * @method outputPostFormatter
  * @param {Object}
  * @returns {Object}
  */
@@ -3983,7 +3983,7 @@ module.exports = {
 */
 /**
  * @file function.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
@@ -3996,8 +3996,8 @@ var sha3 = require('../utils/sha3');
 /**
  * This prototype should be used to call/sendTransaction to solidity functions
  */
-var SolidityFunction = function (sev, json, address) {
-    this._sev = sev;
+var SolidityFunction = function (eth, json, address) {
+    this._eth = eth;
     this._inputTypes = json.inputs.map(function (i) {
         return i.type;
     });
@@ -4025,7 +4025,7 @@ SolidityFunction.prototype.extractDefaultBlock = function (args) {
 /**
  * Should be called to check if the number of arguments is correct
  *
- * @msevod validateArgs
+ * @method validateArgs
  * @param {Array} arguments
  * @throws {Error} if it is not
  */
@@ -4045,7 +4045,7 @@ SolidityFunction.prototype.validateArgs = function (args) {
 /**
  * Should be used to create payload from arguments
  *
- * @msevod toPayload
+ * @method toPayload
  * @param {Array} solidity function params
  * @param {Object} optional payload options
  */
@@ -4063,7 +4063,7 @@ SolidityFunction.prototype.toPayload = function (args) {
 /**
  * Should be used to get function signature
  *
- * @msevod signature
+ * @method signature
  * @return {String} function signature
  */
 SolidityFunction.prototype.signature = function () {
@@ -4084,7 +4084,7 @@ SolidityFunction.prototype.unpackOutput = function (output) {
 /**
  * Calls a contract function.
  *
- * @msevod call
+ * @method call
  * @param {...Object} Contract function arguments
  * @param {function} If the last argument is a function, the contract function
  *   call will be asynchronous, and the callback will be passed the
@@ -4099,12 +4099,12 @@ SolidityFunction.prototype.call = function () {
 
 
     if (!callback) {
-        var output = this._sev.call(payload, defaultBlock);
+        var output = this._eth.call(payload, defaultBlock);
         return this.unpackOutput(output);
     }
 
     var self = this;
-    this._sev.call(payload, defaultBlock, function (error, output) {
+    this._eth.call(payload, defaultBlock, function (error, output) {
         if (error) return callback(error, null);
 
         var unpacked = null;
@@ -4122,7 +4122,7 @@ SolidityFunction.prototype.call = function () {
 /**
  * Should be used to sendTransaction to solidity function
  *
- * @msevod sendTransaction
+ * @method sendTransaction
  */
 SolidityFunction.prototype.sendTransaction = function () {
     var args = Array.prototype.slice.call(arguments).filter(function (a) {return a !== undefined; });
@@ -4134,16 +4134,16 @@ SolidityFunction.prototype.sendTransaction = function () {
     }
 
     if (!callback) {
-        return this._sev.sendTransaction(payload);
+        return this._eth.sendTransaction(payload);
     }
 
-    this._sev.sendTransaction(payload, callback);
+    this._eth.sendTransaction(payload, callback);
 };
 
 /**
  * Should be used to estimateGas of solidity function
  *
- * @msevod estimateGas
+ * @method estimateGas
  */
 SolidityFunction.prototype.estimateGas = function () {
     var args = Array.prototype.slice.call(arguments);
@@ -4151,16 +4151,16 @@ SolidityFunction.prototype.estimateGas = function () {
     var payload = this.toPayload(args);
 
     if (!callback) {
-        return this._sev.estimateGas(payload);
+        return this._eth.estimateGas(payload);
     }
 
-    this._sev.estimateGas(payload, callback);
+    this._eth.estimateGas(payload, callback);
 };
 
 /**
  * Return the encoded data of the call
  *
- * @msevod getData
+ * @method getData
  * @return {String} the encoded data
  */
 SolidityFunction.prototype.getData = function () {
@@ -4173,7 +4173,7 @@ SolidityFunction.prototype.getData = function () {
 /**
  * Should be used to get function display name
  *
- * @msevod displayName
+ * @method displayName
  * @return {String} display name of the function
  */
 SolidityFunction.prototype.displayName = function () {
@@ -4183,7 +4183,7 @@ SolidityFunction.prototype.displayName = function () {
 /**
  * Should be used to get function type name
  *
- * @msevod typeName
+ * @method typeName
  * @return {String} type name of the function
  */
 SolidityFunction.prototype.typeName = function () {
@@ -4193,7 +4193,7 @@ SolidityFunction.prototype.typeName = function () {
 /**
  * Should be called to get rpc requests from solidity function
  *
- * @msevod request
+ * @method request
  * @returns {Object}
  */
 SolidityFunction.prototype.request = function () {
@@ -4203,7 +4203,7 @@ SolidityFunction.prototype.request = function () {
     var format = this.unpackOutput.bind(this);
 
     return {
-        msevod: this._constant ? 'sev_call' : 'sev_sendTransaction',
+        method: this._constant ? 'eth_call' : 'eth_sendTransaction',
         callback: callback,
         params: [payload],
         format: format
@@ -4213,7 +4213,7 @@ SolidityFunction.prototype.request = function () {
 /**
  * Should be called to execute function
  *
- * @msevod execute
+ * @method execute
  */
 SolidityFunction.prototype.execute = function () {
     var transaction = !this._constant;
@@ -4230,7 +4230,7 @@ SolidityFunction.prototype.execute = function () {
 /**
  * Should be called to attach function to contract
  *
- * @msevod attachToContract
+ * @method attachToContract
  * @param {Contract}
  */
 SolidityFunction.prototype.attachToContract = function (contract) {
@@ -4268,9 +4268,9 @@ module.exports = SolidityFunction;
 */
 /** @file httpprovider.js
  * @authors:
- *   Marek Kotewicz <marek@sevdev.com>
- *   Marian Oancea <marian@sevdev.com>
- *   Fabian Vogelsteller <fabian@sevdev.com>
+ *   Marek Kotewicz <marek@ethdev.com>
+ *   Marian Oancea <marian@ethdev.com>
+ *   Fabian Vogelsteller <fabian@ethdev.com>
  * @date 2015
  */
 
@@ -4301,7 +4301,7 @@ var HttpProvider = function (host, timeout, user, password) {
 /**
  * Should be called to prepare new XMLHttpRequest
  *
- * @msevod prepareRequest
+ * @method prepareRequest
  * @param {Boolean} true if request should be async
  * @return {XMLHttpRequest} object
  */
@@ -4326,7 +4326,7 @@ HttpProvider.prototype.prepareRequest = function (async) {
 /**
  * Should be called to make sync request
  *
- * @msevod send
+ * @method send
  * @param {Object} payload
  * @return {Object} result
  */
@@ -4353,7 +4353,7 @@ HttpProvider.prototype.send = function (payload) {
 /**
  * Should be used to make async request
  *
- * @msevod sendAsync
+ * @method sendAsync
  * @param {Object} payload
  * @param {Function} callback triggered on end with (err, result)
  */
@@ -4389,7 +4389,7 @@ HttpProvider.prototype.sendAsync = function (payload, callback) {
 /**
  * Synchronously tries to make Http request
  *
- * @msevod isConnected
+ * @method isConnected
  * @return {Boolean} returns true if request haven't failed. Otherwise false
  */
 HttpProvider.prototype.isConnected = function () {
@@ -4397,7 +4397,7 @@ HttpProvider.prototype.isConnected = function () {
     this.send({
       id: 9999999999,
       jsonrpc: '2.0',
-      msevod: 'net_listening',
+      method: 'net_listening',
       params: []
     });
     return true;
@@ -4427,7 +4427,7 @@ module.exports = HttpProvider;
 */
 /** 
  * @file iban.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
@@ -4445,7 +4445,7 @@ var padLeft = function (string, bytes) {
  * Prepare an IBAN for mod 97 computation by moving the first 4 chars to the end and transforming the letters to
  * numbers (A = 10, B = 11, ..., Z = 35), as specified in ISO13616.
  *
- * @msevod iso13616Prepare
+ * @method iso13616Prepare
  * @param {String} iban the IBAN
  * @returns {String} the prepared IBAN
  */
@@ -4470,7 +4470,7 @@ var iso13616Prepare = function (iban) {
 /**
  * Calculates the MOD 97 10 of the passed IBAN as specified in ISO7064.
  *
- * @msevod mod9710
+ * @method mod9710
  * @param {String} iban
  * @returns {Number}
  */
@@ -4496,9 +4496,9 @@ var Iban = function (iban) {
 };
 
 /**
- * This msevod should be used to create iban object from severeum address
+ * This method should be used to create iban object from severeum address
  *
- * @msevod fromAddress
+ * @method fromAddress
  * @param {String} address
  * @return {Iban} the IBAN object
  */
@@ -4512,9 +4512,9 @@ Iban.fromAddress = function (address) {
 /**
  * Convert the passed BBAN to an IBAN for this country specification.
  * Please note that <i>"generation of the IBAN shall be the exclusive responsibility of the bank/branch servicing the account"</i>.
- * This msevod implements the preferred algorithm described in http://en.wikipedia.org/wiki/International_Bank_Account_Number#Generating_IBAN_check_digits
+ * This method implements the preferred algorithm described in http://en.wikipedia.org/wiki/International_Bank_Account_Number#Generating_IBAN_check_digits
  *
- * @msevod fromBban
+ * @method fromBban
  * @param {String} bban the BBAN to convert to IBAN
  * @returns {Iban} the IBAN object
  */
@@ -4530,7 +4530,7 @@ Iban.fromBban = function (bban) {
 /**
  * Should be used to create IBAN object for given institution and identifier
  *
- * @msevod createIndirect
+ * @method createIndirect
  * @param {Object} options, required options are "institution" and "identifier"
  * @return {Iban} the IBAN object
  */
@@ -4539,9 +4539,9 @@ Iban.createIndirect = function (options) {
 };
 
 /**
- * Thos msevod should be used to check if given string is valid iban object
+ * Thos method should be used to check if given string is valid iban object
  *
- * @msevod isValid
+ * @method isValid
  * @param {String} iban string
  * @return {Boolean} true if it is valid IBAN
  */
@@ -4553,7 +4553,7 @@ Iban.isValid = function (iban) {
 /**
  * Should be called to check if iban is correct
  *
- * @msevod isValid
+ * @method isValid
  * @returns {Boolean} true if it is, otherwise false
  */
 Iban.prototype.isValid = function () {
@@ -4564,7 +4564,7 @@ Iban.prototype.isValid = function () {
 /**
  * Should be called to check if iban number is direct
  *
- * @msevod isDirect
+ * @method isDirect
  * @returns {Boolean} true if it is, otherwise false
  */
 Iban.prototype.isDirect = function () {
@@ -4574,7 +4574,7 @@ Iban.prototype.isDirect = function () {
 /**
  * Should be called to check if iban number if indirect
  *
- * @msevod isIndirect
+ * @method isIndirect
  * @returns {Boolean} true if it is, otherwise false
  */
 Iban.prototype.isIndirect = function () {
@@ -4585,7 +4585,7 @@ Iban.prototype.isIndirect = function () {
  * Should be called to get iban checksum
  * Uses the mod-97-10 checksumming protocol (ISO/IEC 7064:2003)
  *
- * @msevod checksum
+ * @method checksum
  * @returns {String} checksum
  */
 Iban.prototype.checksum = function () {
@@ -4596,7 +4596,7 @@ Iban.prototype.checksum = function () {
  * Should be called to get institution identifier
  * eg. XREG
  *
- * @msevod institution
+ * @method institution
  * @returns {String} institution identifier
  */
 Iban.prototype.institution = function () {
@@ -4607,7 +4607,7 @@ Iban.prototype.institution = function () {
  * Should be called to get client identifier within institution
  * eg. GAVOFYORK
  *
- * @msevod client
+ * @method client
  * @returns {String} client identifier
  */
 Iban.prototype.client = function () {
@@ -4617,7 +4617,7 @@ Iban.prototype.client = function () {
 /**
  * Should be called to get client direct address
  *
- * @msevod address
+ * @method address
  * @returns {String} client direct address
  */
 Iban.prototype.address = function () {
@@ -4656,7 +4656,7 @@ module.exports = Iban;
 */
 /** @file ipcprovider.js
  * @authors:
- *   Fabian Vogelsteller <fabian@sevdev.com>
+ *   Fabian Vogelsteller <fabian@ethdev.com>
  * @date 2015
  */
 
@@ -4713,7 +4713,7 @@ var IpcProvider = function (path, net) {
 /**
 Will parse the response and make an array out of it.
 
-@msevod _parseResponse
+@method _parseResponse
 @param {String} data
 */
 IpcProvider.prototype._parseResponse = function(data) {
@@ -4769,20 +4769,20 @@ IpcProvider.prototype._parseResponse = function(data) {
 Get the adds a callback to the responseCallbacks object,
 which will be called if a response matching the response Id will arrive.
 
-@msevod _addResponseCallback
+@method _addResponseCallback
 */
 IpcProvider.prototype._addResponseCallback = function(payload, callback) {
     var id = payload.id || payload[0].id;
-    var msevod = payload.msevod || payload[0].msevod;
+    var method = payload.method || payload[0].method;
 
     this.responseCallbacks[id] = callback;
-    this.responseCallbacks[id].msevod = msevod;
+    this.responseCallbacks[id].method = method;
 };
 
 /**
 Timeout all requests when the end/error event is fired
 
-@msevod _timeout
+@method _timeout
 */
 IpcProvider.prototype._timeout = function() {
     for(var key in this.responseCallbacks) {
@@ -4797,7 +4797,7 @@ IpcProvider.prototype._timeout = function() {
 /**
 Check if the current connection is still valid.
 
-@msevod isConnected
+@method isConnected
 */
 IpcProvider.prototype.isConnected = function() {
     var _this = this;
@@ -4829,7 +4829,7 @@ IpcProvider.prototype.send = function (payload) {
         return result;
 
     } else {
-        throw new Error('You tried to send "'+ payload.msevod +'" synchronously. Synchronous requests are not supported by the IPC provider.');
+        throw new Error('You tried to send "'+ payload.method +'" synchronously. Synchronous requests are not supported by the IPC provider.');
     }
 };
 
@@ -4865,7 +4865,7 @@ module.exports = IpcProvider;
 */
 /** @file jsonrpc.js
  * @authors:
- *   Marek Kotewicz <marek@sevdev.com>
+ *   Marek Kotewicz <marek@ethdev.com>
  *   Aaron Kumavis <aaron@kumavis.me>
  * @date 2015
  */
@@ -4878,14 +4878,14 @@ var Jsonrpc = {
 /**
  * Should be called to valid json create payload object
  *
- * @msevod toPayload
- * @param {Function} msevod of jsonrpc call, required
- * @param {Array} params, an array of msevod params, optional
+ * @method toPayload
+ * @param {Function} method of jsonrpc call, required
+ * @param {Array} params, an array of method params, optional
  * @returns {Object} valid jsonrpc payload object
  */
-Jsonrpc.toPayload = function (msevod, params) {
-    if (!msevod)
-        console.error('jsonrpc msevod should be specified!');
+Jsonrpc.toPayload = function (method, params) {
+    if (!method)
+        console.error('jsonrpc method should be specified!');
 
     // advance message ID
     Jsonrpc.messageId++;
@@ -4893,7 +4893,7 @@ Jsonrpc.toPayload = function (msevod, params) {
     return {
         jsonrpc: '2.0',
         id: Jsonrpc.messageId,
-        msevod: msevod,
+        method: method,
         params: params || []
     };
 };
@@ -4901,7 +4901,7 @@ Jsonrpc.toPayload = function (msevod, params) {
 /**
  * Should be called to check if jsonrpc response is valid
  *
- * @msevod isValidResponse
+ * @method isValidResponse
  * @param {Object}
  * @returns {Boolean} true if response is valid, otherwise false
  */
@@ -4920,13 +4920,13 @@ Jsonrpc.isValidResponse = function (response) {
 /**
  * Should be called to create batch payload object
  *
- * @msevod toBatchPayload
- * @param {Array} messages, an array of objects with msevod (required) and params (optional) fields
+ * @method toBatchPayload
+ * @param {Array} messages, an array of objects with method (required) and params (optional) fields
  * @returns {Array} batch payload
  */
 Jsonrpc.toBatchPayload = function (messages) {
     return messages.map(function (message) {
-        return Jsonrpc.toPayload(message.msevod, message.params);
+        return Jsonrpc.toPayload(message.method, message.params);
     });
 };
 
@@ -4951,15 +4951,15 @@ module.exports = Jsonrpc;
     along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
 */
 /**
- * @file msevod.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @file method.js
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
 var utils = require('../utils/utils');
 var errors = require('./errors');
 
-var Msevod = function (options) {
+var Method = function (options) {
     this.name = options.name;
     this.call = options.call;
     this.params = options.params || 0;
@@ -4968,29 +4968,29 @@ var Msevod = function (options) {
     this.requestManager = null;
 };
 
-Msevod.prototype.setRequestManager = function (rm) {
+Method.prototype.setRequestManager = function (rm) {
     this.requestManager = rm;
 };
 
 /**
- * Should be used to determine name of the jsonrpc msevod based on arguments
+ * Should be used to determine name of the jsonrpc method based on arguments
  *
- * @msevod getCall
+ * @method getCall
  * @param {Array} arguments
- * @return {String} name of jsonrpc msevod
+ * @return {String} name of jsonrpc method
  */
-Msevod.prototype.getCall = function (args) {
+Method.prototype.getCall = function (args) {
     return utils.isFunction(this.call) ? this.call(args) : this.call;
 };
 
 /**
  * Should be used to extract callback from array of arguments. Modifies input param
  *
- * @msevod extractCallback
+ * @method extractCallback
  * @param {Array} arguments
  * @return {Function|Null} callback, if exists
  */
-Msevod.prototype.extractCallback = function (args) {
+Method.prototype.extractCallback = function (args) {
     if (utils.isFunction(args[args.length - 1])) {
         return args.pop(); // modify the args array!
     }
@@ -4999,24 +4999,24 @@ Msevod.prototype.extractCallback = function (args) {
 /**
  * Should be called to check if the number of arguments is correct
  * 
- * @msevod validateArgs
+ * @method validateArgs
  * @param {Array} arguments
  * @throws {Error} if it is not
  */
-Msevod.prototype.validateArgs = function (args) {
+Method.prototype.validateArgs = function (args) {
     if (args.length !== this.params) {
         throw errors.InvalidNumberOfRPCParams();
     }
 };
 
 /**
- * Should be called to format input args of msevod
+ * Should be called to format input args of method
  * 
- * @msevod formatInput
+ * @method formatInput
  * @param {Array}
  * @return {Array}
  */
-Msevod.prototype.formatInput = function (args) {
+Method.prototype.formatInput = function (args) {
     if (!this.inputFormatter) {
         return args;
     }
@@ -5027,37 +5027,37 @@ Msevod.prototype.formatInput = function (args) {
 };
 
 /**
- * Should be called to format output(result) of msevod
+ * Should be called to format output(result) of method
  *
- * @msevod formatOutput
+ * @method formatOutput
  * @param {Object}
  * @return {Object}
  */
-Msevod.prototype.formatOutput = function (result) {
+Method.prototype.formatOutput = function (result) {
     return this.outputFormatter && result ? this.outputFormatter(result) : result;
 };
 
 /**
  * Should create payload from given input args
  *
- * @msevod toPayload
+ * @method toPayload
  * @param {Array} args
  * @return {Object}
  */
-Msevod.prototype.toPayload = function (args) {
+Method.prototype.toPayload = function (args) {
     var call = this.getCall(args);
     var callback = this.extractCallback(args);
     var params = this.formatInput(args);
     this.validateArgs(params);
 
     return {
-        msevod: call,
+        method: call,
         params: params,
         callback: callback
     };
 };
 
-Msevod.prototype.attachToObject = function (obj) {
+Method.prototype.attachToObject = function (obj) {
     var func = this.buildCall();
     func.call = this.call; // TODO!!! that's ugly. filter.js uses it
     var name = this.name.split('.');
@@ -5069,16 +5069,16 @@ Msevod.prototype.attachToObject = function (obj) {
     }
 };
 
-Msevod.prototype.buildCall = function() {
-    var msevod = this;
+Method.prototype.buildCall = function() {
+    var method = this;
     var send = function () {
-        var payload = msevod.toPayload(Array.prototype.slice.call(arguments));
+        var payload = method.toPayload(Array.prototype.slice.call(arguments));
         if (payload.callback) {
-            return msevod.requestManager.sendAsync(payload, function (err, result) {
-                payload.callback(err, msevod.formatOutput(result));
+            return method.requestManager.sendAsync(payload, function (err, result) {
+                payload.callback(err, method.formatOutput(result));
             });
         }
-        return msevod.formatOutput(msevod.requestManager.send(payload));
+        return method.formatOutput(method.requestManager.send(payload));
     };
     send.request = this.request.bind(this);
     return send;
@@ -5087,17 +5087,17 @@ Msevod.prototype.buildCall = function() {
 /**
  * Should be called to create pure JSONRPC request which can be used in batch request
  *
- * @msevod request
+ * @method request
  * @param {...} params
  * @return {Object} jsonrpc request
  */
-Msevod.prototype.request = function () {
+Method.prototype.request = function () {
     var payload = this.toPayload(Array.prototype.slice.call(arguments));
     payload.format = this.formatOutput.bind(this);
     return payload;
 };
 
-module.exports = Msevod;
+module.exports = Method;
 
 },{"../utils/utils":20,"./errors":26}],37:[function(require,module,exports){
 /*
@@ -5118,43 +5118,43 @@ module.exports = Msevod;
 */
 /** @file db.js
  * @authors:
- *   Marek Kotewicz <marek@sevdev.com>
+ *   Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
-var Msevod = require('../msevod');
+var Method = require('../method');
 
 var DB = function (web3) {
     this._requestManager = web3._requestManager;
 
     var self = this;
     
-    msevods().forEach(function(msevod) { 
-        msevod.attachToObject(self);
-        msevod.setRequestManager(web3._requestManager);
+    methods().forEach(function(method) { 
+        method.attachToObject(self);
+        method.setRequestManager(web3._requestManager);
     });
 };
 
-var msevods = function () {
-    var putString = new Msevod({
+var methods = function () {
+    var putString = new Method({
         name: 'putString',
         call: 'db_putString',
         params: 3
     });
 
-    var getString = new Msevod({
+    var getString = new Method({
         name: 'getString',
         call: 'db_getString',
         params: 2
     });
 
-    var putHex = new Msevod({
+    var putHex = new Method({
         name: 'putHex',
         call: 'db_putHex',
         params: 3
     });
 
-    var getHex = new Msevod({
+    var getHex = new Method({
         name: 'getHex',
         call: 'db_getHex',
         params: 2
@@ -5167,7 +5167,7 @@ var msevods = function () {
 
 module.exports = DB;
 
-},{"../msevod":36}],38:[function(require,module,exports){
+},{"../method":36}],38:[function(require,module,exports){
 /*
     This file is part of web3.js.
 
@@ -5185,9 +5185,9 @@ module.exports = DB;
     along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
 */
 /**
- * @file sev.js
- * @author Marek Kotewicz <marek@sevdev.com>
- * @author Fabian Vogelsteller <fabian@sevdev.com>
+ * @file eth.js
+ * @author Marek Kotewicz <marek@ethdev.com>
+ * @author Fabian Vogelsteller <fabian@ethdev.com>
  * @date 2015
  */
 
@@ -5195,7 +5195,7 @@ module.exports = DB;
 
 var formatters = require('../formatters');
 var utils = require('../../utils/utils');
-var Msevod = require('../msevod');
+var Method = require('../method');
 var Property = require('../property');
 var c = require('../../utils/config');
 var Contract = require('../contract');
@@ -5207,23 +5207,23 @@ var Iban = require('../iban');
 var transfer = require('../transfer');
 
 var blockCall = function (args) {
-    return (utils.isString(args[0]) && args[0].indexOf('0x') === 0) ? "sev_getBlockByHash" : "sev_getBlockByNumber";
+    return (utils.isString(args[0]) && args[0].indexOf('0x') === 0) ? "eth_getBlockByHash" : "eth_getBlockByNumber";
 };
 
 var transactionFromBlockCall = function (args) {
-    return (utils.isString(args[0]) && args[0].indexOf('0x') === 0) ? 'sev_getTransactionByBlockHashAndIndex' : 'sev_getTransactionByBlockNumberAndIndex';
+    return (utils.isString(args[0]) && args[0].indexOf('0x') === 0) ? 'eth_getTransactionByBlockHashAndIndex' : 'eth_getTransactionByBlockNumberAndIndex';
 };
 
 var uncleCall = function (args) {
-    return (utils.isString(args[0]) && args[0].indexOf('0x') === 0) ? 'sev_getUncleByBlockHashAndIndex' : 'sev_getUncleByBlockNumberAndIndex';
+    return (utils.isString(args[0]) && args[0].indexOf('0x') === 0) ? 'eth_getUncleByBlockHashAndIndex' : 'eth_getUncleByBlockNumberAndIndex';
 };
 
 var getBlockTransactionCountCall = function (args) {
-    return (utils.isString(args[0]) && args[0].indexOf('0x') === 0) ? 'sev_getBlockTransactionCountByHash' : 'sev_getBlockTransactionCountByNumber';
+    return (utils.isString(args[0]) && args[0].indexOf('0x') === 0) ? 'eth_getBlockTransactionCountByHash' : 'eth_getBlockTransactionCountByNumber';
 };
 
 var uncleCountCall = function (args) {
-    return (utils.isString(args[0]) && args[0].indexOf('0x') === 0) ? 'sev_getUncleCountByBlockHash' : 'sev_getUncleCountByBlockNumber';
+    return (utils.isString(args[0]) && args[0].indexOf('0x') === 0) ? 'eth_getUncleCountByBlockHash' : 'eth_getUncleCountByBlockNumber';
 };
 
 function Sev(web3) {
@@ -5231,9 +5231,9 @@ function Sev(web3) {
 
     var self = this;
 
-    msevods().forEach(function(msevod) {
-        msevod.attachToObject(self);
-        msevod.setRequestManager(self._requestManager);
+    methods().forEach(function(method) {
+        method.attachToObject(self);
+        method.setRequestManager(self._requestManager);
     });
 
     properties().forEach(function(p) {
@@ -5266,30 +5266,30 @@ Object.defineProperty(Sev.prototype, 'defaultAccount', {
     }
 });
 
-var msevods = function () {
-    var getBalance = new Msevod({
+var methods = function () {
+    var getBalance = new Method({
         name: 'getBalance',
-        call: 'sev_getBalance',
+        call: 'eth_getBalance',
         params: 2,
         inputFormatter: [formatters.inputAddressFormatter, formatters.inputDefaultBlockNumberFormatter],
         outputFormatter: formatters.outputBigNumberFormatter
     });
 
-    var getStorageAt = new Msevod({
+    var getStorageAt = new Method({
         name: 'getStorageAt',
-        call: 'sev_getStorageAt',
+        call: 'eth_getStorageAt',
         params: 3,
         inputFormatter: [null, utils.toHex, formatters.inputDefaultBlockNumberFormatter]
     });
 
-    var getCode = new Msevod({
+    var getCode = new Method({
         name: 'getCode',
-        call: 'sev_getCode',
+        call: 'eth_getCode',
         params: 2,
         inputFormatter: [formatters.inputAddressFormatter, formatters.inputDefaultBlockNumberFormatter]
     });
 
-    var getBlock = new Msevod({
+    var getBlock = new Method({
         name: 'getBlock',
         call: blockCall,
         params: 2,
@@ -5297,7 +5297,7 @@ var msevods = function () {
         outputFormatter: formatters.outputBlockFormatter
     });
 
-    var getUncle = new Msevod({
+    var getUncle = new Method({
         name: 'getUncle',
         call: uncleCall,
         params: 2,
@@ -5306,13 +5306,13 @@ var msevods = function () {
 
     });
 
-    var getCompilers = new Msevod({
+    var getCompilers = new Method({
         name: 'getCompilers',
-        call: 'sev_getCompilers',
+        call: 'eth_getCompilers',
         params: 0
     });
 
-    var getBlockTransactionCount = new Msevod({
+    var getBlockTransactionCount = new Method({
         name: 'getBlockTransactionCount',
         call: getBlockTransactionCountCall,
         params: 1,
@@ -5320,7 +5320,7 @@ var msevods = function () {
         outputFormatter: utils.toDecimal
     });
 
-    var getBlockUncleCount = new Msevod({
+    var getBlockUncleCount = new Method({
         name: 'getBlockUncleCount',
         call: uncleCountCall,
         params: 1,
@@ -5328,14 +5328,14 @@ var msevods = function () {
         outputFormatter: utils.toDecimal
     });
 
-    var getTransaction = new Msevod({
+    var getTransaction = new Method({
         name: 'getTransaction',
-        call: 'sev_getTransactionByHash',
+        call: 'eth_getTransactionByHash',
         params: 1,
         outputFormatter: formatters.outputTransactionFormatter
     });
 
-    var getTransactionFromBlock = new Msevod({
+    var getTransactionFromBlock = new Method({
         name: 'getTransactionFromBlock',
         call: transactionFromBlockCall,
         params: 2,
@@ -5343,91 +5343,91 @@ var msevods = function () {
         outputFormatter: formatters.outputTransactionFormatter
     });
 
-    var getTransactionReceipt = new Msevod({
+    var getTransactionReceipt = new Method({
         name: 'getTransactionReceipt',
-        call: 'sev_getTransactionReceipt',
+        call: 'eth_getTransactionReceipt',
         params: 1,
         outputFormatter: formatters.outputTransactionReceiptFormatter
     });
 
-    var getTransactionCount = new Msevod({
+    var getTransactionCount = new Method({
         name: 'getTransactionCount',
-        call: 'sev_getTransactionCount',
+        call: 'eth_getTransactionCount',
         params: 2,
         inputFormatter: [null, formatters.inputDefaultBlockNumberFormatter],
         outputFormatter: utils.toDecimal
     });
 
-    var sendRawTransaction = new Msevod({
+    var sendRawTransaction = new Method({
         name: 'sendRawTransaction',
-        call: 'sev_sendRawTransaction',
+        call: 'eth_sendRawTransaction',
         params: 1,
         inputFormatter: [null]
     });
 
-    var sendTransaction = new Msevod({
+    var sendTransaction = new Method({
         name: 'sendTransaction',
-        call: 'sev_sendTransaction',
+        call: 'eth_sendTransaction',
         params: 1,
         inputFormatter: [formatters.inputTransactionFormatter]
     });
 
-    var signTransaction = new Msevod({
+    var signTransaction = new Method({
         name: 'signTransaction',
-        call: 'sev_signTransaction',
+        call: 'eth_signTransaction',
         params: 1,
         inputFormatter: [formatters.inputTransactionFormatter]
     });
 
-    var sign = new Msevod({
+    var sign = new Method({
         name: 'sign',
-        call: 'sev_sign',
+        call: 'eth_sign',
         params: 2,
         inputFormatter: [formatters.inputAddressFormatter, null]
     });
 
-    var call = new Msevod({
+    var call = new Method({
         name: 'call',
-        call: 'sev_call',
+        call: 'eth_call',
         params: 2,
         inputFormatter: [formatters.inputCallFormatter, formatters.inputDefaultBlockNumberFormatter]
     });
 
-    var estimateGas = new Msevod({
+    var estimateGas = new Method({
         name: 'estimateGas',
-        call: 'sev_estimateGas',
+        call: 'eth_estimateGas',
         params: 1,
         inputFormatter: [formatters.inputCallFormatter],
         outputFormatter: utils.toDecimal
     });
 
-    var compileSolidity = new Msevod({
+    var compileSolidity = new Method({
         name: 'compile.solidity',
-        call: 'sev_compileSolidity',
+        call: 'eth_compileSolidity',
         params: 1
     });
 
-    var compileLLL = new Msevod({
+    var compileLLL = new Method({
         name: 'compile.lll',
-        call: 'sev_compileLLL',
+        call: 'eth_compileLLL',
         params: 1
     });
 
-    var compileSerpent = new Msevod({
+    var compileSerpent = new Method({
         name: 'compile.serpent',
-        call: 'sev_compileSerpent',
+        call: 'eth_compileSerpent',
         params: 1
     });
 
-    var submitWork = new Msevod({
+    var submitWork = new Method({
         name: 'submitWork',
-        call: 'sev_submitWork',
+        call: 'eth_submitWork',
         params: 3
     });
 
-    var getWork = new Msevod({
+    var getWork = new Method({
         name: 'getWork',
-        call: 'sev_getWork',
+        call: 'eth_getWork',
         params: 0
     });
 
@@ -5463,39 +5463,39 @@ var properties = function () {
     return [
         new Property({
             name: 'coinbase',
-            getter: 'sev_coinbase'
+            getter: 'eth_coinbase'
         }),
         new Property({
             name: 'mining',
-            getter: 'sev_mining'
+            getter: 'eth_mining'
         }),
         new Property({
             name: 'hashrate',
-            getter: 'sev_hashrate',
+            getter: 'eth_hashrate',
             outputFormatter: utils.toDecimal
         }),
         new Property({
             name: 'syncing',
-            getter: 'sev_syncing',
+            getter: 'eth_syncing',
             outputFormatter: formatters.outputSyncingFormatter
         }),
         new Property({
             name: 'gasPrice',
-            getter: 'sev_gasPrice',
+            getter: 'eth_gasPrice',
             outputFormatter: formatters.outputBigNumberFormatter
         }),
         new Property({
             name: 'accounts',
-            getter: 'sev_accounts'
+            getter: 'eth_accounts'
         }),
         new Property({
             name: 'blockNumber',
-            getter: 'sev_blockNumber',
+            getter: 'eth_blockNumber',
             outputFormatter: utils.toDecimal
         }),
         new Property({
             name: 'protocolVersion',
-            getter: 'sev_protocolVersion'
+            getter: 'eth_protocolVersion'
         })
     ];
 };
@@ -5506,7 +5506,7 @@ Sev.prototype.contract = function (abi) {
 };
 
 Sev.prototype.filter = function (options, callback, filterCreationErrorCallback) {
-    return new Filter(options, 'sev', this._requestManager, watches.sev(), formatters.outputLogFormatter, callback, filterCreationErrorCallback);
+    return new Filter(options, 'eth', this._requestManager, watches.eth(), formatters.outputLogFormatter, callback, filterCreationErrorCallback);
 };
 
 Sev.prototype.namereg = function () {
@@ -5523,7 +5523,7 @@ Sev.prototype.isSyncing = function (callback) {
 
 module.exports = Sev;
 
-},{"../../utils/config":18,"../../utils/utils":20,"../contract":25,"../filter":29,"../formatters":30,"../iban":33,"../msevod":36,"../namereg":44,"../property":45,"../syncing":48,"../transfer":49,"./watches":43}],39:[function(require,module,exports){
+},{"../../utils/config":18,"../../utils/utils":20,"../contract":25,"../filter":29,"../formatters":30,"../iban":33,"../method":36,"../namereg":44,"../property":45,"../syncing":48,"../transfer":49,"./watches":43}],39:[function(require,module,exports){
 /*
     This file is part of web3.js.
 
@@ -5540,9 +5540,9 @@ module.exports = Sev;
     You should have received a copy of the GNU Lesser General Public License
     along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
 */
-/** @file sev.js
+/** @file eth.js
  * @authors:
- *   Marek Kotewicz <marek@sevdev.com>
+ *   Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
@@ -5560,7 +5560,7 @@ var Net = function (web3) {
     });
 };
 
-/// @returns an array of objects describing web3.sev api properties
+/// @returns an array of objects describing web3.eth api properties
 var properties = function () {
     return [
         new Property({
@@ -5595,15 +5595,15 @@ module.exports = Net;
     along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
 */
 /**
- * @file sev.js
- * @author Marek Kotewicz <marek@sevdev.com>
- * @author Fabian Vogelsteller <fabian@sevdev.com>
+ * @file eth.js
+ * @author Marek Kotewicz <marek@ethdev.com>
+ * @author Fabian Vogelsteller <fabian@ethdev.com>
  * @date 2015
  */
 
 "use strict";
 
-var Msevod = require('../msevod');
+var Method = require('../method');
 var Property = require('../property');
 var formatters = require('../formatters');
 
@@ -5612,9 +5612,9 @@ function Personal(web3) {
 
     var self = this;
 
-    msevods().forEach(function(msevod) {
-        msevod.attachToObject(self);
-        msevod.setRequestManager(self._requestManager);
+    methods().forEach(function(method) {
+        method.attachToObject(self);
+        method.setRequestManager(self._requestManager);
     });
 
     properties().forEach(function(p) {
@@ -5623,48 +5623,48 @@ function Personal(web3) {
     });
 }
 
-var msevods = function () {
-    var newAccount = new Msevod({
+var methods = function () {
+    var newAccount = new Method({
         name: 'newAccount',
         call: 'personal_newAccount',
         params: 1,
         inputFormatter: [null]
     });
 
-    var importRawKey = new Msevod({
+    var importRawKey = new Method({
         name: 'importRawKey',
 		call: 'personal_importRawKey',
 		params: 2
     });
 
-    var sign = new Msevod({
+    var sign = new Method({
         name: 'sign',
 		call: 'personal_sign',
 		params: 3,
 		inputFormatter: [null, formatters.inputAddressFormatter, null]
     });
 
-    var ecRecover = new Msevod({
+    var ecRecover = new Method({
         name: 'ecRecover',
 		call: 'personal_ecRecover',
 		params: 2
     });
 
-    var unlockAccount = new Msevod({
+    var unlockAccount = new Method({
         name: 'unlockAccount',
         call: 'personal_unlockAccount',
         params: 3,
         inputFormatter: [formatters.inputAddressFormatter, null, null]
     });
 
-    var sendTransaction = new Msevod({
+    var sendTransaction = new Method({
         name: 'sendTransaction',
         call: 'personal_sendTransaction',
         params: 2,
         inputFormatter: [formatters.inputTransactionFormatter, null]
     });
 
-    var lockAccount = new Msevod({
+    var lockAccount = new Method({
         name: 'lockAccount',
         call: 'personal_lockAccount',
         params: 1,
@@ -5694,7 +5694,7 @@ var properties = function () {
 
 module.exports = Personal;
 
-},{"../formatters":30,"../msevod":36,"../property":45}],41:[function(require,module,exports){
+},{"../formatters":30,"../method":36,"../property":45}],41:[function(require,module,exports){
 /*
     This file is part of web3.js.
 
@@ -5714,11 +5714,11 @@ module.exports = Personal;
 /** @file shh.js
  * @authors:
  *   Fabian Vogelsteller <fabian@severeum.org>
- *   Marek Kotewicz <marek@sevcore.io>
+ *   Marek Kotewicz <marek@ethcore.io>
  * @date 2017
  */
 
-var Msevod = require('../msevod');
+var Method = require('../method');
 var Filter = require('../filter');
 var watches = require('./watches');
 
@@ -5727,9 +5727,9 @@ var Shh = function (web3) {
 
     var self = this;
 
-    msevods().forEach(function(msevod) {
-        msevod.attachToObject(self);
-        msevod.setRequestManager(self._requestManager);
+    methods().forEach(function(method) {
+        method.attachToObject(self);
+        method.setRequestManager(self._requestManager);
     });
 };
 
@@ -5737,90 +5737,90 @@ Shh.prototype.newMessageFilter = function (options, callback, filterCreationErro
     return new Filter(options, 'shh', this._requestManager, watches.shh(), null, callback, filterCreationErrorCallback);
 };
 
-var msevods = function () {
+var methods = function () {
 
     return [
-        new Msevod({
+        new Method({
             name: 'version',
             call: 'shh_version',
             params: 0
         }),
-        new Msevod({
+        new Method({
             name: 'info',
             call: 'shh_info',
             params: 0
         }),
-        new Msevod({
+        new Method({
             name: 'setMaxMessageSize',
             call: 'shh_setMaxMessageSize',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'setMinPoW',
             call: 'shh_setMinPoW',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'markTrustedPeer',
             call: 'shh_markTrustedPeer',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'newKeyPair',
             call: 'shh_newKeyPair',
             params: 0
         }),
-        new Msevod({
+        new Method({
             name: 'addPrivateKey',
             call: 'shh_addPrivateKey',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'deleteKeyPair',
             call: 'shh_deleteKeyPair',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'hasKeyPair',
             call: 'shh_hasKeyPair',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'getPublicKey',
             call: 'shh_getPublicKey',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'getPrivateKey',
             call: 'shh_getPrivateKey',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'newSymKey',
             call: 'shh_newSymKey',
             params: 0
         }),
-        new Msevod({
+        new Method({
             name: 'addSymKey',
             call: 'shh_addSymKey',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'generateSymKeyFromPassword',
             call: 'shh_generateSymKeyFromPassword',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'hasSymKey',
             call: 'shh_hasSymKey',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'getSymKey',
             call: 'shh_getSymKey',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'deleteSymKey',
             call: 'shh_deleteSymKey',
             params: 1
@@ -5828,7 +5828,7 @@ var msevods = function () {
 
         // subscribe and unsubscribe missing
 
-        new Msevod({
+        new Method({
             name: 'post',
             call: 'shh_post',
             params: 1,
@@ -5840,7 +5840,7 @@ var msevods = function () {
 module.exports = Shh;
 
 
-},{"../filter":29,"../msevod":36,"./watches":43}],42:[function(require,module,exports){
+},{"../filter":29,"../method":36,"./watches":43}],42:[function(require,module,exports){
 /*
     This file is part of web3.js.
 
@@ -5867,7 +5867,7 @@ module.exports = Shh;
 
 "use strict";
 
-var Msevod = require('../msevod');
+var Method = require('../method');
 var Property = require('../property');
 
 function Swarm(web3) {
@@ -5875,9 +5875,9 @@ function Swarm(web3) {
 
     var self = this;
 
-    msevods().forEach(function(msevod) {
-        msevod.attachToObject(self);
-        msevod.setRequestManager(self._requestManager);
+    methods().forEach(function(method) {
+        method.attachToObject(self);
+        method.setRequestManager(self._requestManager);
     });
 
     properties().forEach(function(p) {
@@ -5886,71 +5886,71 @@ function Swarm(web3) {
     });
 }
 
-var msevods = function () {
-    var blockNetworkRead = new Msevod({
+var methods = function () {
+    var blockNetworkRead = new Method({
         name: 'blockNetworkRead',
         call: 'bzz_blockNetworkRead',
         params: 1,
         inputFormatter: [null]
     });
 
-    var syncEnabled = new Msevod({
+    var syncEnabled = new Method({
         name: 'syncEnabled',
         call: 'bzz_syncEnabled',
         params: 1,
         inputFormatter: [null]
     });
 
-    var swapEnabled = new Msevod({
+    var swapEnabled = new Method({
         name: 'swapEnabled',
         call: 'bzz_swapEnabled',
         params: 1,
         inputFormatter: [null]
     });
 
-    var download = new Msevod({
+    var download = new Method({
         name: 'download',
         call: 'bzz_download',
         params: 2,
         inputFormatter: [null, null]
     });
 
-    var upload = new Msevod({
+    var upload = new Method({
         name: 'upload',
         call: 'bzz_upload',
         params: 2,
         inputFormatter: [null, null]
     });
 
-    var retrieve = new Msevod({
+    var retrieve = new Method({
         name: 'retrieve',
         call: 'bzz_retrieve',
         params: 1,
         inputFormatter: [null]
     });
 
-    var store = new Msevod({
+    var store = new Method({
         name: 'store',
         call: 'bzz_store',
         params: 2,
         inputFormatter: [null, null]
     });
 
-    var get = new Msevod({
+    var get = new Method({
         name: 'get',
         call: 'bzz_get',
         params: 1,
         inputFormatter: [null]
     });
 
-    var put = new Msevod({
+    var put = new Method({
         name: 'put',
         call: 'bzz_put',
         params: 2,
         inputFormatter: [null, null]
     });
 
-    var modify = new Msevod({
+    var modify = new Method({
         name: 'modify',
         call: 'bzz_modify',
         params: 4,
@@ -5987,7 +5987,7 @@ var properties = function () {
 
 module.exports = Swarm;
 
-},{"../msevod":36,"../property":45}],43:[function(require,module,exports){
+},{"../method":36,"../property":45}],43:[function(require,module,exports){
 /*
     This file is part of web3.js.
 
@@ -6006,14 +6006,14 @@ module.exports = Swarm;
 */
 /** @file watches.js
  * @authors:
- *   Marek Kotewicz <marek@sevdev.com>
+ *   Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
-var Msevod = require('../msevod');
+var Method = require('../method');
 
-/// @returns an array of objects describing web3.sev.filter api msevods
-var sev = function () {
+/// @returns an array of objects describing web3.eth.filter api methods
+var eth = function () {
     var newFilterCall = function (args) {
         var type = args[0];
 
@@ -6021,37 +6021,37 @@ var sev = function () {
             case 'latest':
                 args.shift();
                 this.params = 0;
-                return 'sev_newBlockFilter';
+                return 'eth_newBlockFilter';
             case 'pending':
                 args.shift();
                 this.params = 0;
-                return 'sev_newPendingTransactionFilter';
+                return 'eth_newPendingTransactionFilter';
             default:
-                return 'sev_newFilter';
+                return 'eth_newFilter';
         }
     };
 
-    var newFilter = new Msevod({
+    var newFilter = new Method({
         name: 'newFilter',
         call: newFilterCall,
         params: 1
     });
 
-    var uninstallFilter = new Msevod({
+    var uninstallFilter = new Method({
         name: 'uninstallFilter',
-        call: 'sev_uninstallFilter',
+        call: 'eth_uninstallFilter',
         params: 1
     });
 
-    var getLogs = new Msevod({
+    var getLogs = new Method({
         name: 'getLogs',
-        call: 'sev_getFilterLogs',
+        call: 'eth_getFilterLogs',
         params: 1
     });
 
-    var poll = new Msevod({
+    var poll = new Method({
         name: 'poll',
-        call: 'sev_getFilterChanges',
+        call: 'eth_getFilterChanges',
         params: 1
     });
 
@@ -6063,26 +6063,26 @@ var sev = function () {
     ];
 };
 
-/// @returns an array of objects describing web3.shh.watch api msevods
+/// @returns an array of objects describing web3.shh.watch api methods
 var shh = function () {
 
     return [
-        new Msevod({
+        new Method({
             name: 'newFilter',
             call: 'shh_newMessageFilter',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'uninstallFilter',
             call: 'shh_deleteMessageFilter',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'getLogs',
             call: 'shh_getFilterMessages',
             params: 1
         }),
-        new Msevod({
+        new Method({
             name: 'poll',
             call: 'shh_getFilterMessages',
             params: 1
@@ -6091,12 +6091,12 @@ var shh = function () {
 };
 
 module.exports = {
-    sev: sev,
+    eth: eth,
     shh: shh
 };
 
 
-},{"../msevod":36}],44:[function(require,module,exports){
+},{"../method":36}],44:[function(require,module,exports){
 /*
     This file is part of web3.js.
 
@@ -6115,7 +6115,7 @@ module.exports = {
 */
 /** 
  * @file namereg.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
@@ -6157,7 +6157,7 @@ module.exports = {
 /**
  * @file property.js
  * @author Fabian Vogelsteller <fabian@frozeman.de>
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
@@ -6177,9 +6177,9 @@ Property.prototype.setRequestManager = function (rm) {
 };
 
 /**
- * Should be called to format input args of msevod
+ * Should be called to format input args of method
  *
- * @msevod formatInput
+ * @method formatInput
  * @param {Array}
  * @return {Array}
  */
@@ -6188,9 +6188,9 @@ Property.prototype.formatInput = function (arg) {
 };
 
 /**
- * Should be called to format output(result) of msevod
+ * Should be called to format output(result) of method
  *
- * @msevod formatOutput
+ * @method formatOutput
  * @param {Object}
  * @return {Object}
  */
@@ -6201,7 +6201,7 @@ Property.prototype.formatOutput = function (result) {
 /**
  * Should be used to extract callback from array of arguments. Modifies input param
  *
- * @msevod extractCallback
+ * @method extractCallback
  * @param {Array} arguments
  * @return {Function|Null} callback, if exists
  */
@@ -6213,9 +6213,9 @@ Property.prototype.extractCallback = function (args) {
 
 
 /**
- * Should attach function to msevod
+ * Should attach function to method
  *
- * @msevod attachToObject
+ * @method attachToObject
  * @param {Object}
  * @param {Function}
  */
@@ -6245,7 +6245,7 @@ Property.prototype.buildGet = function () {
     var property = this;
     return function get() {
         return property.formatOutput(property.requestManager.send({
-            msevod: property.getter
+            method: property.getter
         }));
     };
 };
@@ -6254,7 +6254,7 @@ Property.prototype.buildAsyncGet = function () {
     var property = this;
     var get = function (callback) {
         property.requestManager.sendAsync({
-            msevod: property.getter
+            method: property.getter
         }, function (err, result) {
             callback(err, property.formatOutput(result));
         });
@@ -6266,13 +6266,13 @@ Property.prototype.buildAsyncGet = function () {
 /**
  * Should be called to create pure JSONRPC request which can be used in batch request
  *
- * @msevod request
+ * @method request
  * @param {...} params
  * @return {Object} jsonrpc request
  */
 Property.prototype.request = function () {
     var payload = {
-        msevod: this.getter,
+        method: this.getter,
         params: [],
         callback: this.extractCallback(Array.prototype.slice.call(arguments))
     };
@@ -6302,11 +6302,11 @@ module.exports = Property;
 */
 /** 
  * @file requestmanager.js
- * @author Jeffrey Wilcke <jeff@sevdev.com>
- * @author Marek Kotewicz <marek@sevdev.com>
- * @author Marian Oancea <marian@sevdev.com>
- * @author Fabian Vogelsteller <fabian@sevdev.com>
- * @author Gav Wood <g@sevdev.com>
+ * @author Jeffrey Wilcke <jeff@ethdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
+ * @author Marian Oancea <marian@ethdev.com>
+ * @author Fabian Vogelsteller <fabian@ethdev.com>
+ * @author Gav Wood <g@ethdev.com>
  * @date 2014
  */
 
@@ -6330,7 +6330,7 @@ var RequestManager = function (provider) {
 /**
  * Should be used to synchronously send request
  *
- * @msevod send
+ * @method send
  * @param {Object} data
  * @return {Object}
  */
@@ -6340,7 +6340,7 @@ RequestManager.prototype.send = function (data) {
         return null;
     }
 
-    var payload = Jsonrpc.toPayload(data.msevod, data.params);
+    var payload = Jsonrpc.toPayload(data.method, data.params);
     var result = this.provider.send(payload);
 
     if (!Jsonrpc.isValidResponse(result)) {
@@ -6353,7 +6353,7 @@ RequestManager.prototype.send = function (data) {
 /**
  * Should be used to asynchronously send request
  *
- * @msevod sendAsync
+ * @method sendAsync
  * @param {Object} data
  * @param {Function} callback
  */
@@ -6362,7 +6362,7 @@ RequestManager.prototype.sendAsync = function (data, callback) {
         return callback(errors.InvalidProvider());
     }
 
-    var payload = Jsonrpc.toPayload(data.msevod, data.params);
+    var payload = Jsonrpc.toPayload(data.method, data.params);
     this.provider.sendAsync(payload, function (err, result) {
         if (err) {
             return callback(err);
@@ -6379,7 +6379,7 @@ RequestManager.prototype.sendAsync = function (data, callback) {
 /**
  * Should be called to asynchronously send batch request
  *
- * @msevod sendBatch
+ * @method sendBatch
  * @param {Array} batch data
  * @param {Function} callback
  */
@@ -6406,7 +6406,7 @@ RequestManager.prototype.sendBatch = function (data, callback) {
 /**
  * Should be used to set provider of request manager
  *
- * @msevod setProvider
+ * @method setProvider
  * @param {Object}
  */
 RequestManager.prototype.setProvider = function (p) {
@@ -6416,7 +6416,7 @@ RequestManager.prototype.setProvider = function (p) {
 /**
  * Should be used to start polling
  *
- * @msevod startPolling
+ * @method startPolling
  * @param {Object} data
  * @param {Number} pollId
  * @param {Function} callback
@@ -6437,7 +6437,7 @@ RequestManager.prototype.startPolling = function (data, pollId, callback, uninst
 /**
  * Should be used to stop polling for filter with given id
  *
- * @msevod stopPolling
+ * @method stopPolling
  * @param {Number} pollId
  */
 RequestManager.prototype.stopPolling = function (pollId) {
@@ -6453,7 +6453,7 @@ RequestManager.prototype.stopPolling = function (pollId) {
 /**
  * Should be called to reset the polling mechanism of the request manager
  *
- * @msevod reset
+ * @method reset
  */
 RequestManager.prototype.reset = function (keepIsSyncing) {
     /*jshint maxcomplexity:5 */
@@ -6477,7 +6477,7 @@ RequestManager.prototype.reset = function (keepIsSyncing) {
 /**
  * Should be called to poll for changes on filter with given id
  *
- * @msevod poll
+ * @method poll
  */
 RequestManager.prototype.poll = function () {
     /*jshint maxcomplexity: 6 */
@@ -6580,7 +6580,7 @@ module.exports = Settings;
 */
 /** @file syncing.js
  * @authors:
- *   Fabian Vogelsteller <fabian@sevdev.com>
+ *   Fabian Vogelsteller <fabian@ethdev.com>
  * @date 2015
  */
 
@@ -6590,9 +6590,9 @@ var utils = require('../utils/utils');
 var count = 1;
 
 /**
-Adds the callback and sets up the msevods, to iterate over the results.
+Adds the callback and sets up the methods, to iterate over the results.
 
-@msevod pollSyncing
+@method pollSyncing
 @param {Object} self
 */
 var pollSyncing = function(self) {
@@ -6625,7 +6625,7 @@ var pollSyncing = function(self) {
     };
 
     self.requestManager.startPolling({
-        msevod: 'sev_syncing',
+        method: 'eth_syncing',
         params: [],
     }, self.pollId, onMessage, self.stopWatching.bind(self));
 
@@ -6675,7 +6675,7 @@ module.exports = IsSyncing;
 */
 /** 
  * @file transfer.js
- * @author Marek Kotewicz <marek@sevdev.com>
+ * @author Marek Kotewicz <marek@ethdev.com>
  * @date 2015
  */
 
@@ -6685,29 +6685,29 @@ var exchangeAbi = require('../contracts/SmartExchange.json');
 /**
  * Should be used to make Iban transfer
  *
- * @msevod transfer
+ * @method transfer
  * @param {String} from
  * @param {String} to iban
  * @param {Value} value to be tranfered
  * @param {Function} callback, callback
  */
-var transfer = function (sev, from, to, value, callback) {
+var transfer = function (eth, from, to, value, callback) {
     var iban = new Iban(to); 
     if (!iban.isValid()) {
         throw new Error('invalid iban address');
     }
 
     if (iban.isDirect()) {
-        return transferToAddress(sev, from, iban.address(), value, callback);
+        return transferToAddress(eth, from, iban.address(), value, callback);
     }
     
     if (!callback) {
-        var address = sev.icapNamereg().addr(iban.institution());
-        return deposit(sev, from, address, value, iban.client());
+        var address = eth.icapNamereg().addr(iban.institution());
+        return deposit(eth, from, address, value, iban.client());
     }
 
-    sev.icapNamereg().addr(iban.institution(), function (err, address) {
-        return deposit(sev, from, address, value, iban.client(), callback);
+    eth.icapNamereg().addr(iban.institution(), function (err, address) {
+        return deposit(eth, from, address, value, iban.client(), callback);
     });
     
 };
@@ -6715,14 +6715,14 @@ var transfer = function (sev, from, to, value, callback) {
 /**
  * Should be used to transfer funds to certain address
  *
- * @msevod transferToAddress
+ * @method transferToAddress
  * @param {String} from
  * @param {String} to
  * @param {Value} value to be tranfered
  * @param {Function} callback, callback
  */
-var transferToAddress = function (sev, from, to, value, callback) {
-    return sev.sendTransaction({
+var transferToAddress = function (eth, from, to, value, callback) {
+    return eth.sendTransaction({
         address: to,
         from: from,
         value: value
@@ -6730,18 +6730,18 @@ var transferToAddress = function (sev, from, to, value, callback) {
 };
 
 /**
- * Should be used to deposit funds to generic Exchange contract (must implement deposit(bytes32) msevod!)
+ * Should be used to deposit funds to generic Exchange contract (must implement deposit(bytes32) method!)
  *
- * @msevod deposit
+ * @method deposit
  * @param {String} from
  * @param {String} to
  * @param {Value} value to be transfered
  * @param {String} client unique identifier
  * @param {Function} callback, callback
  */
-var deposit = function (sev, from, to, value, client, callback) {
+var deposit = function (eth, from, to, value, client, callback) {
     var abi = exchangeAbi;
-    return sev.contract(abi).at(to).deposit(client, {
+    return eth.contract(abi).at(to).deposit(client, {
         from: from,
         value: value
     }, callback);
@@ -7931,7 +7931,7 @@ module.exports = transfer;
 	             *     var MyType = CryptoJS.lib.Base.extend({
 	             *         field: 'value',
 	             *
-	             *         msevod: function () {
+	             *         method: function () {
 	             *         }
 	             *     });
 	             */
@@ -7961,7 +7961,7 @@ module.exports = transfer;
 	            },
 
 	            /**
-	             * Extends this object and runs the init msevod.
+	             * Extends this object and runs the init method.
 	             * Arguments to create() will be passed to init().
 	             *
 	             * @return {Object} The new object.
@@ -7981,7 +7981,7 @@ module.exports = transfer;
 
 	            /**
 	             * Initializes a newly created object.
-	             * Override this msevod to add some logic when your objects are created.
+	             * Override this method to add some logic when your objects are created.
 	             *
 	             * @example
 	             *
@@ -8406,9 +8406,9 @@ module.exports = transfer;
 	        /**
 	         * Processes available data blocks.
 	         *
-	         * This msevod invokes _doProcessBlock(offset), which must be implemented by a concrete subtype.
+	         * This method invokes _doProcessBlock(offset), which must be implemented by a concrete subtype.
 	         *
-	         * @param {boolean} doFlush Whsever all blocks and partial blocks should be processed.
+	         * @param {boolean} doFlush Whether all blocks and partial blocks should be processed.
 	         *
 	         * @return {WordArray} The processed data.
 	         *
@@ -10080,7 +10080,7 @@ module.exports = transfer;
 }(this, function (CryptoJS) {
 
 	/**
-	 * ISO/IEC 9797-1 Padding Msevod 2.
+	 * ISO/IEC 9797-1 Padding Method 2.
 	 */
 	CryptoJS.pad.Iso97971 = {
 	    pad: function (data, blockSize) {

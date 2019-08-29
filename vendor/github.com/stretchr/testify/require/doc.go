@@ -9,7 +9,7 @@
 //      "github.com/stretchr/testify/require"
 //    )
 //
-//    func TestSomseving(t *testing.T) {
+//    func TestSomething(t *testing.T) {
 //
 //      var a string = "Hello"
 //      var b string = "Hello"
@@ -24,5 +24,5 @@
 // but instead of returning a boolean result they call `t.FailNow()`.
 //
 // Every assertion function also takes an optional string message as the final argument,
-// allowing custom error messages to be appended to the message the assertion msevod outputs.
+// allowing custom error messages to be appended to the message the assertion method outputs.
 package require

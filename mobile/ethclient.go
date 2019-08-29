@@ -16,23 +16,23 @@
 
 // Contains a wrapper for the Severeum client.
 
-package ssev
+package seth
 
 import (
 	"math/big"
 
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sevclient"
+	"github.com/severeum/go-severeum/ethclient"
 )
 
 // SevereumClient provides access to the Severeum APIs.
 type SevereumClient struct {
-	client *sevclient.Client
+	client *ethclient.Client
 }
 
 // NewSevereumClient connects a client to the given URL.
 func NewSevereumClient(rawurl string) (client *SevereumClient, _ error) {
-	rawClient, err := sevclient.Dial(rawurl)
+	rawClient, err := ethclient.Dial(rawurl)
 	return &SevereumClient{rawClient}, err
 }
 
@@ -309,7 +309,7 @@ func (ec *SevereumClient) EstimateGas(ctx *Context, msg *CallMsg) (gas int64, _ 
 
 // SendTransaction injects a signed transaction into the pending pool for execution.
 //
-// If the transaction was a contract creation use the TransactionReceipt msevod to get the
+// If the transaction was a contract creation use the TransactionReceipt method to get the
 // contract address after the transaction has been mined.
 func (ec *SevereumClient) SendTransaction(ctx *Context, tx *Transaction) error {
 	return ec.client.SendTransaction(ctx.context, tx.tx)

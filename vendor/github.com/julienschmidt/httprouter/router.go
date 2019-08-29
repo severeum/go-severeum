@@ -31,11 +31,11 @@
 //      log.Fatal(http.ListenAndServe(":8080", router))
 //  }
 //
-// The router matches incoming requests by the request msevod and the path.
-// If a handle is registered for this path and msevod, the router delegates the
+// The router matches incoming requests by the request method and the path.
+// If a handle is registered for this path and method, the router delegates the
 // request to that function.
-// For the msevods GET, POST, PUT, PATCH and DELETE shortcut functions exist to
-// register handles, for all other msevods router.Handle can be used.
+// For the methods GET, POST, PUT, PATCH and DELETE shortcut functions exist to
+// register handles, for all other methods router.Handle can be used.
 //
 // The registered path, against which the router matches incoming requests, can
 // contain two types of parameters:
@@ -116,7 +116,7 @@ type Router struct {
 	// handler for the path with (without) the trailing slash exists.
 	// For example if /foo/ is requested but a route only exists for /foo, the
 	// client is redirected to /foo with http status code 301 for GET requests
-	// and 307 for all other request msevods.
+	// and 307 for all other request methods.
 	RedirectTrailingSlash bool
 
 	// If enabled, the router tries to fix the current request path, if no
@@ -125,18 +125,18 @@ type Router struct {
 	// Afterwards the router does a case-insensitive lookup of the cleaned path.
 	// If a handle can be found for this route, the router makes a redirection
 	// to the corrected path with status code 301 for GET requests and 307 for
-	// all other request msevods.
+	// all other request methods.
 	// For example /FOO and /..//Foo could be redirected to /foo.
 	// RedirectTrailingSlash is independent of this option.
 	RedirectFixedPath bool
 
-	// If enabled, the router checks if another msevod is allowed for the
+	// If enabled, the router checks if another method is allowed for the
 	// current route, if the current request can not be routed.
-	// If this is the case, the request is answered with 'Msevod Not Allowed'
+	// If this is the case, the request is answered with 'Method Not Allowed'
 	// and HTTP status code 405.
-	// If no other Msevod is allowed, the request is delegated to the NotFound
+	// If no other Method is allowed, the request is delegated to the NotFound
 	// handler.
-	HandleMsevodNotAllowed bool
+	HandleMethodNotAllowed bool
 
 	// If enabled, the router automatically replies to OPTIONS requests.
 	// Custom OPTIONS handlers take priority over automatic replies.
@@ -147,11 +147,11 @@ type Router struct {
 	NotFound http.Handler
 
 	// Configurable http.Handler which is called when a request
-	// cannot be routed and HandleMsevodNotAllowed is true.
-	// If it is not set, http.Error with http.StatusMsevodNotAllowed is used.
-	// The "Allow" header with allowed request msevods is set before the handler
+	// cannot be routed and HandleMethodNotAllowed is true.
+	// If it is not set, http.Error with http.StatusMethodNotAllowed is used.
+	// The "Allow" header with allowed request methods is set before the handler
 	// is called.
-	MsevodNotAllowed http.Handler
+	MethodNotAllowed http.Handler
 
 	// Function to handle panics recovered from http handlers.
 	// It should be used to generate a error page and return the http error code
@@ -170,7 +170,7 @@ func New() *Router {
 	return &Router{
 		RedirectTrailingSlash:  true,
 		RedirectFixedPath:      true,
-		HandleMsevodNotAllowed: true,
+		HandleMethodNotAllowed: true,
 		HandleOPTIONS:          true,
 	}
 }
@@ -210,15 +210,15 @@ func (r *Router) DELETE(path string, handle Handle) {
 	r.Handle("DELETE", path, handle)
 }
 
-// Handle registers a new request handle with the given path and msevod.
+// Handle registers a new request handle with the given path and method.
 //
 // For GET, POST, PUT, PATCH and DELETE requests the respective shortcut
 // functions can be used.
 //
 // This function is intended for bulk loading and to allow the usage of less
-// frequently used, non-standardized or custom msevods (e.g. for internal
+// frequently used, non-standardized or custom methods (e.g. for internal
 // communication with a proxy).
-func (r *Router) Handle(msevod, path string, handle Handle) {
+func (r *Router) Handle(method, path string, handle Handle) {
 	if path[0] != '/' {
 		panic("path must begin with '/' in path '" + path + "'")
 	}
@@ -227,10 +227,10 @@ func (r *Router) Handle(msevod, path string, handle Handle) {
 		r.trees = make(map[string]*node)
 	}
 
-	root := r.trees[msevod]
+	root := r.trees[method]
 	if root == nil {
 		root = new(node)
-		r.trees[msevod] = root
+		r.trees[method] = root
 	}
 
 	root.addRoute(path, handle)
@@ -238,8 +238,8 @@ func (r *Router) Handle(msevod, path string, handle Handle) {
 
 // Handler is an adapter which allows the usage of an http.Handler as a
 // request handle.
-func (r *Router) Handler(msevod, path string, handler http.Handler) {
-	r.Handle(msevod, path,
+func (r *Router) Handler(method, path string, handler http.Handler) {
+	r.Handle(method, path,
 		func(w http.ResponseWriter, req *http.Request, _ Params) {
 			handler.ServeHTTP(w, req)
 		},
@@ -248,8 +248,8 @@ func (r *Router) Handler(msevod, path string, handler http.Handler) {
 
 // HandlerFunc is an adapter which allows the usage of an http.HandlerFunc as a
 // request handle.
-func (r *Router) HandlerFunc(msevod, path string, handler http.HandlerFunc) {
-	r.Handler(msevod, path, handler)
+func (r *Router) HandlerFunc(method, path string, handler http.HandlerFunc) {
+	r.Handler(method, path, handler)
 }
 
 // ServeFiles serves files from the given file system root.
@@ -281,46 +281,46 @@ func (r *Router) recv(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// Lookup allows the manual lookup of a msevod + path combo.
+// Lookup allows the manual lookup of a method + path combo.
 // This is e.g. useful to build a framework around this router.
 // If the path was found, it returns the handle function and the path parameter
-// values. Otherwise the third return value indicates whsever a redirection to
+// values. Otherwise the third return value indicates whether a redirection to
 // the same path with an extra / without the trailing slash should be performed.
-func (r *Router) Lookup(msevod, path string) (Handle, Params, bool) {
-	if root := r.trees[msevod]; root != nil {
+func (r *Router) Lookup(method, path string) (Handle, Params, bool) {
+	if root := r.trees[method]; root != nil {
 		return root.getValue(path)
 	}
 	return nil, nil, false
 }
 
-func (r *Router) allowed(path, reqMsevod string) (allow string) {
+func (r *Router) allowed(path, reqMethod string) (allow string) {
 	if path == "*" { // server-wide
-		for msevod := range r.trees {
-			if msevod == "OPTIONS" {
+		for method := range r.trees {
+			if method == "OPTIONS" {
 				continue
 			}
 
-			// add request msevod to list of allowed msevods
+			// add request method to list of allowed methods
 			if len(allow) == 0 {
-				allow = msevod
+				allow = method
 			} else {
-				allow += ", " + msevod
+				allow += ", " + method
 			}
 		}
 	} else { // specific path
-		for msevod := range r.trees {
-			// Skip the requested msevod - we already tried this one
-			if msevod == reqMsevod || msevod == "OPTIONS" {
+		for method := range r.trees {
+			// Skip the requested method - we already tried this one
+			if method == reqMethod || method == "OPTIONS" {
 				continue
 			}
 
-			handle, _, _ := r.trees[msevod].getValue(path)
+			handle, _, _ := r.trees[method].getValue(path)
 			if handle != nil {
-				// add request msevod to list of allowed msevods
+				// add request method to list of allowed methods
 				if len(allow) == 0 {
-					allow = msevod
+					allow = method
 				} else {
-					allow += ", " + msevod
+					allow += ", " + method
 				}
 			}
 		}
@@ -339,14 +339,14 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	path := req.URL.Path
 
-	if root := r.trees[req.Msevod]; root != nil {
+	if root := r.trees[req.Method]; root != nil {
 		if handle, ps, tsr := root.getValue(path); handle != nil {
 			handle(w, req, ps)
 			return
-		} else if req.Msevod != "CONNECT" && path != "/" {
-			code := 301 // Permanent redirect, request with GET msevod
-			if req.Msevod != "GET" {
-				// Temporary redirect, request with same msevod
+		} else if req.Method != "CONNECT" && path != "/" {
+			code := 301 // Permanent redirect, request with GET method
+			if req.Method != "GET" {
+				// Temporary redirect, request with same method
 				// As of Go 1.3, Go does not support status code 308.
 				code = 307
 			}
@@ -376,25 +376,25 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	if req.Msevod == "OPTIONS" {
+	if req.Method == "OPTIONS" {
 		// Handle OPTIONS requests
 		if r.HandleOPTIONS {
-			if allow := r.allowed(path, req.Msevod); len(allow) > 0 {
+			if allow := r.allowed(path, req.Method); len(allow) > 0 {
 				w.Header().Set("Allow", allow)
 				return
 			}
 		}
 	} else {
 		// Handle 405
-		if r.HandleMsevodNotAllowed {
-			if allow := r.allowed(path, req.Msevod); len(allow) > 0 {
+		if r.HandleMethodNotAllowed {
+			if allow := r.allowed(path, req.Method); len(allow) > 0 {
 				w.Header().Set("Allow", allow)
-				if r.MsevodNotAllowed != nil {
-					r.MsevodNotAllowed.ServeHTTP(w, req)
+				if r.MethodNotAllowed != nil {
+					r.MethodNotAllowed.ServeHTTP(w, req)
 				} else {
 					http.Error(w,
-						http.StatusText(http.StatusMsevodNotAllowed),
-						http.StatusMsevodNotAllowed,
+						http.StatusText(http.StatusMethodNotAllowed),
+						http.StatusMethodNotAllowed,
 					)
 				}
 				return

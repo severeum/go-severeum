@@ -21,7 +21,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/severeum/go-severeum/internal/sevapi"
+	"github.com/severeum/go-severeum/internal/ethapi"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/rpc"
 )
@@ -41,8 +41,8 @@ func NewStdIOUI() *StdIOUI {
 }
 
 // dispatch sends a request over the stdio
-func (ui *StdIOUI) dispatch(serviceMsevod string, args interface{}, reply interface{}) error {
-	err := ui.client.Call(&reply, serviceMsevod, args)
+func (ui *StdIOUI) dispatch(serviceMethod string, args interface{}, reply interface{}) error {
+	err := ui.client.Call(&reply, serviceMethod, args)
 	if err != nil {
 		log.Info("Error", "exc", err.Error())
 	}
@@ -98,7 +98,7 @@ func (ui *StdIOUI) ShowInfo(message string) {
 		log.Info("Error calling 'ShowInfo'", "exc", err.Error(), "msg", message)
 	}
 }
-func (ui *StdIOUI) OnApprovedTx(tx sevapi.SignTransactionResult) {
+func (ui *StdIOUI) OnApprovedTx(tx ethapi.SignTransactionResult) {
 	err := ui.dispatch("OnApprovedTx", tx, nil)
 	if err != nil {
 		log.Info("Error calling 'OnApprovedTx'", "exc", err.Error(), "tx", tx)

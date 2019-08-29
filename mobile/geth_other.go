@@ -16,7 +16,7 @@
 
 // +build !android,!ios
 
-package ssev
+package seth
 
 // clientIdentifier is a hard coded identifier to report into the network.
-var clientIdentifier = "SsevMobile"
+var clientIdentifier = "SethMobile"

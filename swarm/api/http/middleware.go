@@ -30,8 +30,8 @@ type Adapter func(http.Handler) http.Handler
 func SetRequestID(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r = r.WithContext(SetRUID(r.Context(), uuid.New()[:8]))
-		metrics.GetOrRegisterCounter(fmt.Sprintf("http.request.%s", r.Msevod), nil).Inc(1)
-		log.Info("created ruid for request", "ruid", GetRUID(r.Context()), "msevod", r.Msevod, "url", r.RequestURI)
+		metrics.GetOrRegisterCounter(fmt.Sprintf("http.request.%s", r.Method), nil).Inc(1)
+		log.Info("created ruid for request", "ruid", GetRUID(r.Context()), "method", r.Method, "url", r.RequestURI)
 
 		h.ServeHTTP(w, r)
 	})
@@ -66,7 +66,7 @@ func ParseURI(h http.Handler) http.Handler {
 
 		ctx := r.Context()
 		r = r.WithContext(SetURI(ctx, uri))
-		log.Debug("parsed request path", "ruid", GetRUID(r.Context()), "msevod", r.Msevod, "uri.Addr", uri.Addr, "uri.Path", uri.Path, "uri.Scheme", uri.Scheme)
+		log.Debug("parsed request path", "ruid", GetRUID(r.Context()), "method", r.Method, "uri.Addr", uri.Addr, "uri.Path", uri.Path, "uri.Scheme", uri.Scheme)
 
 		h.ServeHTTP(w, r)
 	})
@@ -81,19 +81,19 @@ func InitLoggingResponseWriter(h http.Handler) http.Handler {
 
 		ts := time.Since(tn)
 		log.Info("request served", "ruid", GetRUID(r.Context()), "code", writer.statusCode, "time", ts)
-		metrics.GetOrRegisterResettingTimer(fmt.Sprintf("http.request.%s.time", r.Msevod), nil).Update(ts)
-		metrics.GetOrRegisterResettingTimer(fmt.Sprintf("http.request.%s.%d.time", r.Msevod, writer.statusCode), nil).Update(ts)
+		metrics.GetOrRegisterResettingTimer(fmt.Sprintf("http.request.%s.time", r.Method), nil).Update(ts)
+		metrics.GetOrRegisterResettingTimer(fmt.Sprintf("http.request.%s.%d.time", r.Method, writer.statusCode), nil).Update(ts)
 	})
 }
 
 func InstrumentOpenTracing(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		uri := GetURI(r.Context())
-		if uri == nil || r.Msevod == "" || (uri != nil && uri.Scheme == "") {
+		if uri == nil || r.Method == "" || (uri != nil && uri.Scheme == "") {
 			h.ServeHTTP(w, r) // soft fail
 			return
 		}
-		spanName := fmt.Sprintf("http.%s.%s", r.Msevod, uri.Scheme)
+		spanName := fmt.Sprintf("http.%s.%s", r.Method, uri.Scheme)
 		ctx, sp := spancontext.StartSpan(r.Context(), spanName)
 
 		defer sp.Finish()

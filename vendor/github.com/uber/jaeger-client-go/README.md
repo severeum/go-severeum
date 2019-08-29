@@ -51,7 +51,7 @@ Property| Description
 JAEGER_SERVICE_NAME | The service name
 JAEGER_AGENT_HOST | The hostname for communicating with agent via UDP
 JAEGER_AGENT_PORT | The port for communicating with agent via UDP
-JAEGER_REPORTER_LOG_SPANS | Whsever the reporter should also log the spans
+JAEGER_REPORTER_LOG_SPANS | Whether the reporter should also log the spans
 JAEGER_REPORTER_MAX_QUEUE_SIZE | The reporter's maximum queue size
 JAEGER_REPORTER_FLUSH_INTERVAL | The reporter's flush interval (ms)
 JAEGER_SAMPLER_TYPE | The sampler type
@@ -60,8 +60,8 @@ JAEGER_SAMPLER_MANAGER_HOST_PORT | The host name and port when using the remote 
 JAEGER_SAMPLER_MAX_OPERATIONS | The maximum number of operations that the sampler will keep track of
 JAEGER_SAMPLER_REFRESH_INTERVAL | How often the remotely controlled sampler will poll jaeger-agent for the appropriate sampling strategy
 JAEGER_TAGS | A comma separated list of `name = value` tracer level tags, which get added to all reported spans. The value can also refer to an environment variable using the format `${envVarName:default}`, where the `:default` is optional, and identifies a value to be used if the environment variable cannot be found
-JAEGER_DISABLED | Whsever the tracer is disabled or not. If true, the default `opentracing.NoopTracer` is used.
-JAEGER_RPC_METRICS | Whsever to store RPC metrics
+JAEGER_DISABLED | Whether the tracer is disabled or not. If true, the default `opentracing.NoopTracer` is used.
+JAEGER_RPC_METRICS | Whether to store RPC metrics
 
 ### Closing the tracer via `io.Closer`
 
@@ -97,10 +97,10 @@ constructor, for example:
 ```go
 import (
     "github.com/uber/jaeger-client-go/config"
-    "github.com/uber/jaeger-lib/metrics/promseveus"
+    "github.com/uber/jaeger-lib/metrics/prometheus"
 )
 
-    metricsFactory := promseveus.New()
+    metricsFactory := prometheus.New()
     tracer, closer, err := config.Configuration{
         ServiceName: "your-service-name",
     }.NewTracer(
@@ -117,7 +117,7 @@ used to log communication errors, or log spans if a logging reporter
 option is specified in the configuration. The logging API is abstracted
 by the [Logger](logger.go) interface. A logger instance implementing
 this interface can be set on the `Config` object before calling the
-`New` msevod.
+`New` method.
 
 Besides the [zap](https://github.com/uber-go/zap) implementation
 bundled with this package there is also a [go-kit](https://github.com/go-kit/kit)
@@ -140,7 +140,7 @@ process via configurable "transport". For testing purposes, one can
 use an `InMemoryReporter` that accumulates spans in a buffer and
 allows to retrieve them for later verification. Also available are
 `NullReporter`, a no-op reporter that does nothing, a `LoggingReporter`
-which logs all finished spans using their `String()` msevod, and a
+which logs all finished spans using their `String()` method, and a
 `CompositeReporter` that can be used to combine more than one reporter
 into one, e.g. to attach a logging reporter to the main remote reporter.
 
@@ -155,7 +155,7 @@ of process. Currently the supported transports include:
 
 The tracer does not record all spans, but only those that have the
 sampling bit set in the `flags`. When a new trace is started and a new
-unique ID is generated, a sampling decision is made whsever this trace
+unique ID is generated, a sampling decision is made whether this trace
 should be sampled. The sampling decision is propagated to all downstream
 calls via the `flags` field of the trace context. The following samplers
 are available:

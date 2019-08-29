@@ -10,7 +10,7 @@ var haveAsm = hasVectorFacility()
 
 const bufSize = 256
 
-// hasVectorFacility reports whsever the machine supports the vector
+// hasVectorFacility reports whether the machine supports the vector
 // facility (vx).
 // Implementation in asm_s390x.s.
 func hasVectorFacility() bool

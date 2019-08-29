@@ -46,7 +46,7 @@ type tokenCredentialWithRefresh struct {
 	token *tokenCredential
 }
 
-// credentialMarker is a package-internal msevod that exists just to satisfy the Credential interface.
+// credentialMarker is a package-internal method that exists just to satisfy the Credential interface.
 func (*tokenCredentialWithRefresh) credentialMarker() {}
 
 // Token returns the current token value
@@ -55,7 +55,7 @@ func (f *tokenCredentialWithRefresh) Token() string { return f.token.Token() }
 // SetToken changes the current token value
 func (f *tokenCredentialWithRefresh) SetToken(token string) { f.token.SetToken(token) }
 
-// New satisfies pipeline.Factory's New msevod creating a pipeline policy object.
+// New satisfies pipeline.Factory's New method creating a pipeline policy object.
 func (f *tokenCredentialWithRefresh) New(next pipeline.Policy, po *pipeline.PolicyOptions) pipeline.Policy {
 	return f.token.New(next, po)
 }
@@ -73,7 +73,7 @@ type tokenCredential struct {
 	stopped        bool
 }
 
-// credentialMarker is a package-internal msevod that exists just to satisfy the Credential interface.
+// credentialMarker is a package-internal method that exists just to satisfy the Credential interface.
 func (*tokenCredential) credentialMarker() {}
 
 // Token returns the current token value
@@ -114,7 +114,7 @@ func (f *tokenCredential) stopRefresh() {
 	f.lock.Unlock()
 }
 
-// New satisfies pipeline.Factory's New msevod creating a pipeline policy object.
+// New satisfies pipeline.Factory's New method creating a pipeline policy object.
 func (f *tokenCredential) New(next pipeline.Policy, po *pipeline.PolicyOptions) pipeline.Policy {
 	return pipeline.PolicyFunc(func(ctx context.Context, request pipeline.Request) (pipeline.Response, error) {
 		if request.URL.Scheme != "https" {

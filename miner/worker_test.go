@@ -24,12 +24,12 @@ import (
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/consensus"
 	"github.com/severeum/go-severeum/consensus/clique"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/core/vm"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/params"
 )
@@ -37,7 +37,7 @@ import (
 var (
 	// Test chain configurations
 	testTxPoolConfig  core.TxPoolConfig
-	sevashChainConfig *params.ChainConfig
+	ethashChainConfig *params.ChainConfig
 	cliqueChainConfig *params.ChainConfig
 
 	// Test accounts
@@ -56,7 +56,7 @@ var (
 func init() {
 	testTxPoolConfig = core.DefaultTxPoolConfig
 	testTxPoolConfig.Journal = ""
-	sevashChainConfig = params.TestChainConfig
+	ethashChainConfig = params.TestChainConfig
 	cliqueChainConfig = params.TestChainConfig
 	cliqueChainConfig.Clique = &params.CliqueConfig{
 		Period: 10,
@@ -70,7 +70,7 @@ func init() {
 
 // testWorkerBackend implements worker.Backend interfaces and wraps all information needed during the testing.
 type testWorkerBackend struct {
-	db         sevdb.Database
+	db         ethdb.Database
 	txPool     *core.TxPool
 	chain      *core.BlockChain
 	testTxFeed event.Feed
@@ -79,7 +79,7 @@ type testWorkerBackend struct {
 
 func newTestWorkerBackend(t *testing.T, chainConfig *params.ChainConfig, engine consensus.Engine, n int) *testWorkerBackend {
 	var (
-		db    = sevdb.NewMemDatabase()
+		db    = ethdb.NewMemDatabase()
 		gspec = core.Genesis{
 			Config: chainConfig,
 			Alloc:  core.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
@@ -90,7 +90,7 @@ func newTestWorkerBackend(t *testing.T, chainConfig *params.ChainConfig, engine 
 	case *clique.Clique:
 		gspec.ExtraData = make([]byte, 32+common.AddressLength+65)
 		copy(gspec.ExtraData[32:], testBankAddress[:])
-	case *sevash.Sevash:
+	case *ethash.Sevash:
 	default:
 		t.Fatalf("unexpected consensus engine type: %T", engine)
 	}
@@ -139,10 +139,10 @@ func newTestWorker(t *testing.T, chainConfig *params.ChainConfig, engine consens
 }
 
 func TestPendingStateAndBlockSevash(t *testing.T) {
-	testPendingStateAndBlock(t, sevashChainConfig, sevash.NewFaker())
+	testPendingStateAndBlock(t, ethashChainConfig, ethash.NewFaker())
 }
 func TestPendingStateAndBlockClique(t *testing.T) {
-	testPendingStateAndBlock(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, sevdb.NewMemDatabase()))
+	testPendingStateAndBlock(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, ethdb.NewMemDatabase()))
 }
 
 func testPendingStateAndBlock(t *testing.T, chainConfig *params.ChainConfig, engine consensus.Engine) {
@@ -171,10 +171,10 @@ func testPendingStateAndBlock(t *testing.T, chainConfig *params.ChainConfig, eng
 }
 
 func TestEmptyWorkSevash(t *testing.T) {
-	testEmptyWork(t, sevashChainConfig, sevash.NewFaker())
+	testEmptyWork(t, ethashChainConfig, ethash.NewFaker())
 }
 func TestEmptyWorkClique(t *testing.T) {
-	testEmptyWork(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, sevdb.NewMemDatabase()))
+	testEmptyWork(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, ethdb.NewMemDatabase()))
 }
 
 func testEmptyWork(t *testing.T, chainConfig *params.ChainConfig, engine consensus.Engine) {
@@ -231,10 +231,10 @@ func testEmptyWork(t *testing.T, chainConfig *params.ChainConfig, engine consens
 }
 
 func TestStreamUncleBlock(t *testing.T) {
-	sevash := sevash.NewFaker()
-	defer sevash.Close()
+	ethash := ethash.NewFaker()
+	defer ethash.Close()
 
-	w, b := newTestWorker(t, sevashChainConfig, sevash, 1)
+	w, b := newTestWorker(t, ethashChainConfig, ethash, 1)
 	defer w.close()
 
 	var taskCh = make(chan struct{})
@@ -287,11 +287,11 @@ func TestStreamUncleBlock(t *testing.T) {
 }
 
 func TestRegenerateMiningBlockSevash(t *testing.T) {
-	testRegenerateMiningBlock(t, sevashChainConfig, sevash.NewFaker())
+	testRegenerateMiningBlock(t, ethashChainConfig, ethash.NewFaker())
 }
 
 func TestRegenerateMiningBlockClique(t *testing.T) {
-	testRegenerateMiningBlock(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, sevdb.NewMemDatabase()))
+	testRegenerateMiningBlock(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, ethdb.NewMemDatabase()))
 }
 
 func testRegenerateMiningBlock(t *testing.T, chainConfig *params.ChainConfig, engine consensus.Engine) {
@@ -352,11 +352,11 @@ func testRegenerateMiningBlock(t *testing.T, chainConfig *params.ChainConfig, en
 }
 
 func TestAdjustIntervalSevash(t *testing.T) {
-	testAdjustInterval(t, sevashChainConfig, sevash.NewFaker())
+	testAdjustInterval(t, ethashChainConfig, ethash.NewFaker())
 }
 
 func TestAdjustIntervalClique(t *testing.T) {
-	testAdjustInterval(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, sevdb.NewMemDatabase()))
+	testAdjustInterval(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, ethdb.NewMemDatabase()))
 }
 
 func testAdjustInterval(t *testing.T, chainConfig *params.ChainConfig, engine consensus.Engine) {

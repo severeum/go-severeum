@@ -113,7 +113,7 @@ returns:
 1. subscription handle `base64(byte)` `rpc.ClientSubscription`
 ```
 
-In `golang` as special msevod is used:
+In `golang` as special method is used:
 
 `rpc.Client.Subscribe(context.Context, "pss", chan pss.APIMsg, "receive", pss.Topic)`
 
@@ -314,5 +314,5 @@ parameters:
 4. remove keys instantly (bool)
 
 returns:
-1. whsever key was successfully removed (bool)
+1. whether key was successfully removed (bool)
 ```

@@ -214,7 +214,7 @@ type reply struct {
 	from  enode.ID
 	ptype byte
 	data  interface{}
-	// loop indicates whsever there was
+	// loop indicates whether there was
 	// a matching request by sending on this channel.
 	matched chan<- bool
 }

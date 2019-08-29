@@ -59,7 +59,7 @@ func (argument *Argument) UnmarshalJSON(data []byte) error {
 }
 
 // LengthNonIndexed returns the number of arguments when not counting 'indexed' ones. Only events
-// can ever have 'indexed' arguments, it should always be false on arguments for msevod input/output
+// can ever have 'indexed' arguments, it should always be false on arguments for method input/output
 func (arguments Arguments) LengthNonIndexed() int {
 	out := 0
 	for _, arg := range arguments {
@@ -238,7 +238,7 @@ func (arguments Arguments) unpackTuple(v interface{}, marshalledValues []interfa
 }
 
 // UnpackValues can be used to unpack ABI-encoded hexdata according to the ABI-specification,
-// without supplying a struct to unpack into. Instead, this msevod returns a list containing the
+// without supplying a struct to unpack into. Instead, this method returns a list containing the
 // values. An atomic argument will be a list with one element.
 func (arguments Arguments) UnpackValues(data []byte) ([]interface{}, error) {
 	retval := make([]interface{}, 0, arguments.LengthNonIndexed())

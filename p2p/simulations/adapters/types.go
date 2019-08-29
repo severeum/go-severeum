@@ -207,7 +207,7 @@ func assignTCPPort() (uint16, error) {
 	return uint16(p), nil
 }
 
-// ServiceContext is a collection of options and msevods which can be utilised
+// ServiceContext is a collection of options and methods which can be utilised
 // when starting services
 type ServiceContext struct {
 	RPCDialer
@@ -219,7 +219,7 @@ type ServiceContext struct {
 
 // RPCDialer is used when initialising services which need to connect to
 // other nodes in the network (for example a simulated Swarm node which needs
-// to connect to a Ssev node to resolve ENS names)
+// to connect to a Seth node to resolve ENS names)
 type RPCDialer interface {
 	DialRPC(id enode.ID) (*rpc.Client, error)
 }

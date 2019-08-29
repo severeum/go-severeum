@@ -90,7 +90,7 @@ type fileStorage struct {
 // path. This also acquire a file lock, so any subsequent attempt to open the
 // same path will fail.
 //
-// The storage must be closed after use, by calling Close msevod.
+// The storage must be closed after use, by calling Close method.
 func OpenFile(path string, readOnly bool) (Storage, error) {
 	if fi, err := os.Stat(path); err == nil {
 		if !fi.IsDir() {

@@ -2,19 +2,19 @@
 # with Go source code. If you know what GOPATH is then you probably
 # don't need to bother with make.
 
-.PHONY: ssev android ios ssev-cross swarm evm all test clean
-.PHONY: ssev-linux ssev-linux-386 ssev-linux-amd64 ssev-linux-mips64 ssev-linux-mips64le
-.PHONY: ssev-linux-arm ssev-linux-arm-5 ssev-linux-arm-6 ssev-linux-arm-7 ssev-linux-arm64
-.PHONY: ssev-darwin ssev-darwin-386 ssev-darwin-amd64
-.PHONY: ssev-windows ssev-windows-386 ssev-windows-amd64
+.PHONY: seth android ios seth-cross swarm evm all test clean
+.PHONY: seth-linux seth-linux-386 seth-linux-amd64 seth-linux-mips64 seth-linux-mips64le
+.PHONY: seth-linux-arm seth-linux-arm-5 seth-linux-arm-6 seth-linux-arm-7 seth-linux-arm64
+.PHONY: seth-darwin seth-darwin-386 seth-darwin-amd64
+.PHONY: seth-windows seth-windows-386 seth-windows-amd64
 
 GOBIN = $(shell pwd)/build/bin
 GO ?= latest
 
-ssev:
-	build/env.sh go run build/ci.go install ./cmd/ssev
+seth:
+	build/env.sh go run build/ci.go install ./cmd/seth
 	@echo "Done building."
-	@echo "Run \"$(GOBIN)/ssev\" to launch ssev."
+	@echo "Run \"$(GOBIN)/seth\" to launch seth."
 
 swarm:
 	build/env.sh go run build/ci.go install ./cmd/swarm
@@ -27,12 +27,12 @@ all:
 android:
 	build/env.sh go run build/ci.go aar --local
 	@echo "Done building."
-	@echo "Import \"$(GOBIN)/ssev.aar\" to use the library."
+	@echo "Import \"$(GOBIN)/seth.aar\" to use the library."
 
 ios:
 	build/env.sh go run build/ci.go xcode --local
 	@echo "Done building."
-	@echo "Import \"$(GOBIN)/Ssev.framework\" to use the library."
+	@echo "Import \"$(GOBIN)/Seth.framework\" to use the library."
 
 test: all
 	build/env.sh go run build/ci.go test
@@ -62,92 +62,92 @@ swarm-devtools:
 
 # Cross Compilation Targets (xgo)
 
-ssev-cross: ssev-linux ssev-darwin ssev-windows ssev-android ssev-ios
+seth-cross: seth-linux seth-darwin seth-windows seth-android seth-ios
 	@echo "Full cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-*
+	@ls -ld $(GOBIN)/seth-*
 
-ssev-linux: ssev-linux-386 ssev-linux-amd64 ssev-linux-arm ssev-linux-mips64 ssev-linux-mips64le
+seth-linux: seth-linux-386 seth-linux-amd64 seth-linux-arm seth-linux-mips64 seth-linux-mips64le
 	@echo "Linux cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-linux-*
+	@ls -ld $(GOBIN)/seth-linux-*
 
-ssev-linux-386:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/386 -v ./cmd/ssev
+seth-linux-386:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/386 -v ./cmd/seth
 	@echo "Linux 386 cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-linux-* | grep 386
+	@ls -ld $(GOBIN)/seth-linux-* | grep 386
 
-ssev-linux-amd64:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/amd64 -v ./cmd/ssev
+seth-linux-amd64:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/amd64 -v ./cmd/seth
 	@echo "Linux amd64 cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-linux-* | grep amd64
+	@ls -ld $(GOBIN)/seth-linux-* | grep amd64
 
-ssev-linux-arm: ssev-linux-arm-5 ssev-linux-arm-6 ssev-linux-arm-7 ssev-linux-arm64
+seth-linux-arm: seth-linux-arm-5 seth-linux-arm-6 seth-linux-arm-7 seth-linux-arm64
 	@echo "Linux ARM cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-linux-* | grep arm
+	@ls -ld $(GOBIN)/seth-linux-* | grep arm
 
-ssev-linux-arm-5:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm-5 -v ./cmd/ssev
+seth-linux-arm-5:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm-5 -v ./cmd/seth
 	@echo "Linux ARMv5 cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-linux-* | grep arm-5
+	@ls -ld $(GOBIN)/seth-linux-* | grep arm-5
 
-ssev-linux-arm-6:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm-6 -v ./cmd/ssev
+seth-linux-arm-6:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm-6 -v ./cmd/seth
 	@echo "Linux ARMv6 cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-linux-* | grep arm-6
+	@ls -ld $(GOBIN)/seth-linux-* | grep arm-6
 
-ssev-linux-arm-7:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm-7 -v ./cmd/ssev
+seth-linux-arm-7:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm-7 -v ./cmd/seth
 	@echo "Linux ARMv7 cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-linux-* | grep arm-7
+	@ls -ld $(GOBIN)/seth-linux-* | grep arm-7
 
-ssev-linux-arm64:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm64 -v ./cmd/ssev
+seth-linux-arm64:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm64 -v ./cmd/seth
 	@echo "Linux ARM64 cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-linux-* | grep arm64
+	@ls -ld $(GOBIN)/seth-linux-* | grep arm64
 
-ssev-linux-mips:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mips --ldflags '-extldflags "-static"' -v ./cmd/ssev
+seth-linux-mips:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mips --ldflags '-extldflags "-static"' -v ./cmd/seth
 	@echo "Linux MIPS cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-linux-* | grep mips
+	@ls -ld $(GOBIN)/seth-linux-* | grep mips
 
-ssev-linux-mipsle:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mipsle --ldflags '-extldflags "-static"' -v ./cmd/ssev
+seth-linux-mipsle:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mipsle --ldflags '-extldflags "-static"' -v ./cmd/seth
 	@echo "Linux MIPSle cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-linux-* | grep mipsle
+	@ls -ld $(GOBIN)/seth-linux-* | grep mipsle
 
-ssev-linux-mips64:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mips64 --ldflags '-extldflags "-static"' -v ./cmd/ssev
+seth-linux-mips64:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mips64 --ldflags '-extldflags "-static"' -v ./cmd/seth
 	@echo "Linux MIPS64 cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-linux-* | grep mips64
+	@ls -ld $(GOBIN)/seth-linux-* | grep mips64
 
-ssev-linux-mips64le:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mips64le --ldflags '-extldflags "-static"' -v ./cmd/ssev
+seth-linux-mips64le:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mips64le --ldflags '-extldflags "-static"' -v ./cmd/seth
 	@echo "Linux MIPS64le cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-linux-* | grep mips64le
+	@ls -ld $(GOBIN)/seth-linux-* | grep mips64le
 
-ssev-darwin: ssev-darwin-386 ssev-darwin-amd64
+seth-darwin: seth-darwin-386 seth-darwin-amd64
 	@echo "Darwin cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-darwin-*
+	@ls -ld $(GOBIN)/seth-darwin-*
 
-ssev-darwin-386:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=darwin/386 -v ./cmd/ssev
+seth-darwin-386:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=darwin/386 -v ./cmd/seth
 	@echo "Darwin 386 cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-darwin-* | grep 386
+	@ls -ld $(GOBIN)/seth-darwin-* | grep 386
 
-ssev-darwin-amd64:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=darwin/amd64 -v ./cmd/ssev
+seth-darwin-amd64:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=darwin/amd64 -v ./cmd/seth
 	@echo "Darwin amd64 cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-darwin-* | grep amd64
+	@ls -ld $(GOBIN)/seth-darwin-* | grep amd64
 
-ssev-windows: ssev-windows-386 ssev-windows-amd64
+seth-windows: seth-windows-386 seth-windows-amd64
 	@echo "Windows cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-windows-*
+	@ls -ld $(GOBIN)/seth-windows-*
 
-ssev-windows-386:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=windows/386 -v ./cmd/ssev
+seth-windows-386:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=windows/386 -v ./cmd/seth
 	@echo "Windows 386 cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-windows-* | grep 386
+	@ls -ld $(GOBIN)/seth-windows-* | grep 386
 
-ssev-windows-amd64:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=windows/amd64 -v ./cmd/ssev
+seth-windows-amd64:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=windows/amd64 -v ./cmd/seth
 	@echo "Windows amd64 cross compilation done:"
-	@ls -ld $(GOBIN)/ssev-windows-* | grep amd64
+	@ls -ld $(GOBIN)/seth-windows-* | grep amd64

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// DISPPARAMS are the arguments that passed to msevods or property.
+// DISPPARAMS are the arguments that passed to methods or property.
 type DISPPARAMS struct {
 	rgvarg            uintptr
 	rgdispidNamedArgs uintptr
@@ -88,12 +88,12 @@ type PARAMDATA struct {
 	Vt   uint16
 }
 
-// MSEVODDATA defines msevod info.
+// MSEVODDATA defines method info.
 type MSEVODDATA struct {
 	Name     *uint16
 	Data     *PARAMDATA
 	Dispid   int32
-	Msev     uint32
+	Meth     uint32
 	CC       int32
 	CArgs    uint32
 	Flags    uint16
@@ -102,7 +102,7 @@ type MSEVODDATA struct {
 
 // INTERFACEDATA defines interface info.
 type INTERFACEDATA struct {
-	MsevodData *MSEVODDATA
+	MethodData *MSEVODDATA
 	CMembers   uint32
 }
 

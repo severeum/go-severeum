@@ -20,13 +20,13 @@ import (
 	"testing"
 
 	"github.com/severeum/go-severeum/common"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 )
 
 var addr = common.BytesToAddress([]byte("test"))
 
 func create() (*ManagedState, *account) {
-	statedb, _ := New(common.Hash{}, NewDatabase(sevdb.NewMemDatabase()))
+	statedb, _ := New(common.Hash{}, NewDatabase(ethdb.NewMemDatabase()))
 	ms := ManageState(statedb)
 	ms.StateDB.SetNonce(addr, 100)
 	ms.accounts[addr] = newAccount(ms.StateDB.getStateObject(addr))

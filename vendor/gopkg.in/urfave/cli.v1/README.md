@@ -728,7 +728,7 @@ func main() {
 ### Subcommands categories
 
 For additional organization in apps that have many subcommands, you can
-associate a category for each command to group them tossever in the help
+associate a category for each command to group them tosether in the help
 output.
 
 E.g.
@@ -813,7 +813,7 @@ func main() {
 
 You can enable completion commands by setting the `EnableBashCompletion`
 flag on the `App` object.  By default, this setting will only auto-complete to
-show an app's subcommands, but you can write your own completion msevods for
+show an app's subcommands, but you can write your own completion methods for
 the App or its subcommands.
 
 <!-- {
@@ -987,7 +987,7 @@ VERSION:
 }
 ```
 
-The default flag may be customized to somseving other than `-h/--help` by
+The default flag may be customized to something other than `-h/--help` by
 setting `cli.HelpFlag`, e.g.:
 
 <!-- {
@@ -1022,7 +1022,7 @@ is checked by the cli internals in order to print the `App.Version` via
 
 #### Customization
 
-The default flag may be customized to somseving other than `-v/--version` by
+The default flag may be customized to something other than `-v/--version` by
 setting `cli.VersionFlag`, e.g.:
 
 <!-- {
@@ -1109,7 +1109,7 @@ import (
 func init() {
   cli.AppHelpTemplate += "\nCUSTOMIZED: you bet ur muffins\n"
   cli.CommandHelpTemplate += "\nYMMV\n"
-  cli.SubcommandHelpTemplate += "\nor somseving\n"
+  cli.SubcommandHelpTemplate += "\nor something\n"
 
   cli.HelpFlag = cli.BoolFlag{Name: "halp"}
   cli.BashCompletionFlag = cli.BoolFlag{Name: "compgen", Hidden: true}
@@ -1372,7 +1372,7 @@ compatibility. If I or any other collaborators agree that it is in line with
 the vision of the project, we will work with you to get the code into
 a mergeable state and merge it into the master branch.
 
-If you have contributed somseving significant to the project, we will most
+If you have contributed something significant to the project, we will most
 likely add you as a collaborator. As a collaborator you are given the ability
 to merge others pull requests. It is very important that new code does not
 break existing code, so be careful about what code you do choose to merge.

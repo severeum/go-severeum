@@ -32,7 +32,7 @@ import (
 )
 
 func init() {
-	spew.Config.DisableMsevods = true
+	spew.Config.DisableMethods = true
 }
 
 // shared test variables

@@ -260,7 +260,7 @@ type ChunkValidator interface {
 	Validate(chunk Chunk) bool
 }
 
-// Provides msevod for validation of content address in chunks
+// Provides method for validation of content address in chunks
 // Holds the corresponding hasher to create the address
 type ContentAddressValidator struct {
 	Hasher SwarmHasher

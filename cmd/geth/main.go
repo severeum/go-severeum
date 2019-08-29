@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with go-severeum. If not, see <http://www.gnu.org/licenses/>.
 
-// ssev is the official command-line client for Severeum.
+// seth is the official command-line client for Severeum.
 package main
 
 import (
@@ -32,8 +32,8 @@ import (
 	"github.com/severeum/go-severeum/accounts/keystore"
 	"github.com/severeum/go-severeum/cmd/utils"
 	"github.com/severeum/go-severeum/console"
-	"github.com/severeum/go-severeum/sev"
-	"github.com/severeum/go-severeum/sevclient"
+	"github.com/severeum/go-severeum/eth"
+	"github.com/severeum/go-severeum/ethclient"
 	"github.com/severeum/go-severeum/internal/debug"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/metrics"
@@ -42,7 +42,7 @@ import (
 )
 
 const (
-	clientIdentifier = "ssev" // Client identifier to advertise over the network
+	clientIdentifier = "seth" // Client identifier to advertise over the network
 )
 
 var (
@@ -169,8 +169,8 @@ var (
 )
 
 func init() {
-	// Initialize the CLI app and start Ssev
-	app.Action = ssev
+	// Initialize the CLI app and start Seth
+	app.Action = seth
 	app.HideVersion = true // we have a command to print the version
 	app.Copyright = "Copyright 2013-2019 The go-severeum Authors"
 	app.Commands = []cli.Command{
@@ -257,10 +257,10 @@ func main() {
 	}
 }
 
-// ssev is the main entry point into the system if no special subcommand is ran.
+// seth is the main entry point into the system if no special subcommand is ran.
 // It creates a default node based on the command line arguments and runs it in
 // blocking mode, waiting for it to be shut down.
-func ssev(ctx *cli.Context) error {
+func seth(ctx *cli.Context) error {
 	if args := ctx.Args(); len(args) > 0 {
 		return fmt.Errorf("invalid command: %q", args[0])
 	}
@@ -299,7 +299,7 @@ func startNode(ctx *cli.Context, stack *node.Node) {
 		if err != nil {
 			utils.Fatalf("Failed to attach to self: %v", err)
 		}
-		stateReader := sevclient.NewClient(rpcClient)
+		stateReader := ethclient.NewClient(rpcClient)
 
 		// Open any wallets already attached
 		for _, wallet := range stack.AccountManager().Wallets() {
@@ -336,7 +336,7 @@ func startNode(ctx *cli.Context, stack *node.Node) {
 		if ctx.GlobalString(utils.SyncModeFlag.Name) == "light" {
 			utils.Fatalf("Light clients do not support mining")
 		}
-		var severeum *sev.Severeum
+		var severeum *eth.Severeum
 		if err := stack.Service(&severeum); err != nil {
 			utils.Fatalf("Severeum service not running: %v", err)
 		}

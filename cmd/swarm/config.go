@@ -125,7 +125,7 @@ func initSwarmNode(config *bzzapi.Config, stack *node.Node, ctx *cli.Context) {
 	//at this point, all vars should be set in the Config
 	//get the account for the provided swarm account
 	prvkey := getAccount(config.BzzAccount, ctx, stack)
-	//set the resolved config path (ssev --datadir)
+	//set the resolved config path (seth --datadir)
 	config.Path = expandPath(stack.InstanceDir())
 	//finally, initialize the configuration
 	config.Init(prvkey)
@@ -139,7 +139,7 @@ func initSwarmNode(config *bzzapi.Config, stack *node.Node, ctx *cli.Context) {
 func configFileOverride(config *bzzapi.Config, ctx *cli.Context) (*bzzapi.Config, error) {
 	var err error
 
-	//only do somseving if the -config flag has been set
+	//only do something if the -config flag has been set
 	if ctx.GlobalIsSet(SwarmTomlConfigPathFlag.Name) {
 		var filepath string
 		if filepath = ctx.GlobalString(SwarmTomlConfigPathFlag.Name); filepath == "" {
@@ -421,7 +421,7 @@ func validateEnsAPIs(s string) (err error) {
 func printConfig(config *bzzapi.Config) string {
 	out, err := tomlSettings.Marshal(&config)
 	if err != nil {
-		return fmt.Sprintf("Somseving is not right with the configuration: %v", err)
+		return fmt.Sprintf("Something is not right with the configuration: %v", err)
 	}
 	return string(out)
 }

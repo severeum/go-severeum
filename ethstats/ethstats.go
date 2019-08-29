@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package sevstats implements the network stats reporting service.
-package sevstats
+// Package ethstats implements the network stats reporting service.
+package ethstats
 
 import (
 	"context"
@@ -35,7 +35,7 @@ import (
 	"github.com/severeum/go-severeum/consensus"
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sev"
+	"github.com/severeum/go-severeum/eth"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/les"
 	"github.com/severeum/go-severeum/log"
@@ -70,7 +70,7 @@ type blockChain interface {
 // chain statistics up to a monitoring server.
 type Service struct {
 	server *p2p.Server        // Peer-to-peer server to retrieve networking infos
-	sev    *sev.Severeum      // Full Severeum service if monitoring a full node
+	eth    *eth.Severeum      // Full Severeum service if monitoring a full node
 	les    *les.LightSevereum // Light Severeum service if monitoring a light node
 	engine consensus.Engine   // Consensus engine to retrieve variadic block fields
 
@@ -83,7 +83,7 @@ type Service struct {
 }
 
 // New returns a monitoring service ready for stats reporting.
-func New(url string, sevServ *sev.Severeum, lesServ *les.LightSevereum) (*Service, error) {
+func New(url string, ethServ *eth.Severeum, lesServ *les.LightSevereum) (*Service, error) {
 	// Parse the netstats connection url
 	re := regexp.MustCompile("([^:@]*)(:([^@]*))?@(.+)")
 	parts := re.FindStringSubmatch(url)
@@ -92,13 +92,13 @@ func New(url string, sevServ *sev.Severeum, lesServ *les.LightSevereum) (*Servic
 	}
 	// Assemble and return the stats service
 	var engine consensus.Engine
-	if sevServ != nil {
-		engine = sevServ.Engine()
+	if ethServ != nil {
+		engine = ethServ.Engine()
 	} else {
 		engine = lesServ.Engine()
 	}
 	return &Service{
-		sev:    sevServ,
+		eth:    ethServ,
 		les:    lesServ,
 		engine: engine,
 		node:   parts[1],
@@ -138,9 +138,9 @@ func (s *Service) loop() {
 	// Subscribe to chain events to execute updates on
 	var blockchain blockChain
 	var txpool txPool
-	if s.sev != nil {
-		blockchain = s.sev.BlockChain()
-		txpool = s.sev.TxPool()
+	if s.eth != nil {
+		blockchain = s.eth.BlockChain()
+		txpool = s.eth.TxPool()
 	} else {
 		blockchain = s.les.BlockChain()
 		txpool = s.les.TxPool()
@@ -373,9 +373,9 @@ func (s *Service) login(conn *websocket.Conn) error {
 	infos := s.server.NodeInfo()
 
 	var network, protocol string
-	if info := infos.Protocols["sev"]; info != nil {
-		network = fmt.Sprintf("%d", info.(*sev.NodeInfo).Network)
-		protocol = fmt.Sprintf("sev/%d", sev.ProtocolVersions[0])
+	if info := infos.Protocols["eth"]; info != nil {
+		network = fmt.Sprintf("%d", info.(*eth.NodeInfo).Network)
+		protocol = fmt.Sprintf("eth/%d", eth.ProtocolVersions[0])
 	} else {
 		network = fmt.Sprintf("%d", infos.Protocols["les"].(*les.NodeInfo).Network)
 		protocol = fmt.Sprintf("les/%d", les.ClientProtocolVersions[0])
@@ -412,7 +412,7 @@ func (s *Service) login(conn *websocket.Conn) error {
 
 // report collects all possible data to report and send it to the stats server.
 // This should only be used on reconnects or rarely to avoid overloading the
-// server. Use the individual msevods for reporting subscribed events.
+// server. Use the individual methods for reporting subscribed events.
 func (s *Service) report(conn *websocket.Conn) error {
 	if err := s.reportLatency(conn); err != nil {
 		return err
@@ -432,7 +432,7 @@ func (s *Service) report(conn *websocket.Conn) error {
 // reportLatency sends a ping request to the server, measures the RTT time and
 // finally sends a latency update.
 func (s *Service) reportLatency(conn *websocket.Conn) error {
-	// Send the current time to the sevstats server
+	// Send the current time to the ethstats server
 	start := time.Now()
 
 	ping := map[string][]interface{}{
@@ -455,7 +455,7 @@ func (s *Service) reportLatency(conn *websocket.Conn) error {
 	latency := strconv.Itoa(int((time.Since(start) / time.Duration(2)).Nanoseconds() / 1000000))
 
 	// Send back the measured latency
-	log.Trace("Sending measured latency to sevstats", "latency", latency)
+	log.Trace("Sending measured latency to ethstats", "latency", latency)
 
 	stats := map[string][]interface{}{
 		"emit": {"latency", map[string]string{
@@ -505,7 +505,7 @@ func (s *Service) reportBlock(conn *websocket.Conn, block *types.Block) error {
 	details := s.assembleBlockStats(block)
 
 	// Assemble the block report and send it to the server
-	log.Trace("Sending new block to sevstats", "number", details.Number, "hash", details.Hash)
+	log.Trace("Sending new block to ethstats", "number", details.Number, "hash", details.Hash)
 
 	stats := map[string]interface{}{
 		"id":    s.node,
@@ -527,13 +527,13 @@ func (s *Service) assembleBlockStats(block *types.Block) *blockStats {
 		txs    []txStats
 		uncles []*types.Header
 	)
-	if s.sev != nil {
+	if s.eth != nil {
 		// Full nodes have all needed information available
 		if block == nil {
-			block = s.sev.BlockChain().CurrentBlock()
+			block = s.eth.BlockChain().CurrentBlock()
 		}
 		header = block.Header()
-		td = s.sev.BlockChain().GetTd(header.Hash(), header.Number.Uint64())
+		td = s.eth.BlockChain().GetTd(header.Hash(), header.Number.Uint64())
 
 		txs = make([]txStats, len(block.Transactions()))
 		for i, tx := range block.Transactions() {
@@ -581,8 +581,8 @@ func (s *Service) reportHistory(conn *websocket.Conn, list []uint64) error {
 	} else {
 		// No indexes requested, send back the top ones
 		var head int64
-		if s.sev != nil {
-			head = s.sev.BlockChain().CurrentHeader().Number.Int64()
+		if s.eth != nil {
+			head = s.eth.BlockChain().CurrentHeader().Number.Int64()
 		} else {
 			head = s.les.BlockChain().CurrentHeader().Number.Int64()
 		}
@@ -599,8 +599,8 @@ func (s *Service) reportHistory(conn *websocket.Conn, list []uint64) error {
 	for i, number := range indexes {
 		// Retrieve the next block if it's known to us
 		var block *types.Block
-		if s.sev != nil {
-			block = s.sev.BlockChain().GetBlockByNumber(number)
+		if s.eth != nil {
+			block = s.eth.BlockChain().GetBlockByNumber(number)
 		} else {
 			if header := s.les.BlockChain().GetHeaderByNumber(number); header != nil {
 				block = types.NewBlockWithHeader(header)
@@ -617,7 +617,7 @@ func (s *Service) reportHistory(conn *websocket.Conn, list []uint64) error {
 	}
 	// Assemble the history report and send it to the server
 	if len(history) > 0 {
-		log.Trace("Sending historical blocks to sevstats", "first", history[0].Number, "last", history[len(history)-1].Number)
+		log.Trace("Sending historical blocks to ethstats", "first", history[0].Number, "last", history[len(history)-1].Number)
 	} else {
 		log.Trace("No history to send to stats server")
 	}
@@ -641,13 +641,13 @@ type pendStats struct {
 func (s *Service) reportPending(conn *websocket.Conn) error {
 	// Retrieve the pending count from the local blockchain
 	var pending int
-	if s.sev != nil {
-		pending, _ = s.sev.TxPool().Stats()
+	if s.eth != nil {
+		pending, _ = s.eth.TxPool().Stats()
 	} else {
 		pending = s.les.TxPool().Stats()
 	}
 	// Assemble the transaction stats and send it to the server
-	log.Trace("Sending pending transactions to sevstats", "count", pending)
+	log.Trace("Sending pending transactions to ethstats", "count", pending)
 
 	stats := map[string]interface{}{
 		"id": s.node,
@@ -682,21 +682,21 @@ func (s *Service) reportStats(conn *websocket.Conn) error {
 		syncing  bool
 		gasprice int
 	)
-	if s.sev != nil {
-		mining = s.sev.Miner().Mining()
-		hashrate = int(s.sev.Miner().HashRate())
+	if s.eth != nil {
+		mining = s.eth.Miner().Mining()
+		hashrate = int(s.eth.Miner().HashRate())
 
-		sync := s.sev.Downloader().Progress()
-		syncing = s.sev.BlockChain().CurrentHeader().Number.Uint64() >= sync.HighestBlock
+		sync := s.eth.Downloader().Progress()
+		syncing = s.eth.BlockChain().CurrentHeader().Number.Uint64() >= sync.HighestBlock
 
-		price, _ := s.sev.APIBackend.SuggestPrice(context.Background())
+		price, _ := s.eth.APIBackend.SuggestPrice(context.Background())
 		gasprice = int(price.Uint64())
 	} else {
 		sync := s.les.Downloader().Progress()
 		syncing = s.les.BlockChain().CurrentHeader().Number.Uint64() >= sync.HighestBlock
 	}
 	// Assemble the node stats and send it to the server
-	log.Trace("Sending node details to sevstats")
+	log.Trace("Sending node details to ethstats")
 
 	stats := map[string]interface{}{
 		"id": s.node,

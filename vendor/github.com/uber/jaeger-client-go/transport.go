@@ -18,9 +18,9 @@ import (
 	"io"
 )
 
-// Transport abstracts the msevod of sending spans out of process.
+// Transport abstracts the method of sending spans out of process.
 // Implementations are NOT required to be thread-safe; the RemoteReporter
-// is expected to only call msevods on the Transport from the same go-routine.
+// is expected to only call methods on the Transport from the same go-routine.
 type Transport interface {
 	// Append converts the span to the wire representation and adds it
 	// to sender's internal buffer.  If the buffer exceeds its designated

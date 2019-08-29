@@ -682,7 +682,7 @@ while (user_has_not_requested_exit)
  * interpret the meaning of the file descriptors, just do as libusb indicates,
  * polling all of them at once.
  *
- * In pseudo-code, you want somseving that looks like:
+ * In pseudo-code, you want something that looks like:
 \code
 // initialise libusb
 
@@ -788,7 +788,7 @@ while (user has not requested application exit) {
  * Consider the following pseudo-code, which submits an asynchronous transfer
  * then waits for its completion. This style is one way you could implement a
  * synchronous interface on top of the asynchronous interface (and libusb
- * does somseving similar, albeit more advanced due to the complications
+ * does something similar, albeit more advanced due to the complications
  * explained on this page).
  *
 \code
@@ -1522,7 +1522,7 @@ int API_EXPORTED libusb_submit_transfer(struct libusb_transfer *transfer)
 	}
 	/*
 	 * We must release the flying transfers lock here, because with
-	 * some backends the submit_transfer msevod is synchroneous.
+	 * some backends the submit_transfer method is synchroneous.
 	 */
 	usbi_mutex_unlock(&ctx->flying_transfers_lock);
 
@@ -2402,7 +2402,7 @@ int API_EXPORTED libusb_handle_events_timeout(libusb_context *ctx,
 /** \ingroup libusb_poll
  * Handle any pending events in blocking mode. There is currently a timeout
  * hardcoded at 60 seconds but we plan to make it unlimited in future. For
- * finer control over whsever this function is blocking or non-blocking, or
+ * finer control over whether this function is blocking or non-blocking, or
  * for control over the timeout, use libusb_handle_events_timeout_completed()
  * instead.
  *
@@ -2478,7 +2478,7 @@ int API_EXPORTED libusb_handle_events_locked(libusb_context *ctx,
 }
 
 /** \ingroup libusb_poll
- * Determines whsever your application must apply special timing considerations
+ * Determines whether your application must apply special timing considerations
  * when monitoring libusb's file descriptors.
  *
  * This function is only useful for applications which retrieve and poll
@@ -2494,7 +2494,7 @@ int API_EXPORTED libusb_handle_events_locked(libusb_context *ctx,
  * Some platforms supported by libusb do not come with this baggage - any
  * events relevant to timing will be represented by activity on the file
  * descriptor set, and libusb_get_next_timeout() will always return 0.
- * This function allows you to detect whsever you are running on such a
+ * This function allows you to detect whether you are running on such a
  * platform.
  *
  * Since v1.0.5.

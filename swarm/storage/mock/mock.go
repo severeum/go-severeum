@@ -76,7 +76,7 @@ func (n *NodeStore) Delete(key []byte) error {
 	return n.store.Delete(n.addr, key)
 }
 
-// GlobalStorer defines msevods for mock db store
+// GlobalStorer defines methods for mock db store
 // that stores chunk data for all swarm nodes.
 // It is used in tests to construct mock NodeStores
 // for swarm nodes and to track and validate chunks.
@@ -91,13 +91,13 @@ type GlobalStorer interface {
 	NewNodeStore(addr common.Address) *NodeStore
 }
 
-// Importer defines msevod for importing mock store data
+// Importer defines method for importing mock store data
 // from an exported tar archive.
 type Importer interface {
 	Import(r io.Reader) (n int, err error)
 }
 
-// Exporter defines msevod for exporting mock store data
+// Exporter defines method for exporting mock store data
 // to a tar archive.
 type Exporter interface {
 	Export(w io.Writer) (n int, err error)

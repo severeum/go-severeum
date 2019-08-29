@@ -31,8 +31,8 @@ import (
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/state"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sev/downloader"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/eth/downloader"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/trie"
@@ -73,9 +73,9 @@ It expects the genesis file as argument.`,
 		Category: "BLOCKCHAIN COMMANDS",
 		Description: `
 The import command imports blocks from an RLP-encoded form. The form can be one file
-with several RLP-encoded blocks, or several files can be used.
+with etheral RLP-encoded blocks, or etheral files can be used.
 
-If only one file is used, import error will result in failure. If several files are used,
+If only one file is used, import error will result in failure. If etheral files are used,
 processing will proceed even if an individual RLP-file import failure occurs.`,
 	}
 	exportCommand = cli.Command{
@@ -245,7 +245,7 @@ func importChain(ctx *cli.Context) error {
 	fmt.Printf("Import done in %v.\n\n", time.Since(start))
 
 	// Output pre-compaction stats mostly to see the import trashing
-	db := chainDb.(*sevdb.LDBDatabase)
+	db := chainDb.(*ethdb.LDBDatabase)
 
 	stats, err := db.LDB().GetProperty("leveldb.stats")
 	if err != nil {
@@ -336,7 +336,7 @@ func importPreimages(ctx *cli.Context) error {
 		utils.Fatalf("This command requires an argument.")
 	}
 	stack := makeFullNode(ctx)
-	diskdb := utils.MakeChainDatabase(ctx, stack).(*sevdb.LDBDatabase)
+	diskdb := utils.MakeChainDatabase(ctx, stack).(*ethdb.LDBDatabase)
 
 	start := time.Now()
 	if err := utils.ImportPreimages(diskdb, ctx.Args().First()); err != nil {
@@ -352,7 +352,7 @@ func exportPreimages(ctx *cli.Context) error {
 		utils.Fatalf("This command requires an argument.")
 	}
 	stack := makeFullNode(ctx)
-	diskdb := utils.MakeChainDatabase(ctx, stack).(*sevdb.LDBDatabase)
+	diskdb := utils.MakeChainDatabase(ctx, stack).(*ethdb.LDBDatabase)
 
 	start := time.Now()
 	if err := utils.ExportPreimages(diskdb, ctx.Args().First()); err != nil {
@@ -375,7 +375,7 @@ func copyDb(ctx *cli.Context) error {
 	dl := downloader.New(syncmode, chainDb, new(event.TypeMux), chain, nil, nil)
 
 	// Create a source peer to satisfy downloader requests from
-	db, err := sevdb.NewLDBDatabase(ctx.Args().First(), ctx.GlobalInt(utils.CacheFlag.Name), 256)
+	db, err := ethdb.NewLDBDatabase(ctx.Args().First(), ctx.GlobalInt(utils.CacheFlag.Name), 256)
 	if err != nil {
 		return err
 	}
@@ -402,7 +402,7 @@ func copyDb(ctx *cli.Context) error {
 	// Compact the entire database to remove any sync overhead
 	start = time.Now()
 	fmt.Println("Compacting entire database...")
-	if err = chainDb.(*sevdb.LDBDatabase).LDB().CompactRange(util.Range{}); err != nil {
+	if err = chainDb.(*ethdb.LDBDatabase).LDB().CompactRange(util.Range{}); err != nil {
 		utils.Fatalf("Compaction failed: %v", err)
 	}
 	fmt.Printf("Compaction done in %v.\n\n", time.Since(start))

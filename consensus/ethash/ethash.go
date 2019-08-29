@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package sevash implements the sevash proof-of-work consensus engine.
-package sevash
+// Package ethash implements the ethash proof-of-work consensus engine.
+package ethash
 
 import (
 	"errors"
@@ -59,7 +59,7 @@ var (
 	dumpMagic = []uint32{0xbaddcafe, 0xfee1dead}
 )
 
-// isLittleEndian returns whsever the local system is running in little or big
+// isLittleEndian returns whether the local system is running in little or big
 // endian byte order.
 func isLittleEndian() bool {
 	n := uint32(0x01020304)
@@ -166,7 +166,7 @@ func newlru(what string, maxItems int, new func(epoch uint64) interface{}) *lru 
 		maxItems = 1
 	}
 	cache, _ := simplelru.NewLRU(maxItems, func(key, value interface{}) {
-		log.Trace("Evicted sevash "+what, "epoch", key)
+		log.Trace("Evicted ethash "+what, "epoch", key)
 	})
 	return &lru{what: what, new: new, cache: cache}
 }
@@ -184,14 +184,14 @@ func (lru *lru) get(epoch uint64) (item, future interface{}) {
 		if lru.future > 0 && lru.future == epoch {
 			item = lru.futureItem
 		} else {
-			log.Trace("Requiring new sevash "+lru.what, "epoch", epoch)
+			log.Trace("Requiring new ethash "+lru.what, "epoch", epoch)
 			item = lru.new(epoch)
 		}
 		lru.cache.Add(epoch, item)
 	}
 	// Update the 'future item' if epoch is larger than previously seen.
 	if epoch < maxEpoch-1 && lru.future < epoch+1 {
-		log.Trace("Requiring new future sevash "+lru.what, "epoch", epoch+1)
+		log.Trace("Requiring new future ethash "+lru.what, "epoch", epoch+1)
 		future = lru.new(epoch + 1)
 		lru.future = epoch + 1
 		lru.futureItem = future
@@ -199,7 +199,7 @@ func (lru *lru) get(epoch uint64) (item, future interface{}) {
 	return item, future
 }
 
-// cache wraps an sevash cache with some metadata to allow easier concurrent use.
+// cache wraps an ethash cache with some metadata to allow easier concurrent use.
 type cache struct {
 	epoch uint64    // Epoch for which this cache is relevant
 	dump  *os.File  // File descriptor of the memory mapped cache
@@ -208,7 +208,7 @@ type cache struct {
 	once  sync.Once // Ensures the cache is generated only once
 }
 
-// newCache creates a new sevash verification cache and returns it as a plain Go
+// newCache creates a new ethash verification cache and returns it as a plain Go
 // interface to be usable in an LRU cache.
 func newCache(epoch uint64) interface{} {
 	return &cache{epoch: epoch}
@@ -244,15 +244,15 @@ func (c *cache) generate(dir string, limit int, test bool) {
 		var err error
 		c.dump, c.mmap, c.cache, err = memoryMap(path)
 		if err == nil {
-			logger.Debug("Loaded old sevash cache from disk")
+			logger.Debug("Loaded old ethash cache from disk")
 			return
 		}
-		logger.Debug("Failed to load old sevash cache", "err", err)
+		logger.Debug("Failed to load old ethash cache", "err", err)
 
 		// No previous cache available, create a new cache file to fill
 		c.dump, c.mmap, c.cache, err = memoryMapAndGenerate(path, size, func(buffer []uint32) { generateCache(buffer, c.epoch, seed) })
 		if err != nil {
-			logger.Error("Failed to generate mapped sevash cache", "err", err)
+			logger.Error("Failed to generate mapped ethash cache", "err", err)
 
 			c.cache = make([]uint32, size/4)
 			generateCache(c.cache, c.epoch, seed)
@@ -275,7 +275,7 @@ func (c *cache) finalizer() {
 	}
 }
 
-// dataset wraps an sevash dataset with some metadata to allow easier concurrent use.
+// dataset wraps an ethash dataset with some metadata to allow easier concurrent use.
 type dataset struct {
 	epoch   uint64    // Epoch for which this cache is relevant
 	dump    *os.File  // File descriptor of the memory mapped cache
@@ -285,7 +285,7 @@ type dataset struct {
 	done    uint32    // Atomic flag to determine generation status
 }
 
-// newDataset creates a new sevash mining dataset and returns it as a plain Go
+// newDataset creates a new ethash mining dataset and returns it as a plain Go
 // interface to be usable in an LRU cache.
 func newDataset(epoch uint64) interface{} {
 	return &dataset{epoch: epoch}
@@ -330,10 +330,10 @@ func (d *dataset) generate(dir string, limit int, test bool) {
 		var err error
 		d.dump, d.mmap, d.dataset, err = memoryMap(path)
 		if err == nil {
-			logger.Debug("Loaded old sevash dataset from disk")
+			logger.Debug("Loaded old ethash dataset from disk")
 			return
 		}
-		logger.Debug("Failed to load old sevash dataset", "err", err)
+		logger.Debug("Failed to load old ethash dataset", "err", err)
 
 		// No previous dataset available, create a new dataset file to fill
 		cache := make([]uint32, csize/4)
@@ -341,7 +341,7 @@ func (d *dataset) generate(dir string, limit int, test bool) {
 
 		d.dump, d.mmap, d.dataset, err = memoryMapAndGenerate(path, dsize, func(buffer []uint32) { generateDataset(buffer, d.epoch, cache) })
 		if err != nil {
-			logger.Error("Failed to generate mapped sevash dataset", "err", err)
+			logger.Error("Failed to generate mapped ethash dataset", "err", err)
 
 			d.dataset = make([]uint32, dsize/2)
 			generateDataset(d.dataset, d.epoch, cache)
@@ -355,7 +355,7 @@ func (d *dataset) generate(dir string, limit int, test bool) {
 	})
 }
 
-// generated returns whsever this particular dataset finished generating already
+// generated returns whether this particular dataset finished generating already
 // or not (it may not have been started at all). This is useful for remote miners
 // to default to verification caches instead of blocking on DAG generations.
 func (d *dataset) generated() bool {
@@ -371,19 +371,19 @@ func (d *dataset) finalizer() {
 	}
 }
 
-// MakeCache generates a new sevash cache and optionally stores it to disk.
+// MakeCache generates a new ethash cache and optionally stores it to disk.
 func MakeCache(block uint64, dir string) {
 	c := cache{epoch: block / epochLength}
 	c.generate(dir, math.MaxInt32, false)
 }
 
-// MakeDataset generates a new sevash dataset and optionally stores it to disk.
+// MakeDataset generates a new ethash dataset and optionally stores it to disk.
 func MakeDataset(block uint64, dir string) {
 	d := dataset{epoch: block / epochLength}
 	d.generate(dir, math.MaxInt32, false)
 }
 
-// Mode defines the type and amount of PoW verification an sevash engine makes.
+// Mode defines the type and amount of PoW verification an ethash engine makes.
 type Mode uint
 
 const (
@@ -394,7 +394,7 @@ const (
 	ModeFullFake
 )
 
-// Config are the configuration parameters of the sevash.
+// Config are the configuration parameters of the ethash.
 type Config struct {
 	CacheDir       string
 	CachesInMem    int
@@ -435,7 +435,7 @@ type sealWork struct {
 	res  chan [4]string
 }
 
-// Sevash is a consensus engine based on proof-of-work implementing the sevash
+// Sevash is a consensus engine based on proof-of-work implementing the ethash
 // algorithm.
 type Sevash struct {
 	config Config
@@ -466,21 +466,21 @@ type Sevash struct {
 	exitCh    chan chan error // Notification channel to exiting backend threads
 }
 
-// New creates a full sized sevash PoW scheme and starts a background thread for
+// New creates a full sized ethash PoW scheme and starts a background thread for
 // remote mining, also optionally notifying a batch of remote services of new work
 // packages.
 func New(config Config, notify []string, noverify bool) *Sevash {
 	if config.CachesInMem <= 0 {
-		log.Warn("One sevash cache must always be in memory", "requested", config.CachesInMem)
+		log.Warn("One ethash cache must always be in memory", "requested", config.CachesInMem)
 		config.CachesInMem = 1
 	}
 	if config.CacheDir != "" && config.CachesOnDisk > 0 {
-		log.Info("Disk storage enabled for sevash caches", "dir", config.CacheDir, "count", config.CachesOnDisk)
+		log.Info("Disk storage enabled for ethash caches", "dir", config.CacheDir, "count", config.CachesOnDisk)
 	}
 	if config.DatasetDir != "" && config.DatasetsOnDisk > 0 {
-		log.Info("Disk storage enabled for sevash DAGs", "dir", config.DatasetDir, "count", config.DatasetsOnDisk)
+		log.Info("Disk storage enabled for ethash DAGs", "dir", config.DatasetDir, "count", config.DatasetsOnDisk)
 	}
-	sevash := &Sevash{
+	ethash := &Sevash{
 		config:       config,
 		caches:       newlru("cache", config.CachesInMem, newCache),
 		datasets:     newlru("dataset", config.DatasetsInMem, newDataset),
@@ -493,14 +493,14 @@ func New(config Config, notify []string, noverify bool) *Sevash {
 		submitRateCh: make(chan *hashrate),
 		exitCh:       make(chan chan error),
 	}
-	go sevash.remote(notify, noverify)
-	return sevash
+	go ethash.remote(notify, noverify)
+	return ethash
 }
 
-// NewTester creates a small sized sevash PoW scheme useful only for testing
+// NewTester creates a small sized ethash PoW scheme useful only for testing
 // purposes.
 func NewTester(notify []string, noverify bool) *Sevash {
-	sevash := &Sevash{
+	ethash := &Sevash{
 		config:       Config{PowMode: ModeTest},
 		caches:       newlru("cache", 1, newCache),
 		datasets:     newlru("dataset", 1, newDataset),
@@ -513,11 +513,11 @@ func NewTester(notify []string, noverify bool) *Sevash {
 		submitRateCh: make(chan *hashrate),
 		exitCh:       make(chan chan error),
 	}
-	go sevash.remote(notify, noverify)
-	return sevash
+	go ethash.remote(notify, noverify)
+	return ethash
 }
 
-// NewFaker creates a sevash consensus engine with a fake PoW scheme that accepts
+// NewFaker creates a ethash consensus engine with a fake PoW scheme that accepts
 // all blocks' seal as valid, though they still have to conform to the Severeum
 // consensus rules.
 func NewFaker() *Sevash {
@@ -528,7 +528,7 @@ func NewFaker() *Sevash {
 	}
 }
 
-// NewFakeFailer creates a sevash consensus engine with a fake PoW scheme that
+// NewFakeFailer creates a ethash consensus engine with a fake PoW scheme that
 // accepts all blocks as valid apart from the single one specified, though they
 // still have to conform to the Severeum consensus rules.
 func NewFakeFailer(fail uint64) *Sevash {
@@ -540,7 +540,7 @@ func NewFakeFailer(fail uint64) *Sevash {
 	}
 }
 
-// NewFakeDelayer creates a sevash consensus engine with a fake PoW scheme that
+// NewFakeDelayer creates a ethash consensus engine with a fake PoW scheme that
 // accepts all blocks as valid, but delays verifications by some time, though
 // they still have to conform to the Severeum consensus rules.
 func NewFakeDelayer(delay time.Duration) *Sevash {
@@ -552,7 +552,7 @@ func NewFakeDelayer(delay time.Duration) *Sevash {
 	}
 }
 
-// NewFullFaker creates an sevash consensus engine with a full fake scheme that
+// NewFullFaker creates an ethash consensus engine with a full fake scheme that
 // accepts all blocks as valid, without checking any consensus rules whatsoever.
 func NewFullFaker() *Sevash {
 	return &Sevash{
@@ -562,24 +562,24 @@ func NewFullFaker() *Sevash {
 	}
 }
 
-// NewShared creates a full sized sevash PoW shared between all requesters running
+// NewShared creates a full sized ethash PoW shared between all requesters running
 // in the same process.
 func NewShared() *Sevash {
 	return &Sevash{shared: sharedSevash}
 }
 
 // Close closes the exit channel to notify all backend threads exiting.
-func (sevash *Sevash) Close() error {
+func (ethash *Sevash) Close() error {
 	var err error
-	sevash.closeOnce.Do(func() {
+	ethash.closeOnce.Do(func() {
 		// Short circuit if the exit channel is not allocated.
-		if sevash.exitCh == nil {
+		if ethash.exitCh == nil {
 			return
 		}
 		errc := make(chan error)
-		sevash.exitCh <- errc
+		ethash.exitCh <- errc
 		err = <-errc
-		close(sevash.exitCh)
+		close(ethash.exitCh)
 	})
 	return err
 }
@@ -587,18 +587,18 @@ func (sevash *Sevash) Close() error {
 // cache tries to retrieve a verification cache for the specified block number
 // by first checking against a list of in-memory caches, then against caches
 // stored on disk, and finally generating one if none can be found.
-func (sevash *Sevash) cache(block uint64) *cache {
+func (ethash *Sevash) cache(block uint64) *cache {
 	epoch := block / epochLength
-	currentI, futureI := sevash.caches.get(epoch)
+	currentI, futureI := ethash.caches.get(epoch)
 	current := currentI.(*cache)
 
 	// Wait for generation finish.
-	current.generate(sevash.config.CacheDir, sevash.config.CachesOnDisk, sevash.config.PowMode == ModeTest)
+	current.generate(ethash.config.CacheDir, ethash.config.CachesOnDisk, ethash.config.PowMode == ModeTest)
 
 	// If we need a new future cache, now's a good time to regenerate it.
 	if futureI != nil {
 		future := futureI.(*cache)
-		go future.generate(sevash.config.CacheDir, sevash.config.CachesOnDisk, sevash.config.PowMode == ModeTest)
+		go future.generate(ethash.config.CacheDir, ethash.config.CachesOnDisk, ethash.config.PowMode == ModeTest)
 	}
 	return current
 }
@@ -609,29 +609,29 @@ func (sevash *Sevash) cache(block uint64) *cache {
 //
 // If async is specified, not only the future but the current DAG is also
 // generates on a background thread.
-func (sevash *Sevash) dataset(block uint64, async bool) *dataset {
-	// Retrieve the requested sevash dataset
+func (ethash *Sevash) dataset(block uint64, async bool) *dataset {
+	// Retrieve the requested ethash dataset
 	epoch := block / epochLength
-	currentI, futureI := sevash.datasets.get(epoch)
+	currentI, futureI := ethash.datasets.get(epoch)
 	current := currentI.(*dataset)
 
 	// If async is specified, generate everything in a background thread
 	if async && !current.generated() {
 		go func() {
-			current.generate(sevash.config.DatasetDir, sevash.config.DatasetsOnDisk, sevash.config.PowMode == ModeTest)
+			current.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.PowMode == ModeTest)
 
 			if futureI != nil {
 				future := futureI.(*dataset)
-				future.generate(sevash.config.DatasetDir, sevash.config.DatasetsOnDisk, sevash.config.PowMode == ModeTest)
+				future.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.PowMode == ModeTest)
 			}
 		}()
 	} else {
 		// Either blocking generation was requested, or already done
-		current.generate(sevash.config.DatasetDir, sevash.config.DatasetsOnDisk, sevash.config.PowMode == ModeTest)
+		current.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.PowMode == ModeTest)
 
 		if futureI != nil {
 			future := futureI.(*dataset)
-			go future.generate(sevash.config.DatasetDir, sevash.config.DatasetsOnDisk, sevash.config.PowMode == ModeTest)
+			go future.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.PowMode == ModeTest)
 		}
 	}
 	return current
@@ -639,31 +639,31 @@ func (sevash *Sevash) dataset(block uint64, async bool) *dataset {
 
 // Threads returns the number of mining threads currently enabled. This doesn't
 // necessarily mean that mining is running!
-func (sevash *Sevash) Threads() int {
-	sevash.lock.Lock()
-	defer sevash.lock.Unlock()
+func (ethash *Sevash) Threads() int {
+	ethash.lock.Lock()
+	defer ethash.lock.Unlock()
 
-	return sevash.threads
+	return ethash.threads
 }
 
 // SetThreads updates the number of mining threads currently enabled. Calling
-// this msevod does not start mining, only sets the thread count. If zero is
+// this method does not start mining, only sets the thread count. If zero is
 // specified, the miner will use all cores of the machine. Setting a thread
 // count below zero is allowed and will cause the miner to idle, without any
 // work being done.
-func (sevash *Sevash) SetThreads(threads int) {
-	sevash.lock.Lock()
-	defer sevash.lock.Unlock()
+func (ethash *Sevash) SetThreads(threads int) {
+	ethash.lock.Lock()
+	defer ethash.lock.Unlock()
 
 	// If we're running a shared PoW, set the thread count on that instead
-	if sevash.shared != nil {
-		sevash.shared.SetThreads(threads)
+	if ethash.shared != nil {
+		ethash.shared.SetThreads(threads)
 		return
 	}
 	// Update the threads and ping any running seal to pull in any changes
-	sevash.threads = threads
+	ethash.threads = threads
 	select {
-	case sevash.update <- struct{}{}:
+	case ethash.update <- struct{}{}:
 	default:
 	}
 }
@@ -672,39 +672,39 @@ func (sevash *Sevash) SetThreads(threads int) {
 // per second over the last minute.
 // Note the returned hashrate includes local hashrate, but also includes the total
 // hashrate of all remote miner.
-func (sevash *Sevash) Hashrate() float64 {
-	// Short circuit if we are run the sevash in normal/test mode.
-	if sevash.config.PowMode != ModeNormal && sevash.config.PowMode != ModeTest {
-		return sevash.hashrate.Rate1()
+func (ethash *Sevash) Hashrate() float64 {
+	// Short circuit if we are run the ethash in normal/test mode.
+	if ethash.config.PowMode != ModeNormal && ethash.config.PowMode != ModeTest {
+		return ethash.hashrate.Rate1()
 	}
 	var res = make(chan uint64, 1)
 
 	select {
-	case sevash.fetchRateCh <- res:
-	case <-sevash.exitCh:
-		// Return local hashrate only if sevash is stopped.
-		return sevash.hashrate.Rate1()
+	case ethash.fetchRateCh <- res:
+	case <-ethash.exitCh:
+		// Return local hashrate only if ethash is stopped.
+		return ethash.hashrate.Rate1()
 	}
 
 	// Gather total submitted hash rate of remote sealers.
-	return sevash.hashrate.Rate1() + float64(<-res)
+	return ethash.hashrate.Rate1() + float64(<-res)
 }
 
 // APIs implements consensus.Engine, returning the user facing RPC APIs.
-func (sevash *Sevash) APIs(chain consensus.ChainReader) []rpc.API {
-	// In order to ensure backward compatibility, we exposes sevash RPC APIs
-	// to both sev and sevash namespaces.
+func (ethash *Sevash) APIs(chain consensus.ChainReader) []rpc.API {
+	// In order to ensure backward compatibility, we exposes ethash RPC APIs
+	// to both eth and ethash namespaces.
 	return []rpc.API{
 		{
-			Namespace: "sev",
+			Namespace: "eth",
 			Version:   "1.0",
-			Service:   &API{sevash},
+			Service:   &API{ethash},
 			Public:    true,
 		},
 		{
-			Namespace: "sevash",
+			Namespace: "ethash",
 			Version:   "1.0",
-			Service:   &API{sevash},
+			Service:   &API{ethash},
 			Public:    true,
 		},
 	}

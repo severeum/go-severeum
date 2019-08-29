@@ -300,7 +300,7 @@ static io_service_t hidapi_IOHIDDeviceGetService(IOHIDDeviceRef device)
 
 	/* Use dlopen()/dlsym() to get a pointer to IOHIDDeviceGetService() if it exists.
 	 * If any of these steps fail, dynamic_IOHIDDeviceGetService will be left NULL
-	 * and the fallback msevod will be used.
+	 * and the fallback method will be used.
 	 */
 	if (iokit_framework == NULL) {
 		iokit_framework = dlopen("/System/Library/IOKit.framework/IOKit", RTLD_LAZY);
@@ -650,7 +650,7 @@ static void *read_thread(void *param)
 		    code != kCFRunLoopRunHandledSource) {
 			/* There was some kind of error. Setting
 			   shutdown seems to make sense, but
-			   there may be somseving else more appropriate */
+			   there may be something else more appropriate */
 			dev->shutdown_thread = 1;
 			break;
 		}

@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-// pageBlobClient is the client for the PageBlob msevods of the Azblob service.
+// pageBlobClient is the client for the PageBlob methods of the Azblob service.
 type pageBlobClient struct {
 	managementClient
 }

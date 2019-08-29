@@ -34,17 +34,17 @@ import (
 	"github.com/severeum/go-severeum/common/fdlimit"
 	"github.com/severeum/go-severeum/consensus"
 	"github.com/severeum/go-severeum/consensus/clique"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/state"
 	"github.com/severeum/go-severeum/core/vm"
 	"github.com/severeum/go-severeum/crypto"
 	"github.com/severeum/go-severeum/dashboard"
-	"github.com/severeum/go-severeum/sev"
-	"github.com/severeum/go-severeum/sev/downloader"
-	"github.com/severeum/go-severeum/sev/gasprice"
-	"github.com/severeum/go-severeum/sevdb"
-	"github.com/severeum/go-severeum/sevstats"
+	"github.com/severeum/go-severeum/eth"
+	"github.com/severeum/go-severeum/eth/downloader"
+	"github.com/severeum/go-severeum/eth/gasprice"
+	"github.com/severeum/go-severeum/ethdb"
+	"github.com/severeum/go-severeum/ethstats"
 	"github.com/severeum/go-severeum/les"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/metrics"
@@ -130,7 +130,7 @@ var (
 	NetworkIdFlag = cli.Uint64Flag{
 		Name:  "networkid",
 		Usage: "Network identifier (integer, 1=Frontier, 2=Morden (disused), 3=Ropsten, 4=Rinkeby)",
-		Value: sev.DefaultConfig.NetworkId,
+		Value: eth.DefaultConfig.NetworkId,
 	}
 	TestnetFlag = cli.BoolFlag{
 		Name:  "testnet",
@@ -161,7 +161,7 @@ var (
 		Usage: "Document Root for HTTPClient file scheme",
 		Value: DirectoryString{homeDir()},
 	}
-	defaultSyncMode = sev.DefaultConfig.SyncMode
+	defaultSyncMode = eth.DefaultConfig.SyncMode
 	SyncModeFlag    = TextMarshalerFlag{
 		Name:  "syncmode",
 		Usage: `Blockchain sync mode ("fast", "full", or "light")`,
@@ -180,7 +180,7 @@ var (
 	LightPeersFlag = cli.IntFlag{
 		Name:  "lightpeers",
 		Usage: "Maximum number of LES client peers",
-		Value: sev.DefaultConfig.LightPeers,
+		Value: eth.DefaultConfig.LightPeers,
 	}
 	LightKDFFlag = cli.BoolFlag{
 		Name:  "lightkdf",
@@ -212,33 +212,33 @@ var (
 	}
 	// Sevash settings
 	SevashCacheDirFlag = DirectoryFlag{
-		Name:  "sevash.cachedir",
-		Usage: "Directory to store the sevash verification caches (default = inside the datadir)",
+		Name:  "ethash.cachedir",
+		Usage: "Directory to store the ethash verification caches (default = inside the datadir)",
 	}
 	SevashCachesInMemoryFlag = cli.IntFlag{
-		Name:  "sevash.cachesinmem",
-		Usage: "Number of recent sevash caches to keep in memory (16MB each)",
-		Value: sev.DefaultConfig.Sevash.CachesInMem,
+		Name:  "ethash.cachesinmem",
+		Usage: "Number of recent ethash caches to keep in memory (16MB each)",
+		Value: eth.DefaultConfig.Sevash.CachesInMem,
 	}
 	SevashCachesOnDiskFlag = cli.IntFlag{
-		Name:  "sevash.cachesondisk",
-		Usage: "Number of recent sevash caches to keep on disk (16MB each)",
-		Value: sev.DefaultConfig.Sevash.CachesOnDisk,
+		Name:  "ethash.cachesondisk",
+		Usage: "Number of recent ethash caches to keep on disk (16MB each)",
+		Value: eth.DefaultConfig.Sevash.CachesOnDisk,
 	}
 	SevashDatasetDirFlag = DirectoryFlag{
-		Name:  "sevash.dagdir",
-		Usage: "Directory to store the sevash mining DAGs (default = inside home folder)",
-		Value: DirectoryString{sev.DefaultConfig.Sevash.DatasetDir},
+		Name:  "ethash.dagdir",
+		Usage: "Directory to store the ethash mining DAGs (default = inside home folder)",
+		Value: DirectoryString{eth.DefaultConfig.Sevash.DatasetDir},
 	}
 	SevashDatasetsInMemoryFlag = cli.IntFlag{
-		Name:  "sevash.dagsinmem",
-		Usage: "Number of recent sevash mining DAGs to keep in memory (1+GB each)",
-		Value: sev.DefaultConfig.Sevash.DatasetsInMem,
+		Name:  "ethash.dagsinmem",
+		Usage: "Number of recent ethash mining DAGs to keep in memory (1+GB each)",
+		Value: eth.DefaultConfig.Sevash.DatasetsInMem,
 	}
 	SevashDatasetsOnDiskFlag = cli.IntFlag{
-		Name:  "sevash.dagsondisk",
-		Usage: "Number of recent sevash mining DAGs to keep on disk (1+GB each)",
-		Value: sev.DefaultConfig.Sevash.DatasetsOnDisk,
+		Name:  "ethash.dagsondisk",
+		Usage: "Number of recent ethash mining DAGs to keep on disk (1+GB each)",
+		Value: eth.DefaultConfig.Sevash.DatasetsOnDisk,
 	}
 	// Transaction pool settings
 	TxPoolLocalsFlag = cli.StringFlag{
@@ -262,37 +262,37 @@ var (
 	TxPoolPriceLimitFlag = cli.Uint64Flag{
 		Name:  "txpool.pricelimit",
 		Usage: "Minimum gas price limit to enforce for acceptance into the pool",
-		Value: sev.DefaultConfig.TxPool.PriceLimit,
+		Value: eth.DefaultConfig.TxPool.PriceLimit,
 	}
 	TxPoolPriceBumpFlag = cli.Uint64Flag{
 		Name:  "txpool.pricebump",
 		Usage: "Price bump percentage to replace an already existing transaction",
-		Value: sev.DefaultConfig.TxPool.PriceBump,
+		Value: eth.DefaultConfig.TxPool.PriceBump,
 	}
 	TxPoolAccountSlotsFlag = cli.Uint64Flag{
 		Name:  "txpool.accountslots",
 		Usage: "Minimum number of executable transaction slots guaranteed per account",
-		Value: sev.DefaultConfig.TxPool.AccountSlots,
+		Value: eth.DefaultConfig.TxPool.AccountSlots,
 	}
 	TxPoolGlobalSlotsFlag = cli.Uint64Flag{
 		Name:  "txpool.globalslots",
 		Usage: "Maximum number of executable transaction slots for all accounts",
-		Value: sev.DefaultConfig.TxPool.GlobalSlots,
+		Value: eth.DefaultConfig.TxPool.GlobalSlots,
 	}
 	TxPoolAccountQueueFlag = cli.Uint64Flag{
 		Name:  "txpool.accountqueue",
 		Usage: "Maximum number of non-executable transaction slots permitted per account",
-		Value: sev.DefaultConfig.TxPool.AccountQueue,
+		Value: eth.DefaultConfig.TxPool.AccountQueue,
 	}
 	TxPoolGlobalQueueFlag = cli.Uint64Flag{
 		Name:  "txpool.globalqueue",
 		Usage: "Maximum number of non-executable transaction slots for all accounts",
-		Value: sev.DefaultConfig.TxPool.GlobalQueue,
+		Value: eth.DefaultConfig.TxPool.GlobalQueue,
 	}
 	TxPoolLifetimeFlag = cli.DurationFlag{
 		Name:  "txpool.lifetime",
 		Usage: "Maximum amount of time non-executable transaction are queued",
-		Value: sev.DefaultConfig.TxPool.Lifetime,
+		Value: eth.DefaultConfig.TxPool.Lifetime,
 	}
 	// Performance tuning settings
 	CacheFlag = cli.IntFlag{
@@ -342,36 +342,36 @@ var (
 	MinerGasTargetFlag = cli.Uint64Flag{
 		Name:  "miner.gastarget",
 		Usage: "Target gas floor for mined blocks",
-		Value: sev.DefaultConfig.MinerGasFloor,
+		Value: eth.DefaultConfig.MinerGasFloor,
 	}
 	MinerLegacyGasTargetFlag = cli.Uint64Flag{
 		Name:  "targetgaslimit",
 		Usage: "Target gas floor for mined blocks (deprecated, use --miner.gastarget)",
-		Value: sev.DefaultConfig.MinerGasFloor,
+		Value: eth.DefaultConfig.MinerGasFloor,
 	}
 	MinerGasLimitFlag = cli.Uint64Flag{
 		Name:  "miner.gaslimit",
 		Usage: "Target gas ceiling for mined blocks",
-		Value: sev.DefaultConfig.MinerGasCeil,
+		Value: eth.DefaultConfig.MinerGasCeil,
 	}
 	MinerGasPriceFlag = BigFlag{
 		Name:  "miner.gasprice",
 		Usage: "Minimum gas price for mining a transaction",
-		Value: sev.DefaultConfig.MinerGasPrice,
+		Value: eth.DefaultConfig.MinerGasPrice,
 	}
 	MinerLegacyGasPriceFlag = BigFlag{
 		Name:  "gasprice",
 		Usage: "Minimum gas price for mining a transaction (deprecated, use --miner.gasprice)",
-		Value: sev.DefaultConfig.MinerGasPrice,
+		Value: eth.DefaultConfig.MinerGasPrice,
 	}
 	MinerSeverbaseFlag = cli.StringFlag{
-		Name:  "miner.severbase",
+		Name:  "miner.etherbase",
 		Usage: "Public address for block mining rewards (default = first account)",
 		Value: "0",
 	}
 	MinerLegacySeverbaseFlag = cli.StringFlag{
-		Name:  "severbase",
-		Usage: "Public address for block mining rewards (default = first account, deprecated, use --miner.severbase)",
+		Name:  "etherbase",
+		Usage: "Public address for block mining rewards (default = first account, deprecated, use --miner.etherbase)",
 		Value: "0",
 	}
 	MinerExtraDataFlag = cli.StringFlag{
@@ -385,7 +385,7 @@ var (
 	MinerRecommitIntervalFlag = cli.DurationFlag{
 		Name:  "miner.recommit",
 		Usage: "Time interval to recreate the block being mined",
-		Value: sev.DefaultConfig.MinerRecommit,
+		Value: eth.DefaultConfig.MinerRecommit,
 	}
 	MinerNoVerfiyFlag = cli.BoolFlag{
 		Name:  "miner.noverify",
@@ -409,8 +409,8 @@ var (
 	}
 	// Logging and debug settings
 	SevStatsURLFlag = cli.StringFlag{
-		Name:  "sevstats",
-		Usage: "Reporting URL of a sevstats service (nodename:secret@host:port)",
+		Name:  "ethstats",
+		Usage: "Reporting URL of a ethstats service (nodename:secret@host:port)",
 	}
 	FakePoWFlag = cli.BoolFlag{
 		Name:  "fakepow",
@@ -559,12 +559,12 @@ var (
 	GpoBlocksFlag = cli.IntFlag{
 		Name:  "gpoblocks",
 		Usage: "Number of recent blocks to check for gas prices",
-		Value: sev.DefaultConfig.GPO.Blocks,
+		Value: eth.DefaultConfig.GPO.Blocks,
 	}
 	GpoPercentileFlag = cli.IntFlag{
 		Name:  "gpopercentile",
 		Usage: "Suggested gas price is the given percentile of a set of recent transaction gas prices",
-		Value: sev.DefaultConfig.GPO.Percentile,
+		Value: eth.DefaultConfig.GPO.Percentile,
 	}
 	WhisperEnabledFlag = cli.BoolFlag{
 		Name:  "shh",
@@ -602,7 +602,7 @@ var (
 	MetricsInfluxDBDatabaseFlag = cli.StringFlag{
 		Name:  "metrics.influxdb.database",
 		Usage: "InfluxDB database name to push reported metrics to",
-		Value: "ssev",
+		Value: "seth",
 	}
 	MetricsInfluxDBUsernameFlag = cli.StringFlag{
 		Name:  "metrics.influxdb.username",
@@ -655,7 +655,7 @@ func MakeDataDir(ctx *cli.Context) string {
 
 // setNodeKey creates a node key from set command line flags, either loading it
 // from a file or as a specified hex value. If neither flags were provided, this
-// msevod returns nil and an emphemeral key is to be generated.
+// method returns nil and an emphemeral key is to be generated.
 func setNodeKey(ctx *cli.Context, cfg *p2p.Config) {
 	var (
 		hex  = ctx.GlobalString(NodeKeyHexFlag.Name)
@@ -830,7 +830,7 @@ func setIPC(ctx *cli.Context, cfg *node.Config) {
 }
 
 // makeDatabaseHandles raises out the number of allowed file handles per process
-// for Ssev and returns half of the allowance to assign to the database.
+// for Seth and returns half of the allowance to assign to the database.
 func makeDatabaseHandles() int {
 	limit, err := fdlimit.Maximum()
 	if err != nil {
@@ -857,7 +857,7 @@ func MakeAddress(ks *keystore.KeyStore, account string) (accounts.Account, error
 	log.Warn("-------------------------------------------------------------------")
 	log.Warn("Referring to accounts by order in the keystore folder is dangerous!")
 	log.Warn("This functionality is deprecated and will be removed in the future!")
-	log.Warn("Please use explicit addresses! (can search via `ssev account list`)")
+	log.Warn("Please use explicit addresses! (can search via `seth account list`)")
 	log.Warn("-------------------------------------------------------------------")
 
 	accs := ks.Accounts()
@@ -867,22 +867,22 @@ func MakeAddress(ks *keystore.KeyStore, account string) (accounts.Account, error
 	return accs[index], nil
 }
 
-// setSeverbase retrieves the severbase either from the directly specified
+// setSeverbase retrieves the etherbase either from the directly specified
 // command line flags or from the keystore if CLI indexed.
-func setSeverbase(ctx *cli.Context, ks *keystore.KeyStore, cfg *sev.Config) {
-	// Extract the current severbase, new flag overriding legacy one
-	var severbase string
+func setSeverbase(ctx *cli.Context, ks *keystore.KeyStore, cfg *eth.Config) {
+	// Extract the current etherbase, new flag overriding legacy one
+	var etherbase string
 	if ctx.GlobalIsSet(MinerLegacySeverbaseFlag.Name) {
-		severbase = ctx.GlobalString(MinerLegacySeverbaseFlag.Name)
+		etherbase = ctx.GlobalString(MinerLegacySeverbaseFlag.Name)
 	}
 	if ctx.GlobalIsSet(MinerSeverbaseFlag.Name) {
-		severbase = ctx.GlobalString(MinerSeverbaseFlag.Name)
+		etherbase = ctx.GlobalString(MinerSeverbaseFlag.Name)
 	}
-	// Convert the severbase into an address and configure it
-	if severbase != "" {
-		account, err := MakeAddress(ks, severbase)
+	// Convert the etherbase into an address and configure it
+	if etherbase != "" {
+		account, err := MakeAddress(ks, etherbase)
 		if err != nil {
-			Fatalf("Invalid miner severbase: %v", err)
+			Fatalf("Invalid miner etherbase: %v", err)
 		}
 		cfg.Severbase = account.Address
 	}
@@ -933,11 +933,11 @@ func SetP2PConfig(ctx *cli.Context, cfg *p2p.Config) {
 	if !(lightClient || lightServer) {
 		lightPeers = 0
 	}
-	sevPeers := cfg.MaxPeers - lightPeers
+	ethPeers := cfg.MaxPeers - lightPeers
 	if lightClient {
-		sevPeers = 0
+		ethPeers = 0
 	}
-	log.Info("Maximum peer count", "SEV", sevPeers, "LES", lightPeers, "total", cfg.MaxPeers)
+	log.Info("Maximum peer count", "SEV", ethPeers, "LES", lightPeers, "total", cfg.MaxPeers)
 
 	if ctx.GlobalIsSet(MaxPendingPeersFlag.Name) {
 		cfg.MaxPendingPeers = ctx.GlobalInt(MaxPendingPeersFlag.Name)
@@ -1059,7 +1059,7 @@ func setTxPool(ctx *cli.Context, cfg *core.TxPoolConfig) {
 	}
 }
 
-func setSevash(ctx *cli.Context, cfg *sev.Config) {
+func setSevash(ctx *cli.Context, cfg *eth.Config) {
 	if ctx.GlobalIsSet(SevashCacheDirFlag.Name) {
 		cfg.Sevash.CacheDir = ctx.GlobalString(SevashCacheDirFlag.Name)
 	}
@@ -1080,7 +1080,7 @@ func setSevash(ctx *cli.Context, cfg *sev.Config) {
 	}
 }
 
-func setWhitelist(ctx *cli.Context, cfg *sev.Config) {
+func setWhitelist(ctx *cli.Context, cfg *eth.Config) {
 	whitelist := ctx.GlobalString(WhitelistFlag.Name)
 	if whitelist == "" {
 		return
@@ -1157,8 +1157,8 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node, cfg *whisper.Config) {
 	}
 }
 
-// SetSevConfig applies sev-related command line flags to the config.
-func SetSevConfig(ctx *cli.Context, stack *node.Node, cfg *sev.Config) {
+// SetSevConfig applies eth-related command line flags to the config.
+func SetSevConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Avoid conflicting network flags
 	checkExclusive(ctx, DeveloperFlag, TestnetFlag, RinkebyFlag)
 	checkExclusive(ctx, LightServFlag, SyncModeFlag, "light")
@@ -1297,7 +1297,7 @@ func SetDashboardConfig(ctx *cli.Context, cfg *dashboard.Config) {
 }
 
 // RegisterSevService adds an Severeum client to the stack.
-func RegisterSevService(stack *node.Node, cfg *sev.Config) {
+func RegisterSevService(stack *node.Node, cfg *eth.Config) {
 	var err error
 	if cfg.SyncMode == downloader.LightSync {
 		err = stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
@@ -1305,7 +1305,7 @@ func RegisterSevService(stack *node.Node, cfg *sev.Config) {
 		})
 	} else {
 		err = stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
-			fullNode, err := sev.New(ctx, cfg)
+			fullNode, err := eth.New(ctx, cfg)
 			if fullNode != nil && cfg.LightServ > 0 {
 				ls, _ := les.NewLesServer(fullNode, cfg)
 				fullNode.AddLesServer(ls)
@@ -1338,14 +1338,14 @@ func RegisterShhService(stack *node.Node, cfg *whisper.Config) {
 // the given node.
 func RegisterSevStatsService(stack *node.Node, url string) {
 	if err := stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
-		// Retrieve both sev and les services
-		var sevServ *sev.Severeum
-		ctx.Service(&sevServ)
+		// Retrieve both eth and les services
+		var ethServ *eth.Severeum
+		ctx.Service(&ethServ)
 
 		var lesServ *les.LightSevereum
 		ctx.Service(&lesServ)
 
-		return sevstats.New(url, sevServ, lesServ)
+		return ethstats.New(url, ethServ, lesServ)
 	}); err != nil {
 		Fatalf("Failed to register the Severeum Stats service: %v", err)
 	}
@@ -1365,7 +1365,7 @@ func SetupMetrics(ctx *cli.Context) {
 
 		if enableExport {
 			log.Info("Enabling metrics export to InfluxDB")
-			go influxdb.InfluxDBWithTags(metrics.DefaultRegistry, 10*time.Second, endpoint, database, username, password, "ssev.", map[string]string{
+			go influxdb.InfluxDBWithTags(metrics.DefaultRegistry, 10*time.Second, endpoint, database, username, password, "seth.", map[string]string{
 				"host": hosttag,
 			})
 		}
@@ -1373,7 +1373,7 @@ func SetupMetrics(ctx *cli.Context) {
 }
 
 // MakeChainDatabase open an LevelDB using the flags passed to the client and will hard crash if it fails.
-func MakeChainDatabase(ctx *cli.Context, stack *node.Node) sevdb.Database {
+func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 	var (
 		cache   = ctx.GlobalInt(CacheFlag.Name) * ctx.GlobalInt(CacheDatabaseFlag.Name) / 100
 		handles = makeDatabaseHandles()
@@ -1403,7 +1403,7 @@ func MakeGenesis(ctx *cli.Context) *core.Genesis {
 }
 
 // MakeChain creates a chain manager from set command line flags.
-func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chainDb sevdb.Database) {
+func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chainDb ethdb.Database) {
 	var err error
 	chainDb = MakeChainDatabase(ctx, stack)
 	config, _, err := core.SetupGenesisBlock(chainDb, MakeGenesis(ctx))
@@ -1414,15 +1414,15 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 	if config.Clique != nil {
 		engine = clique.New(config.Clique, chainDb)
 	} else {
-		engine = sevash.NewFaker()
+		engine = ethash.NewFaker()
 		if !ctx.GlobalBool(FakePoWFlag.Name) {
-			engine = sevash.New(sevash.Config{
-				CacheDir:       stack.ResolvePath(sev.DefaultConfig.Sevash.CacheDir),
-				CachesInMem:    sev.DefaultConfig.Sevash.CachesInMem,
-				CachesOnDisk:   sev.DefaultConfig.Sevash.CachesOnDisk,
-				DatasetDir:     stack.ResolvePath(sev.DefaultConfig.Sevash.DatasetDir),
-				DatasetsInMem:  sev.DefaultConfig.Sevash.DatasetsInMem,
-				DatasetsOnDisk: sev.DefaultConfig.Sevash.DatasetsOnDisk,
+			engine = ethash.New(ethash.Config{
+				CacheDir:       stack.ResolvePath(eth.DefaultConfig.Sevash.CacheDir),
+				CachesInMem:    eth.DefaultConfig.Sevash.CachesInMem,
+				CachesOnDisk:   eth.DefaultConfig.Sevash.CachesOnDisk,
+				DatasetDir:     stack.ResolvePath(eth.DefaultConfig.Sevash.DatasetDir),
+				DatasetsInMem:  eth.DefaultConfig.Sevash.DatasetsInMem,
+				DatasetsOnDisk: eth.DefaultConfig.Sevash.DatasetsOnDisk,
 			}, nil, false)
 		}
 	}
@@ -1431,9 +1431,9 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 	}
 	cache := &core.CacheConfig{
 		Disabled:       ctx.GlobalString(GCModeFlag.Name) == "archive",
-		TrieCleanLimit: sev.DefaultConfig.TrieCleanCache,
-		TrieDirtyLimit: sev.DefaultConfig.TrieDirtyCache,
-		TrieTimeLimit:  sev.DefaultConfig.TrieTimeout,
+		TrieCleanLimit: eth.DefaultConfig.TrieCleanCache,
+		TrieDirtyLimit: eth.DefaultConfig.TrieDirtyCache,
+		TrieTimeLimit:  eth.DefaultConfig.TrieTimeout,
 	}
 	if ctx.GlobalIsSet(CacheFlag.Name) || ctx.GlobalIsSet(CacheTrieFlag.Name) {
 		cache.TrieCleanLimit = ctx.GlobalInt(CacheFlag.Name) * ctx.GlobalInt(CacheTrieFlag.Name) / 100
@@ -1470,11 +1470,11 @@ func MakeConsolePreloads(ctx *cli.Context) []string {
 // This is a temporary function used for migrating old command/flags to the
 // new format.
 //
-// e.g. ssev account new --keystore /tmp/mykeystore --lightkdf
+// e.g. seth account new --keystore /tmp/mykeystore --lightkdf
 //
-// is equivalent after calling this msevod with:
+// is equivalent after calling this method with:
 //
-// ssev --keystore /tmp/mykeystore --lightkdf account new
+// seth --keystore /tmp/mykeystore --lightkdf account new
 //
 // This allows the use of the existing configuration functionality.
 // When all flags are migrated this function can be removed and the existing

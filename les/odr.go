@@ -20,21 +20,21 @@ import (
 	"context"
 
 	"github.com/severeum/go-severeum/core"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/light"
 	"github.com/severeum/go-severeum/log"
 )
 
 // LesOdr implements light.OdrBackend
 type LesOdr struct {
-	db                                         sevdb.Database
+	db                                         ethdb.Database
 	indexerConfig                              *light.IndexerConfig
 	chtIndexer, bloomTrieIndexer, bloomIndexer *core.ChainIndexer
 	retriever                                  *retrieveManager
 	stop                                       chan struct{}
 }
 
-func NewLesOdr(db sevdb.Database, config *light.IndexerConfig, retriever *retrieveManager) *LesOdr {
+func NewLesOdr(db ethdb.Database, config *light.IndexerConfig, retriever *retrieveManager) *LesOdr {
 	return &LesOdr{
 		db:            db,
 		indexerConfig: config,
@@ -49,7 +49,7 @@ func (odr *LesOdr) Stop() {
 }
 
 // Database returns the backing database
-func (odr *LesOdr) Database() sevdb.Database {
+func (odr *LesOdr) Database() ethdb.Database {
 	return odr.db
 }
 

@@ -53,7 +53,7 @@ func baseInit() {
 	template.Must(base.New("rootbuttons").Parse(`
 <a class="button" href="{{$.Link ""}}">Overview</a>
 {{- range $root := .Roots -}}
-<form class="inline" msevod="POST" action="{{$.Link "scan?root=" $root}}">
+<form class="inline" method="POST" action="{{$.Link "scan?root=" $root}}">
 	<button type="submit">Scan {{quote $root}}</button>
 </form>
 {{- end -}}`))
@@ -88,7 +88,7 @@ var notFoundTemplate = contentTemplate(`
 var reportTemplate = contentTemplate(`
 {{- $report := .Data -}}
 <h1>Memsize Report {{$report.ID}}</h1>
-<form msevod="POST" action="{{$.Link "scan?root=" $report.RootName}}">
+<form method="POST" action="{{$.Link "scan?root=" $report.RootName}}">
 	<a class="button" href="{{$.Link ""}}">Overview</a>
 	<button type="submit">Scan Again</button>
 </form>

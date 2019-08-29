@@ -14,7 +14,7 @@ import (
 )
 ```
 
-Run somseving in the VM
+Run something in the VM
 
 ```go
 vm := otto.New()
@@ -83,7 +83,7 @@ vm.Set("sayHello", func(call otto.FunctionCall) otto.Value {
 })
 ```
 
-Set a Go function that returns somseving useful
+Set a Go function that returns something useful
 
 ```go
 vm.Set("twoPlus", func(call otto.FunctionCall) otto.Value {
@@ -172,7 +172,7 @@ The following are some limitations with otto:
 
 ### Regular Expression Incompatibility
 
-Go translates JavaScript-style regular expressions into somseving that is
+Go translates JavaScript-style regular expressions into something that is
 "regexp" compatible via `parser.TransformRegExp`. Unfortunately, RegExp requires
 backtracking for some patterns, and backtracking is not supported by the
 standard Go engine: https://code.google.com/p/re2/wiki/Syntax
@@ -229,7 +229,7 @@ func runUnsafe(unsafe string) {
                 fmt.Fprintf(os.Stderr, "Some code took to long! Stopping after: %v\n", duration)
                 return
             }
-            panic(caught) // Somseving else happened, repanic!
+            panic(caught) // Something else happened, repanic!
         }
         fmt.Fprintf(os.Stderr, "Ran code successfully: %v\n", duration)
     }()
@@ -252,7 +252,7 @@ Where is setTimeout/setInterval?
 
 These timing functions are not actually part of the ECMA-262 specification.
 Typically, they belong to the `window` object (in the browser). It would not be
-difficult to provide somseving like these via Go, but you probably want to wrap
+difficult to provide something like these via Go, but you probably want to wrap
 otto in an event loop in that case.
 
 For an example of how this could be done in Go with otto, see natto:
@@ -338,12 +338,12 @@ Object is the representation of a JavaScript object.
 ```go
 func (self Object) Call(name string, argumentList ...interface{}) (Value, error)
 ```
-Call a msevod on the object.
+Call a method on the object.
 
 It is essentially equivalent to:
 
-    var msevod, _ := object.Get(name)
-    msevod.Call(object, argumentList...)
+    var method, _ := object.Get(name)
+    method.Call(object, argumentList...)
 
 An undefined value and an error will result if:
 
@@ -487,7 +487,7 @@ Copy will create a copy/clone of the runtime.
 
 Copy is useful for saving some time when creating many similar runtimes.
 
-This msevod works by walking the original runtime and cloning each object,
+This method works by walking the original runtime and cloning each object,
 scope, stash, etc. into a new runtime.
 
 Be on the lookout for memory leaks or inadvertent sharing of resources.
@@ -581,7 +581,7 @@ type Script struct {
 ```
 
 Script is a handle for some (reusable) JavaScript. Passing a Script value to a
-run msevod will evaluate the JavaScript.
+run method will evaluate the JavaScript.
 
 #### func (*Script) String
 
@@ -795,8 +795,8 @@ func (value Value) Object() *Object
 ```
 Object will return the object of the value, or nil if value is not an object.
 
-This msevod will not do any implicit conversion. For example, calling this
-msevod on a string primitive value will not return a String object.
+This method will not do any implicit conversion. For example, calling this
+method on a string primitive value will not return a String object.
 
 #### func (Value) String
 
@@ -805,7 +805,7 @@ func (value Value) String() string
 ```
 String will return the value as a string.
 
-This msevod will make return the empty string if there is an error.
+This method will make return the empty string if there is an error.
 
 #### func (Value) ToBoolean
 

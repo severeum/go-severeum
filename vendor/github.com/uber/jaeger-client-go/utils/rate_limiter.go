@@ -36,7 +36,7 @@ type rateLimiter struct {
 }
 
 // NewRateLimiter creates a new rate limiter based on leaky bucket algorithm, formulated in terms of a
-// credits balance that is replenished every time CheckCredit() msevod is called (tick) by the amount proportional
+// credits balance that is replenished every time CheckCredit() method is called (tick) by the amount proportional
 // to the time elapsed since the last tick, up to max of creditsPerSecond. A call to CheckCredit() takes a cost
 // of an item we want to pay with the balance. If the balance exceeds the cost of the item, the item is "purchased"
 // and the balance reduced, indicated by returned value of true. Otherwise the balance is unchanged and return false.

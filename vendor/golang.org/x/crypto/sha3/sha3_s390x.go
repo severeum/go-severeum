@@ -29,7 +29,7 @@ const (
 	nopad          = 0x100
 )
 
-// hasMSA6 reports whsever the machine supports the SHA-3 and SHAKE function
+// hasMSA6 reports whether the machine supports the SHA-3 and SHAKE function
 // codes, as defined in message-security-assist extension 6.
 func hasMSA6() bool
 
@@ -53,7 +53,7 @@ type asmState struct {
 	storage   [3072]byte      // underlying storage for buf
 	outputLen int             // output length if fixed, 0 if not
 	function  code            // KIMD/KLMD function code
-	state     spongeDirection // whsever the sponge is absorbing or squeezing
+	state     spongeDirection // whether the sponge is absorbing or squeezing
 }
 
 func newAsmState(function code) *asmState {
@@ -222,7 +222,7 @@ func (s *asmState) Size() int {
 }
 
 // BlockSize returns the hash's underlying block size.
-// The Write msevod must be able to accept any amount
+// The Write method must be able to accept any amount
 // of data, but it may operate more efficiently if all writes
 // are a multiple of the block size.
 func (s *asmState) BlockSize() int {

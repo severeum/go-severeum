@@ -77,17 +77,17 @@ type FIFSRegistrarTransactorSession struct {
 
 // FIFSRegistrarRaw is an auto generated low-level Go binding around an Severeum contract.
 type FIFSRegistrarRaw struct {
-	Contract *FIFSRegistrar // Generic contract binding to access the raw msevods on
+	Contract *FIFSRegistrar // Generic contract binding to access the raw methods on
 }
 
 // FIFSRegistrarCallerRaw is an auto generated low-level read-only Go binding around an Severeum contract.
 type FIFSRegistrarCallerRaw struct {
-	Contract *FIFSRegistrarCaller // Generic read-only contract binding to access the raw msevods on
+	Contract *FIFSRegistrarCaller // Generic read-only contract binding to access the raw methods on
 }
 
 // FIFSRegistrarTransactorRaw is an auto generated low-level write-only Go binding around an Severeum contract.
 type FIFSRegistrarTransactorRaw struct {
-	Contract *FIFSRegistrarTransactor // Generic write-only contract binding to access the raw msevods on
+	Contract *FIFSRegistrarTransactor // Generic write-only contract binding to access the raw methods on
 }
 
 // NewFIFSRegistrar creates a new instance of FIFSRegistrar, bound to a specific deployed contract.
@@ -135,59 +135,59 @@ func bindFIFSRegistrar(address common.Address, caller bind.ContractCaller, trans
 	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
 }
 
-// Call invokes the (constant) contract msevod with params as input values and
+// Call invokes the (constant) contract method with params as input values and
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_FIFSRegistrar *FIFSRegistrarRaw) Call(opts *bind.CallOpts, result interface{}, msevod string, params ...interface{}) error {
-	return _FIFSRegistrar.Contract.FIFSRegistrarCaller.contract.Call(opts, result, msevod, params...)
+func (_FIFSRegistrar *FIFSRegistrarRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
+	return _FIFSRegistrar.Contract.FIFSRegistrarCaller.contract.Call(opts, result, method, params...)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
-// its default msevod if one is available.
+// its default method if one is available.
 func (_FIFSRegistrar *FIFSRegistrarRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
 	return _FIFSRegistrar.Contract.FIFSRegistrarTransactor.contract.Transfer(opts)
 }
 
-// Transact invokes the (paid) contract msevod with params as input values.
-func (_FIFSRegistrar *FIFSRegistrarRaw) Transact(opts *bind.TransactOpts, msevod string, params ...interface{}) (*types.Transaction, error) {
-	return _FIFSRegistrar.Contract.FIFSRegistrarTransactor.contract.Transact(opts, msevod, params...)
+// Transact invokes the (paid) contract method with params as input values.
+func (_FIFSRegistrar *FIFSRegistrarRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+	return _FIFSRegistrar.Contract.FIFSRegistrarTransactor.contract.Transact(opts, method, params...)
 }
 
-// Call invokes the (constant) contract msevod with params as input values and
+// Call invokes the (constant) contract method with params as input values and
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_FIFSRegistrar *FIFSRegistrarCallerRaw) Call(opts *bind.CallOpts, result interface{}, msevod string, params ...interface{}) error {
-	return _FIFSRegistrar.Contract.contract.Call(opts, result, msevod, params...)
+func (_FIFSRegistrar *FIFSRegistrarCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
+	return _FIFSRegistrar.Contract.contract.Call(opts, result, method, params...)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
-// its default msevod if one is available.
+// its default method if one is available.
 func (_FIFSRegistrar *FIFSRegistrarTransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
 	return _FIFSRegistrar.Contract.contract.Transfer(opts)
 }
 
-// Transact invokes the (paid) contract msevod with params as input values.
-func (_FIFSRegistrar *FIFSRegistrarTransactorRaw) Transact(opts *bind.TransactOpts, msevod string, params ...interface{}) (*types.Transaction, error) {
-	return _FIFSRegistrar.Contract.contract.Transact(opts, msevod, params...)
+// Transact invokes the (paid) contract method with params as input values.
+func (_FIFSRegistrar *FIFSRegistrarTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+	return _FIFSRegistrar.Contract.contract.Transact(opts, method, params...)
 }
 
-// Register is a paid mutator transaction binding the contract msevod 0xd22057a9.
+// Register is a paid mutator transaction binding the contract method 0xd22057a9.
 //
 // Solidity: function register(subnode bytes32, owner address) returns()
 func (_FIFSRegistrar *FIFSRegistrarTransactor) Register(opts *bind.TransactOpts, subnode [32]byte, owner common.Address) (*types.Transaction, error) {
 	return _FIFSRegistrar.contract.Transact(opts, "register", subnode, owner)
 }
 
-// Register is a paid mutator transaction binding the contract msevod 0xd22057a9.
+// Register is a paid mutator transaction binding the contract method 0xd22057a9.
 //
 // Solidity: function register(subnode bytes32, owner address) returns()
 func (_FIFSRegistrar *FIFSRegistrarSession) Register(subnode [32]byte, owner common.Address) (*types.Transaction, error) {
 	return _FIFSRegistrar.Contract.Register(&_FIFSRegistrar.TransactOpts, subnode, owner)
 }
 
-// Register is a paid mutator transaction binding the contract msevod 0xd22057a9.
+// Register is a paid mutator transaction binding the contract method 0xd22057a9.
 //
 // Solidity: function register(subnode bytes32, owner address) returns()
 func (_FIFSRegistrar *FIFSRegistrarTransactorSession) Register(subnode [32]byte, owner common.Address) (*types.Transaction, error) {

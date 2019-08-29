@@ -241,7 +241,7 @@ func (t *handshakeTransport) requestKeyExchange() {
 	select {
 	case t.requestKex <- struct{}{}:
 	default:
-		// somseving already requested a kex, so do nothing.
+		// something already requested a kex, so do nothing.
 	}
 }
 
@@ -558,7 +558,7 @@ func (t *handshakeTransport) enterKeyExchange(otherInitPacket []byte) error {
 
 	// We don't send FirstKexFollows, but we handle receiving it.
 	//
-	// RFC 4253 section 7 defines the kex and the agreement msevod for
+	// RFC 4253 section 7 defines the kex and the agreement method for
 	// first_kex_packet_follows. It states that the guessed packet
 	// should be ignored if the "kex algorithm and/or the host
 	// key algorithm is guessed wrong (server and client have

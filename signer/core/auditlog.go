@@ -24,7 +24,7 @@ import (
 	"github.com/severeum/go-severeum/accounts"
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/common/hexutil"
-	"github.com/severeum/go-severeum/internal/sevapi"
+	"github.com/severeum/go-severeum/internal/ethapi"
 	"github.com/severeum/go-severeum/log"
 )
 
@@ -45,16 +45,16 @@ func (l *AuditLogger) New(ctx context.Context) (accounts.Account, error) {
 	return l.api.New(ctx)
 }
 
-func (l *AuditLogger) SignTransaction(ctx context.Context, args SendTxArgs, msevodSelector *string) (*sevapi.SignTransactionResult, error) {
+func (l *AuditLogger) SignTransaction(ctx context.Context, args SendTxArgs, methodSelector *string) (*ethapi.SignTransactionResult, error) {
 	sel := "<nil>"
-	if msevodSelector != nil {
-		sel = *msevodSelector
+	if methodSelector != nil {
+		sel = *methodSelector
 	}
 	l.log.Info("SignTransaction", "type", "request", "metadata", MetadataFromContext(ctx).String(),
 		"tx", args.String(),
-		"msevodSelector", sel)
+		"methodSelector", sel)
 
-	res, e := l.api.SignTransaction(ctx, args, msevodSelector)
+	res, e := l.api.SignTransaction(ctx, args, methodSelector)
 	if res != nil {
 		l.log.Info("SignTransaction", "type", "response", "data", common.Bytes2Hex(res.Raw), "error", e)
 	} else {

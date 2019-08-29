@@ -13,8 +13,8 @@ var (
 	ErrECDSAVerification = errors.New("crypto/ecdsa: verification error")
 )
 
-// Implements the ECDSA family of signing msevods signing msevods
-type SigningMsevodECDSA struct {
+// Implements the ECDSA family of signing methods signing methods
+type SigningMethodECDSA struct {
 	Name      string
 	Hash      crypto.Hash
 	KeySize   int
@@ -23,38 +23,38 @@ type SigningMsevodECDSA struct {
 
 // Specific instances for EC256 and company
 var (
-	SigningMsevodES256 *SigningMsevodECDSA
-	SigningMsevodES384 *SigningMsevodECDSA
-	SigningMsevodES512 *SigningMsevodECDSA
+	SigningMethodES256 *SigningMethodECDSA
+	SigningMethodES384 *SigningMethodECDSA
+	SigningMethodES512 *SigningMethodECDSA
 )
 
 func init() {
 	// ES256
-	SigningMsevodES256 = &SigningMsevodECDSA{"ES256", crypto.SHA256, 32, 256}
-	RegisterSigningMsevod(SigningMsevodES256.Alg(), func() SigningMsevod {
-		return SigningMsevodES256
+	SigningMethodES256 = &SigningMethodECDSA{"ES256", crypto.SHA256, 32, 256}
+	RegisterSigningMethod(SigningMethodES256.Alg(), func() SigningMethod {
+		return SigningMethodES256
 	})
 
 	// ES384
-	SigningMsevodES384 = &SigningMsevodECDSA{"ES384", crypto.SHA384, 48, 384}
-	RegisterSigningMsevod(SigningMsevodES384.Alg(), func() SigningMsevod {
-		return SigningMsevodES384
+	SigningMethodES384 = &SigningMethodECDSA{"ES384", crypto.SHA384, 48, 384}
+	RegisterSigningMethod(SigningMethodES384.Alg(), func() SigningMethod {
+		return SigningMethodES384
 	})
 
 	// ES512
-	SigningMsevodES512 = &SigningMsevodECDSA{"ES512", crypto.SHA512, 66, 521}
-	RegisterSigningMsevod(SigningMsevodES512.Alg(), func() SigningMsevod {
-		return SigningMsevodES512
+	SigningMethodES512 = &SigningMethodECDSA{"ES512", crypto.SHA512, 66, 521}
+	RegisterSigningMethod(SigningMethodES512.Alg(), func() SigningMethod {
+		return SigningMethodES512
 	})
 }
 
-func (m *SigningMsevodECDSA) Alg() string {
+func (m *SigningMethodECDSA) Alg() string {
 	return m.Name
 }
 
-// Implements the Verify msevod from SigningMsevod
-// For this verify msevod, key must be an ecdsa.PublicKey struct
-func (m *SigningMsevodECDSA) Verify(signingString, signature string, key interface{}) error {
+// Implements the Verify method from SigningMethod
+// For this verify method, key must be an ecdsa.PublicKey struct
+func (m *SigningMethodECDSA) Verify(signingString, signature string, key interface{}) error {
 	var err error
 
 	// Decode the signature
@@ -94,9 +94,9 @@ func (m *SigningMsevodECDSA) Verify(signingString, signature string, key interfa
 	}
 }
 
-// Implements the Sign msevod from SigningMsevod
-// For this signing msevod, key must be an ecdsa.PrivateKey struct
-func (m *SigningMsevodECDSA) Sign(signingString string, key interface{}) (string, error) {
+// Implements the Sign method from SigningMethod
+// For this signing method, key must be an ecdsa.PrivateKey struct
+func (m *SigningMethodECDSA) Sign(signingString string, key interface{}) (string, error) {
 	// Get the key
 	var ecdsaKey *ecdsa.PrivateKey
 	switch k := key.(type) {

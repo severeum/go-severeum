@@ -106,10 +106,10 @@ func TestNeighbourhoodDepth(t *testing.T) {
 		addr := pot.RandomAddressAt(baseAddress, i)
 		peers = append(peers, newTestDiscoveryPeer(addr, kad))
 	}
-	var sevenPeers []*Peer
+	var ethenPeers []*Peer
 	for i := 0; i < 2; i++ {
 		addr := pot.RandomAddressAt(baseAddress, 7)
-		sevenPeers = append(sevenPeers, newTestDiscoveryPeer(addr, kad))
+		ethenPeers = append(ethenPeers, newTestDiscoveryPeer(addr, kad))
 	}
 
 	testNum := 0
@@ -121,7 +121,7 @@ func TestNeighbourhoodDepth(t *testing.T) {
 	testNum++
 
 	// add one peer on 7
-	kad.On(sevenPeers[0])
+	kad.On(ethenPeers[0])
 	depth = kad.NeighbourhoodDepth()
 	if depth != 0 {
 		t.Fatalf("%d expected depth 0, was %d", testNum, depth)
@@ -129,7 +129,7 @@ func TestNeighbourhoodDepth(t *testing.T) {
 	testNum++
 
 	// add a second on 7
-	kad.On(sevenPeers[1])
+	kad.On(ethenPeers[1])
 	depth = kad.NeighbourhoodDepth()
 	if depth != 0 {
 		t.Fatalf("%d expected depth 0, was %d", testNum, depth)
@@ -146,7 +146,7 @@ func TestNeighbourhoodDepth(t *testing.T) {
 	}
 	testNum++
 
-	kad.Off(sevenPeers[1])
+	kad.Off(ethenPeers[1])
 	depth = kad.NeighbourhoodDepth()
 	if depth != 6 {
 		t.Fatalf("%d expected depth 6, was %d", testNum, depth)
@@ -169,7 +169,7 @@ func TestNeighbourhoodDepth(t *testing.T) {
 }
 
 // TestHealthStrict tests the simplest definition of health
-// Which means whsever we are connected to all neighbors we know of
+// Which means whether we are connected to all neighbors we know of
 func TestHealthStrict(t *testing.T) {
 
 	// base address is all zeros

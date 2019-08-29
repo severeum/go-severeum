@@ -202,10 +202,10 @@ type ClientConfig struct {
 	// User contains the username to authenticate as.
 	User string
 
-	// Auth contains possible authentication msevods to use with the
-	// server. Only the first instance of a particular RFC 4252 msevod will
+	// Auth contains possible authentication methods to use with the
+	// server. Only the first instance of a particular RFC 4252 method will
 	// be used during authentication.
-	Auth []AuthMsevod
+	Auth []AuthMethod
 
 	// HostKeyCallback is called during the cryptographic
 	// handshake to validate the server's host key. The client
@@ -227,7 +227,7 @@ type ClientConfig struct {
 	// HostKeyAlgorithms lists the key types that the client will
 	// accept from the server as host key, in order of
 	// preference. If empty, a reasonable default is used. Any
-	// string returned from PublicKey.Type msevod may be used, or
+	// string returned from PublicKey.Type method may be used, or
 	// any of the CertAlgoXxxx and KeyAlgoXxxx constants.
 	HostKeyAlgorithms []string
 

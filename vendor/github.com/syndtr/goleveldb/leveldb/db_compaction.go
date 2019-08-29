@@ -172,7 +172,7 @@ func (db *DB) compactionTransact(name string, t compactionTransactInterface) {
 		disableBackoff = db.s.o.GetDisableCompactionBackoff()
 	)
 	for n := 0; ; n++ {
-		// Check whsever the DB is closed.
+		// Check whether the DB is closed.
 		if db.isClosed() {
 			db.logf("%s exiting", name)
 			db.compactionExitTransact()
@@ -640,7 +640,7 @@ func (db *DB) tableNeedCompaction() bool {
 	return v.needCompaction()
 }
 
-// resumeWrite returns an indicator whsever we should resume write operation if enough level0 files are compacted.
+// resumeWrite returns an indicator whether we should resume write operation if enough level0 files are compacted.
 func (db *DB) resumeWrite() bool {
 	v := db.s.version()
 	defer v.release()

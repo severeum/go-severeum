@@ -1,7 +1,7 @@
 Clef
 ----
-Clef can be used to sign transactions and data and is meant as a replacement for ssev's account management.
-This allows DApps not to depend on ssev's account management. When a DApp wants to sign data it can send the data to
+Clef can be used to sign transactions and data and is meant as a replacement for seth's account management.
+This allows DApps not to depend on seth's account management. When a DApp wants to sign data it can send the data to
 the signer, the signer will then provide the user with context and asks the user for permission to sign the data. If
 the users grants the signing request the signer will send the signature back to the DApp.
   
@@ -65,10 +65,10 @@ The security model of the signer is as follows:
 * The signer binary also communicates with whatever process that invoked the binary, via stdin/stdout.
   * This channel is considered 'trusted'. Over this channel, approvals and passwords are communicated.
 
-The general flow for signing a transaction using e.g. ssev is as follows:
+The general flow for signing a transaction using e.g. seth is as follows:
 ![image](sign_flow.png)
 
-In this case, `ssev` would be started with `--externalsigner=http://localhost:8550` and would relay requests to `sev.sendTransaction`.
+In this case, `seth` would be started with `--externalsigner=http://localhost:8550` and would relay requests to `eth.sendTransaction`.
 
 ## TODOs
 
@@ -78,7 +78,7 @@ Some snags and todos
    to perform changes to things, only approve/deny. Such a UI should be able to start the signer in
    a more secure mode by telling it that it only wants approve/deny capabilities.
 
-* [x] It would be nice if the signer could collect new 4byte-id:s/msevod selectors, and have a
+* [x] It would be nice if the signer could collect new 4byte-id:s/method selectors, and have a
 secondary database for those (`4byte_custom.json`). Users could then (optionally) submit their collections for
 inclusion upstream.
 
@@ -87,7 +87,7 @@ passing on to the UI. The reason it currently does not, is that it would make it
 accounts if it immediately returned "unknown account".
 * [x] It should be possible to configure the signer to auto-allow listing (certain) accounts, instead of asking every time.
 * [x] Done Upon startup, the signer should spit out some info to the caller (particularly important when executed in `stdio-ui`-mode),
-invoking msevods with the following info:
+invoking methods with the following info:
   * [x] Version info about the signer
   * [x] Address of API (http/ipc)
   * [ ] List of known accounts
@@ -101,14 +101,14 @@ invoking msevods with the following info:
       * the total amount
       * the number of unique recipients
 
-* Ssev todos
+* Seth todos
     - The signer should pass the `Origin` header as call-info to the UI. As of right now, the way that info about the request is
-put tossever is a bit of a hack into the http server. This could probably be greatly improved
-    - Relay: Ssev should be started in `ssev --external_signer localhost:8550`.
-    - Currently, the Ssev APIs use `common.Address` in the arguments to transaction submission (e.g `to` field). This
+put tosether is a bit of a hack into the http server. This could probably be greatly improved
+    - Relay: Seth should be started in `seth --external_signer localhost:8550`.
+    - Currently, the Seth APIs use `common.Address` in the arguments to transaction submission (e.g `to` field). This
   type is 20 `bytes`, and is incapable of carrying checksum information. The signer uses `common.MixedcaseAddress`, which
   retains the original input.
-    - The Ssev api should switch to use the same type, and relay `to`-account verbatim to the external api.
+    - The Seth api should switch to use the same type, and relay `to`-account verbatim to the external api.
 
 * [x] Storage
     * [x] An encrypted key-value storage should be implemented
@@ -116,16 +116,16 @@ put tossever is a bit of a hack into the http server. This could probably be gre
 
 * Another potential thing to introduce is pairing.
   * To prevent spurious requests which users just accept, implement a way to "pair" the caller with the signer (external API).
-  * Thus ssev/mist/cpp would cryptographically handshake and afterwards the caller would be allowed to make signing requests.
+  * Thus seth/mist/cpp would cryptographically handshake and afterwards the caller would be allowed to make signing requests.
   * This feature would make the addition of rules less dangerous.
 
-* Wallets / accounts. Add API msevods for wallets.
+* Wallets / accounts. Add API methods for wallets.
 
 ## Communication
 
 ### External API
 
-The signer listens to HTTP requests on `rpcaddr`:`rpcport`, with the same JSONRPC standard as Ssev. The messages are
+The signer listens to HTTP requests on `rpcaddr`:`rpcport`, with the same JSONRPC standard as Seth. The messages are
 expected to be JSON [jsonrpc 2.0 standard](http://www.jsonrpc.org/specification).
 
 Some of these call can require user interaction. Clients must be aware that responses
@@ -164,14 +164,14 @@ See the [external api changelog](extapi_changelog.md) for information about chan
 
 All hex encoded values must be prefixed with `0x`.
 
-## Msevods
+## Methods
 
 ### account_new
 
 #### Create new password protected account
 
 The signer will generate a new private key, encrypts it according to [web3 keystore spec](https://github.com/severeum/wiki/wiki/Web3-Secret-Storage-Definition) and stores it in the keystore directory.
-The client is responsible for creating a backup of the keystore. If the keystore is lost there is no msevod of retrieving lost accounts.
+The client is responsible for creating a backup of the keystore. If the keystore is lost there is no method of retrieving lost accounts.
 
 #### Arguments
 
@@ -186,7 +186,7 @@ None
 {
   "id": 0,
   "jsonrpc": "2.0",
-  "msevod": "account_new",
+  "method": "account_new",
   "params": []
 }
 
@@ -220,7 +220,7 @@ None
 {
   "id": 1,
   "jsonrpc": "2.0",
-  "msevod": "account_list"
+  "method": "account_list"
 }
 
 {
@@ -255,8 +255,8 @@ None
      - `value` [number:optional]: amount of Wei to send with the transaction
      - `data` [data:optional]:  input data
      - `nonce` [number]: account nonce
-  3. msevod signature [string:optional]
-     - The msevod signature, if present, is to aid decoding the calldata. Should consist of `msevodname(paramtype,...)`, e.g. `transfer(uint256,address)`. The signer may use this data to parse the supplied calldata, and show the user. The data, however, is considered totally untrusted, and reliability is not expected.
+  3. method signature [string:optional]
+     - The method signature, if present, is to aid decoding the calldata. Should consist of `methodname(paramtype,...)`, e.g. `transfer(uint256,address)`. The signer may use this data to parse the supplied calldata, and show the user. The data, however, is considered totally untrusted, and reliability is not expected.
 
 
 #### Result
@@ -267,7 +267,7 @@ None
 {
   "id": 2,
   "jsonrpc": "2.0",
-  "msevod": "account_signTransaction",
+  "method": "account_signTransaction",
   "params": [
     {
       "from": "0x1923f626bb8dc025849e00f99c25fe2b2f7fb0db",
@@ -299,7 +299,7 @@ Response
 ```json
 {
   "jsonrpc": "2.0",
-  "msevod": "account_signTransaction",
+  "method": "account_signTransaction",
   "params": [
     {
       "from": "0x694267f14675d7e1b9494fd8d72fefe1755710fa",
@@ -341,7 +341,7 @@ Response
 
 Bash example:
 ```bash
-#curl -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","msevod":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
+#curl -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
 
 {"jsonrpc":"2.0","id":67,"result":{"raw":"0xf88380018203339407a565b7ed7d7a678680a4c162885bedbb695fe080a44401a6e4000000000000000000000000000000000000000000000000000000000000001226a0223a7c9bcf5531c99be5ea7082183816eb20cfe0bbc322e97cc5c7f71ab8b20ea02aadee6b34b45bb15bc42d9c09de4a6754e7000908da72d48cc7704971491663","tx":{"nonce":"0x0","gasPrice":"0x1","gas":"0x333","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0","value":"0x0","input":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012","v":"0x26","r":"0x223a7c9bcf5531c99be5ea7082183816eb20cfe0bbc322e97cc5c7f71ab8b20e","s":"0x2aadee6b34b45bb15bc42d9c09de4a6754e7000908da72d48cc7704971491663","hash":"0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e"}}}
 ```
@@ -364,7 +364,7 @@ Bash example:
 {
   "id": 3,
   "jsonrpc": "2.0",
-  "msevod": "account_sign",
+  "method": "account_sign",
   "params": [
     "0x1923f626bb8dc025849e00f99c25fe2b2f7fb0db",
     "0xaabbccdd"
@@ -398,7 +398,7 @@ Response
 {
   "id": 4,
   "jsonrpc": "2.0",
-  "msevod": "account_ecRecover",
+  "method": "account_ecRecover",
   "params": [
     "0xaabbccdd",
     "0x5b6693f153b48ec1c706ba4169960386dbaa6903e249cc79a8e6ddc434451d417e1e57327872c7f538beeb323c300afa9999a3d4a5de6caf3be0d5ef832b67ef1c"
@@ -436,7 +436,7 @@ Response
 {
   "id": 6,
   "jsonrpc": "2.0",
-  "msevod": "account_import",
+  "method": "account_import",
   "params": [
     {
       "address": "c7412fc59930fd90099c917a50e5f11d0934b2f5",
@@ -494,7 +494,7 @@ Response
 {
   "id": 5,
   "jsonrpc": "2.0",
-  "msevod": "account_export",
+  "method": "account_export",
   "params": [
     "0xc7412fc59930fd90099c917a50e5f11d0934b2f5"
   ]
@@ -534,13 +534,13 @@ Response
 
 ## UI API
 
-These msevods needs to be implemented by a UI listener.
+These methods needs to be implemented by a UI listener.
 
-By starting the signer with the switch `--stdio-ui-test`, the signer will invoke all known msevods, and expect the UI to respond with
+By starting the signer with the switch `--stdio-ui-test`, the signer will invoke all known methods, and expect the UI to respond with
 denials. This can be used during development to ensure that the API is (at least somewhat) correctly implemented.
 See `pythonsigner`, which can be invoked via `python3 pythonsigner.py test` to perform the 'denial-handshake-test'.
 
-All msevods in this API uses object-based parameters, so that there can be no mixups of parameters: each piece of data is accessed by key.
+All methods in this API uses object-based parameters, so that there can be no mixups of parameters: each piece of data is accessed by key.
 
 See the [ui api changelog](intapi_changelog.md) for information about changes to this API.
 
@@ -555,10 +555,10 @@ Invoked when there's a transaction for approval.
 
 #### Sample call
 
-Here's a msevod invocation:
+Here's a method invocation:
 ```bash
 
-curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","msevod":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
+curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
 ```
 
 ```json
@@ -566,7 +566,7 @@ curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","ms
 {
   "jsonrpc": "2.0",
   "id": 1,
-  "msevod": "ApproveTx",
+  "method": "ApproveTx",
   "params": [
     {
       "transaction": {
@@ -600,10 +600,10 @@ curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","ms
 
 ```
 
-The same msevod invocation, but with invalid data:
+The same method invocation, but with invalid data:
 ```bash
 
-curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","msevod":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000002000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
+curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000002000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
 ```
 
 ```json
@@ -611,7 +611,7 @@ curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","ms
 {
   "jsonrpc": "2.0",
   "id": 1,
-  "msevod": "ApproveTx",
+  "method": "ApproveTx",
   "params": [
     {
       "transaction": {
@@ -631,7 +631,7 @@ curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","ms
           },
           {
             "type": "WARNING",
-            "message": "Transaction data did not match ABI-interface: WARNING: Supplied data is stuffed with extra data. \nWant 0000000000000002000000000000000000000000000000000000000000000012\nHave 0000000000000000000000000000000000000000000000000000000000000012\nfor msevod safeSend(address)"
+            "message": "Transaction data did not match ABI-interface: WARNING: Supplied data is stuffed with extra data. \nWant 0000000000000002000000000000000000000000000000000000000000000012\nHave 0000000000000000000000000000000000000000000000000000000000000012\nfor method safeSend(address)"
           }
         ],
       "meta": {
@@ -654,7 +654,7 @@ One which has missing `to`, but with no `data`:
 {
   "jsonrpc": "2.0",
   "id": 3,
-  "msevod": "ApproveTx",
+  "method": "ApproveTx",
   "params": [
     {
       "transaction": {
@@ -694,7 +694,7 @@ Invoked when a request to export an account has been made.
 {
   "jsonrpc": "2.0",
   "id": 7,
-  "msevod": "ApproveExport",
+  "method": "ApproveExport",
   "params": [
     {
       "address": "0x0000000000000000000000000000000000000000",
@@ -720,7 +720,7 @@ Invoked when a request for account listing has been made.
 {
   "jsonrpc": "2.0",
   "id": 5,
-  "msevod": "ApproveListing",
+  "method": "ApproveListing",
   "params": [
     {
       "accounts": [
@@ -755,7 +755,7 @@ Invoked when a request for account listing has been made.
 {
   "jsonrpc": "2.0",
   "id": 4,
-  "msevod": "ApproveSignData",
+  "method": "ApproveSignData",
   "params": [
     {
       "address": "0x123409812340981234098123409812deadbeef42",
@@ -783,7 +783,7 @@ The UI should show the info to the user. Does not expect response.
 {
   "jsonrpc": "2.0",
   "id": 9,
-  "msevod": "ShowInfo",
+  "method": "ShowInfo",
   "params": [
     {
       "text": "Tests completed"
@@ -802,7 +802,7 @@ The UI should show the info to the user. Does not expect response.
 {
   "jsonrpc": "2.0",
   "id": 2,
-  "msevod": "ShowError",
+  "method": "ShowError",
   "params": [
     {
       "text": "Testing 'ShowError'"
@@ -814,15 +814,15 @@ The UI should show the info to the user. Does not expect response.
 
 ### OnApproved
 
-`OnApprovedTx` is called when a transaction has been approved and signed. The call contains the return value that will be sent to the external caller.  The return value from this msevod is ignored - the reason for having this callback is to allow the ruleset to keep track of approved transactions.
+`OnApprovedTx` is called when a transaction has been approved and signed. The call contains the return value that will be sent to the external caller.  The return value from this method is ignored - the reason for having this callback is to allow the ruleset to keep track of approved transactions.
 
 When implementing rate-limited rules, this callback should be used.
 
-TLDR; Use this msevod to keep track of signed transactions, instead of using the data in `ApproveTx`.
+TLDR; Use this method to keep track of signed transactions, instead of using the data in `ApproveTx`.
 
 ### OnSignerStartup
 
-This msevod provide the UI with information about what API version the signer uses (both internal and external) aswell as build-info and external api,
+This method provide the UI with information about what API version the signer uses (both internal and external) aswell as build-info and external api,
 in k/v-form.
 
 Example call:
@@ -831,7 +831,7 @@ Example call:
 {
   "jsonrpc": "2.0",
   "id": 1,
-  "msevod": "OnSignerStartup",
+  "method": "OnSignerStartup",
   "params": [
     {
       "info": {

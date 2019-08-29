@@ -1089,7 +1089,7 @@ var neutral = table{
 	{0xE0020, 0xE007F},
 }
 
-// Condition have flag EastAsianWidth whsever the current locale is CJK or not.
+// Condition have flag EastAsianWidth whether the current locale is CJK or not.
 type Condition struct {
 	EastAsianWidth bool
 }
@@ -1199,12 +1199,12 @@ func RuneWidth(r rune) int {
 	return DefaultCondition.RuneWidth(r)
 }
 
-// IsAmbiguousWidth returns whsever is ambiguous width or not.
+// IsAmbiguousWidth returns whether is ambiguous width or not.
 func IsAmbiguousWidth(r rune) bool {
 	return inTables(r, private, ambiguous)
 }
 
-// IsNeutralWidth returns whsever is neutral width or not.
+// IsNeutralWidth returns whether is neutral width or not.
 func IsNeutralWidth(r rune) bool {
 	return inTable(r, neutral)
 }

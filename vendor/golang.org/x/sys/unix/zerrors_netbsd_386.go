@@ -1671,7 +1671,7 @@ var errors = [...]string{
 	92: "STREAM ioctl timeout",
 	93: "attribute not found",
 	94: "multihop attempted",
-	95: "link has been severed",
+	95: "link has been ethered",
 	96: "protocol error",
 }
 

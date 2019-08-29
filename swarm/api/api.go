@@ -930,7 +930,7 @@ func (a *API) FeedsUpdate(ctx context.Context, request *feed.Request) (storage.A
 // ErrCannotLoadFeedManifest is returned when looking up a feeds manifest fails
 var ErrCannotLoadFeedManifest = errors.New("Cannot load feed manifest")
 
-// ErrNotAFeedManifest is returned when the address provided returned somseving other than a valid manifest
+// ErrNotAFeedManifest is returned when the address provided returned something other than a valid manifest
 var ErrNotAFeedManifest = errors.New("Not a feed manifest")
 
 // ResolveFeedManifest retrieves the Swarm feed manifest for the given address, and returns the referenced Feed.

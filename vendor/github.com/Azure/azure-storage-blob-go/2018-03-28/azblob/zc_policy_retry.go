@@ -38,7 +38,7 @@ type RetryOptions struct {
 	// A value of zero means that you accept our default timeout. NOTE: When transferring large amounts
 	// of data, the default TryTimeout will probably not be sufficient. You should override this value
 	// based on the bandwidth available to the host machine and proximity to the Storage service. A good
-	// starting point may be somseving like (60 seconds per MB of anticipated-payload-size).
+	// starting point may be something like (60 seconds per MB of anticipated-payload-size).
 	TryTimeout time.Duration
 
 	// RetryDelay specifies the amount of delay to use before retrying an operation (0=default).
@@ -53,7 +53,7 @@ type RetryOptions struct {
 	// If you specify 0, then you must also specify 0 for RetryDelay.
 	MaxRetryDelay time.Duration
 
-	// RetryReadsFromSecondaryHost specifies whsever the retry policy should retry a read operation against another host.
+	// RetryReadsFromSecondaryHost specifies whether the retry policy should retry a read operation against another host.
 	// If RetryReadsFromSecondaryHost is "" (the default) then operations are not retried against another host.
 	// NOTE: Before setting this field, make sure you understand the issues around reading stale & potentially-inconsistent
 	// data at this webpage: https://docs.microsoft.com/en-us/azure/storage/common/storage-designing-ha-apps-with-ragrs
@@ -143,7 +143,7 @@ func NewRetryPolicyFactory(o RetryOptions) pipeline.Factory {
 			primaryTry := int32(0) // This indicates how many tries we've attempted against the primary DC
 
 			// We only consider retrying against a secondary if we have a read request (GET/HEAD) AND this policy has a Secondary URL it can use
-			considerSecondary := (request.Msevod == http.MsevodGet || request.Msevod == http.MsevodHead) && o.retryReadsFromSecondaryHost() != ""
+			considerSecondary := (request.Method == http.MethodGet || request.Method == http.MethodHead) && o.retryReadsFromSecondaryHost() != ""
 
 			// Exponential retry algorithm: ((2 ^ attempt) - 1) * delay * random(0.8, 1.2)
 			// When to retry: connection failure or temporary/timeout. NOTE: StorageError considers HTTP 500/503 as temporary & is therefore retryable
@@ -259,10 +259,10 @@ func NewRetryPolicyFactory(o RetryOptions) pipeline.Factory {
 	})
 }
 
-// According to https://github.com/golang/go/wiki/CompilerOptimizations, the compiler will inline this msevod and hopefully optimize all calls to it away
+// According to https://github.com/golang/go/wiki/CompilerOptimizations, the compiler will inline this method and hopefully optimize all calls to it away
 var logf = func(format string, a ...interface{}) {}
 
-// Use this version to see the retry msevod's code path (import "fmt")
+// Use this version to see the retry method's code path (import "fmt")
 //var logf = fmt.Printf
 
 /*
@@ -311,7 +311,7 @@ func improveDeadlineExceeded(cause error) error {
 	}
 }
 
-// Error implements the error interface's Error msevod to return a string representation of the error.
+// Error implements the error interface's Error method to return a string representation of the error.
 func (e *deadlineExceeded) Error() string {
 	return e.ErrorNode.Error("context deadline exceeded; when creating a pipeline, consider increasing RetryOptions' TryTimeout field")
 }

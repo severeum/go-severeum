@@ -45,7 +45,7 @@ type NetworkConfig struct {
 // simulated nodes and the connections which exist between them.
 //
 // The Network has a single NodeAdapter which is responsible for actually
-// starting nodes and connecting them tossever.
+// starting nodes and connecting them tosether.
 //
 // The Network emits events when nodes are started and stopped, when they are
 // connected and disconnected, and also when messages are sent between nodes.
@@ -274,8 +274,8 @@ func (net *Network) Stop(id enode.ID) error {
 	return nil
 }
 
-// Connect connects two nodes tossever by calling the "admin_addPeer" RPC
-// msevod on the "one" node so that it connects to the "other" node
+// Connect connects two nodes tosether by calling the "admin_addPeer" RPC
+// method on the "one" node so that it connects to the "other" node
 func (net *Network) Connect(oneID, otherID enode.ID) error {
 	log.Debug("Connecting nodes with addPeer", "id", oneID, "other", otherID)
 	conn, err := net.InitConn(oneID, otherID)
@@ -291,7 +291,7 @@ func (net *Network) Connect(oneID, otherID enode.ID) error {
 }
 
 // Disconnect disconnects two nodes by calling the "admin_removePeer" RPC
-// msevod on the "one" node so that it disconnects from the "other" node
+// method on the "one" node so that it disconnects from the "other" node
 func (net *Network) Disconnect(oneID, otherID enode.ID) error {
 	conn := net.GetConn(oneID, otherID)
 	if conn == nil {
@@ -521,7 +521,7 @@ func (net *Network) getConn(oneID, otherID enode.ID) *Conn {
 // the order of nodes does not matter, i.e., Conn(i,j) == Conn(j, i)
 // it checks if the connection is already up, and if the nodes are running
 // NOTE:
-// it also checks whsever there has been recent attempt to connect the peers
+// it also checks whether there has been recent attempt to connect the peers
 // this is cheating as the simulation is used as an oracle and know about
 // remote peers attempt to connect to a node which will then not initiate the connection
 func (net *Network) InitConn(oneID, otherID enode.ID) (*Conn, error) {
@@ -584,7 +584,7 @@ type Node struct {
 	// Config if the config used to created the node
 	Config *adapters.NodeConfig `json:"config"`
 
-	// Up tracks whsever or not the node is running
+	// Up tracks whether or not the node is running
 	Up bool `json:"up"`
 }
 
@@ -631,7 +631,7 @@ type Conn struct {
 	// Other is the node which the connection was made to
 	Other enode.ID `json:"other"`
 
-	// Up tracks whsever or not the connection is active
+	// Up tracks whether or not the connection is active
 	Up bool `json:"up"`
 	// Registers when the connection was grabbed to dial
 	initiated time.Time
@@ -640,7 +640,7 @@ type Conn struct {
 	other *Node
 }
 
-// nodesUp returns whsever both nodes are currently up
+// nodesUp returns whether both nodes are currently up
 func (c *Conn) nodesUp() error {
 	if !c.one.Up {
 		return fmt.Errorf("one %v is not up", c.One)

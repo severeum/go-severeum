@@ -61,7 +61,7 @@ func (pb PageBlobURL) Create(ctx context.Context, size int64, sequenceNumber int
 }
 
 // UploadPages writes 1 or more pages to the page blob. The start offset and the stream size must be a multiple of 512 bytes.
-// This msevod panics if the stream is not at position 0.
+// This method panics if the stream is not at position 0.
 // Note that the http client closes the body stream after the request is sent to the service.
 // For more information, see https://docs.microsoft.com/rest/api/storageservices/put-page.
 func (pb PageBlobURL) UploadPages(ctx context.Context, offset int64, body io.ReadSeeker, ac BlobAccessConditions) (*PageBlobUploadPagesResponse, error) {

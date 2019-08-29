@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sevash
+package ethash
 
 import (
 	"bytes"
@@ -37,7 +37,7 @@ import (
 )
 
 const (
-	// staleThreshold is the maximum depth of the acceptable stale but valid sevash solution.
+	// staleThreshold is the maximum depth of the acceptable stale but valid ethash solution.
 	staleThreshold = 7
 )
 
@@ -48,36 +48,36 @@ var (
 
 // Seal implements consensus.Engine, attempting to find a nonce that satisfies
 // the block's difficulty requirements.
-func (sevash *Sevash) Seal(chain consensus.ChainReader, block *types.Block, results chan<- *types.Block, stop <-chan struct{}) error {
+func (ethash *Sevash) Seal(chain consensus.ChainReader, block *types.Block, results chan<- *types.Block, stop <-chan struct{}) error {
 	// If we're running a fake PoW, simply return a 0 nonce immediately
-	if sevash.config.PowMode == ModeFake || sevash.config.PowMode == ModeFullFake {
+	if ethash.config.PowMode == ModeFake || ethash.config.PowMode == ModeFullFake {
 		header := block.Header()
 		header.Nonce, header.MixDigest = types.BlockNonce{}, common.Hash{}
 		select {
 		case results <- block.WithSeal(header):
 		default:
-			log.Warn("Sealing result is not read by miner", "mode", "fake", "sealhash", sevash.SealHash(block.Header()))
+			log.Warn("Sealing result is not read by miner", "mode", "fake", "sealhash", ethash.SealHash(block.Header()))
 		}
 		return nil
 	}
 	// If we're running a shared PoW, delegate sealing to it
-	if sevash.shared != nil {
-		return sevash.shared.Seal(chain, block, results, stop)
+	if ethash.shared != nil {
+		return ethash.shared.Seal(chain, block, results, stop)
 	}
 	// Create a runner and the multiple search threads it directs
 	abort := make(chan struct{})
 
-	sevash.lock.Lock()
-	threads := sevash.threads
-	if sevash.rand == nil {
+	ethash.lock.Lock()
+	threads := ethash.threads
+	if ethash.rand == nil {
 		seed, err := crand.Int(crand.Reader, big.NewInt(math.MaxInt64))
 		if err != nil {
-			sevash.lock.Unlock()
+			ethash.lock.Unlock()
 			return err
 		}
-		sevash.rand = rand.New(rand.NewSource(seed.Int64()))
+		ethash.rand = rand.New(rand.NewSource(seed.Int64()))
 	}
-	sevash.lock.Unlock()
+	ethash.lock.Unlock()
 	if threads == 0 {
 		threads = runtime.NumCPU()
 	}
@@ -85,8 +85,8 @@ func (sevash *Sevash) Seal(chain consensus.ChainReader, block *types.Block, resu
 		threads = 0 // Allows disabling local mining without extra logic around local/remote
 	}
 	// Push new work to remote sealer
-	if sevash.workCh != nil {
-		sevash.workCh <- &sealTask{block: block, results: results}
+	if ethash.workCh != nil {
+		ethash.workCh <- &sealTask{block: block, results: results}
 	}
 	var (
 		pend   sync.WaitGroup
@@ -96,8 +96,8 @@ func (sevash *Sevash) Seal(chain consensus.ChainReader, block *types.Block, resu
 		pend.Add(1)
 		go func(id int, nonce uint64) {
 			defer pend.Done()
-			sevash.mine(block, id, nonce, abort, locals)
-		}(i, uint64(sevash.rand.Int63()))
+			ethash.mine(block, id, nonce, abort, locals)
+		}(i, uint64(ethash.rand.Int63()))
 	}
 	// Wait until sealing is terminated or a nonce is found
 	go func() {
@@ -111,13 +111,13 @@ func (sevash *Sevash) Seal(chain consensus.ChainReader, block *types.Block, resu
 			select {
 			case results <- result:
 			default:
-				log.Warn("Sealing result is not read by miner", "mode", "local", "sealhash", sevash.SealHash(block.Header()))
+				log.Warn("Sealing result is not read by miner", "mode", "local", "sealhash", ethash.SealHash(block.Header()))
 			}
 			close(abort)
-		case <-sevash.update:
+		case <-ethash.update:
 			// Thread count was changed on user request, restart
 			close(abort)
-			if err := sevash.Seal(chain, block, results, stop); err != nil {
+			if err := ethash.Seal(chain, block, results, stop); err != nil {
 				log.Error("Failed to restart sealing after update", "err", err)
 			}
 		}
@@ -129,14 +129,14 @@ func (sevash *Sevash) Seal(chain consensus.ChainReader, block *types.Block, resu
 
 // mine is the actual proof-of-work miner that searches for a nonce starting from
 // seed that results in correct final block difficulty.
-func (sevash *Sevash) mine(block *types.Block, id int, seed uint64, abort chan struct{}, found chan *types.Block) {
+func (ethash *Sevash) mine(block *types.Block, id int, seed uint64, abort chan struct{}, found chan *types.Block) {
 	// Extract some data from the header
 	var (
 		header  = block.Header()
-		hash    = sevash.SealHash(header).Bytes()
+		hash    = ethash.SealHash(header).Bytes()
 		target  = new(big.Int).Div(two256, header.Difficulty)
 		number  = header.Number.Uint64()
-		dataset = sevash.dataset(number, false)
+		dataset = ethash.dataset(number, false)
 	)
 	// Start generating random nonces until we abort or find a good one
 	var (
@@ -144,21 +144,21 @@ func (sevash *Sevash) mine(block *types.Block, id int, seed uint64, abort chan s
 		nonce    = seed
 	)
 	logger := log.New("miner", id)
-	logger.Trace("Started sevash search for new nonces", "seed", seed)
+	logger.Trace("Started ethash search for new nonces", "seed", seed)
 search:
 	for {
 		select {
 		case <-abort:
 			// Mining terminated, update stats and abort
 			logger.Trace("Sevash nonce search aborted", "attempts", nonce-seed)
-			sevash.hashrate.Mark(attempts)
+			ethash.hashrate.Mark(attempts)
 			break search
 
 		default:
 			// We don't have to update hash rate on every nonce, so update after after 2^X nonces
 			attempts++
 			if (attempts % (1 << 15)) == 0 {
-				sevash.hashrate.Mark(attempts)
+				ethash.hashrate.Mark(attempts)
 				attempts = 0
 			}
 			// Compute the PoW value of this nonce
@@ -187,7 +187,7 @@ search:
 }
 
 // remote is a standalone goroutine to handle remote mining related stuff.
-func (sevash *Sevash) remote(notify []string, noverify bool) {
+func (ethash *Sevash) remote(notify []string, noverify bool) {
 	var (
 		works = make(map[common.Hash]*types.Block)
 		rates = make(map[common.Hash]hashrate)
@@ -237,7 +237,7 @@ func (sevash *Sevash) remote(notify []string, noverify bool) {
 	//   result[2], 32 bytes hex encoded boundary condition ("target"), 2^256/difficulty
 	//   result[3], hex encoded block number
 	makeWork := func(block *types.Block) {
-		hash := sevash.SealHash(block.Header())
+		hash := ethash.SealHash(block.Header())
 
 		currentWork[0] = hash.Hex()
 		currentWork[1] = common.BytesToHash(SeedHash(block.NumberU64())).Hex()
@@ -249,7 +249,7 @@ func (sevash *Sevash) remote(notify []string, noverify bool) {
 		works[hash] = block
 	}
 	// submitWork verifies the submitted pow solution, returning
-	// whsever the solution was accepted or not (not can be both a bad pow as well as
+	// whether the solution was accepted or not (not can be both a bad pow as well as
 	// any other error, like no pending work or stale mining result).
 	submitWork := func(nonce types.BlockNonce, mixDigest common.Hash, sealhash common.Hash) bool {
 		if currentBlock == nil {
@@ -269,7 +269,7 @@ func (sevash *Sevash) remote(notify []string, noverify bool) {
 
 		start := time.Now()
 		if !noverify {
-			if err := sevash.verifySeal(nil, header, true); err != nil {
+			if err := ethash.verifySeal(nil, header, true); err != nil {
 				log.Warn("Invalid proof-of-work submitted", "sealhash", sealhash, "elapsed", time.Since(start), "err", err)
 				return false
 			}
@@ -305,7 +305,7 @@ func (sevash *Sevash) remote(notify []string, noverify bool) {
 
 	for {
 		select {
-		case work := <-sevash.workCh:
+		case work := <-ethash.workCh:
 			// Update current work with new received block.
 			// Note same work can be past twice, happens when changing CPU threads.
 			results = work.results
@@ -315,7 +315,7 @@ func (sevash *Sevash) remote(notify []string, noverify bool) {
 			// Notify and requested URLs of the new work availability
 			notifyWork()
 
-		case work := <-sevash.fetchWorkCh:
+		case work := <-ethash.fetchWorkCh:
 			// Return current mining work to remote miner.
 			if currentBlock == nil {
 				work.errc <- errNoMiningWork
@@ -323,7 +323,7 @@ func (sevash *Sevash) remote(notify []string, noverify bool) {
 				work.res <- currentWork
 			}
 
-		case result := <-sevash.submitWorkCh:
+		case result := <-ethash.submitWorkCh:
 			// Verify submitted PoW solution based on maintained mining blocks.
 			if submitWork(result.nonce, result.mixDigest, result.hash) {
 				result.errc <- nil
@@ -331,12 +331,12 @@ func (sevash *Sevash) remote(notify []string, noverify bool) {
 				result.errc <- errInvalidSealResult
 			}
 
-		case result := <-sevash.submitRateCh:
+		case result := <-ethash.submitRateCh:
 			// Trace remote sealer's hash rate by submitted value.
 			rates[result.id] = hashrate{rate: result.rate, ping: time.Now()}
 			close(result.done)
 
-		case req := <-sevash.fetchRateCh:
+		case req := <-ethash.fetchRateCh:
 			// Gather all hash rate submitted by remote sealer.
 			var total uint64
 			for _, rate := range rates {
@@ -361,8 +361,8 @@ func (sevash *Sevash) remote(notify []string, noverify bool) {
 				}
 			}
 
-		case errc := <-sevash.exitCh:
-			// Exit remote loop if sevash is closed and return relevant error.
+		case errc := <-ethash.exitCh:
+			// Exit remote loop if ethash is closed and return relevant error.
 			errc <- nil
 			log.Trace("Sevash remote sealer is exiting")
 			return

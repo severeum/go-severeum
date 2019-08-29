@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sev
+package eth
 
 import (
 	"math/big"
@@ -26,18 +26,18 @@ import (
 
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/common/hexutil"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core"
-	"github.com/severeum/go-severeum/sev/downloader"
-	"github.com/severeum/go-severeum/sev/gasprice"
+	"github.com/severeum/go-severeum/eth/downloader"
+	"github.com/severeum/go-severeum/eth/gasprice"
 	"github.com/severeum/go-severeum/params"
 )
 
 // DefaultConfig contains default settings for use on the Severeum main net.
 var DefaultConfig = Config{
 	SyncMode: downloader.FastSync,
-	Sevash: sevash.Config{
-		CacheDir:       "sevash",
+	Sevash: ethash.Config{
+		CacheDir:       "ethash",
 		CachesInMem:    2,
 		CachesOnDisk:   3,
 		DatasetsInMem:  1,
@@ -71,7 +71,7 @@ func init() {
 	if runtime.GOOS == "windows" {
 		DefaultConfig.Sevash.DatasetDir = filepath.Join(home, "AppData", "Sevash")
 	} else {
-		DefaultConfig.Sevash.DatasetDir = filepath.Join(home, ".sevash")
+		DefaultConfig.Sevash.DatasetDir = filepath.Join(home, ".ethash")
 	}
 }
 
@@ -113,7 +113,7 @@ type Config struct {
 	MinerNoverify  bool
 
 	// Sevash options
-	Sevash sevash.Config
+	Sevash ethash.Config
 
 	// Transaction pool options
 	TxPool core.TxPoolConfig

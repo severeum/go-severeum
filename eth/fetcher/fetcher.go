@@ -138,11 +138,11 @@ type Fetcher struct {
 	dropPeer       peerDropFn         // Drops a peer for misbehaving
 
 	// Testing hooks
-	announceChangeHook func(common.Hash, bool) // Msevod to call upon adding or deleting a hash from the announce list
-	queueChangeHook    func(common.Hash, bool) // Msevod to call upon adding or deleting a block from the import queue
-	fetchingHook       func([]common.Hash)     // Msevod to call upon starting a block (sev/61) or header (sev/62) fetch
-	completingHook     func([]common.Hash)     // Msevod to call upon starting a block body fetch (sev/62)
-	importedHook       func(*types.Block)      // Msevod to call upon successful block import (both sev/61 and sev/62)
+	announceChangeHook func(common.Hash, bool) // Method to call upon adding or deleting a hash from the announce list
+	queueChangeHook    func(common.Hash, bool) // Method to call upon adding or deleting a block from the import queue
+	fetchingHook       func([]common.Hash)     // Method to call upon starting a block (eth/61) or header (eth/62) fetch
+	completingHook     func([]common.Hash)     // Method to call upon starting a block body fetch (eth/62)
+	importedHook       func(*types.Block)      // Method to call upon successful block import (both eth/61 and eth/62)
 }
 
 // New creates a block fetcher to retrieve blocks based on hash announcements.
@@ -660,7 +660,7 @@ func (f *Fetcher) insert(peer string, block *types.Block) {
 			// Weird future block, don't fail, but neither propagate
 
 		default:
-			// Somseving went very wrong, drop the peer
+			// Something went very wrong, drop the peer
 			log.Debug("Propagated block verification failed", "peer", peer, "number", block.Number(), "hash", hash, "err", err)
 			f.dropPeer(peer)
 			return

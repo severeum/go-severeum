@@ -29,7 +29,7 @@ import (
 	"github.com/severeum/go-severeum/log"
 )
 
-// makeWizard creates and returns a new puppsev wizard.
+// makeWizard creates and returns a new puppeth wizard.
 func makeWizard(network string) *wizard {
 	return &wizard{
 		network: network,
@@ -46,13 +46,13 @@ func makeWizard(network string) *wizard {
 // setting up a new or managing an existing Severeum private network.
 func (w *wizard) run() {
 	fmt.Println("+-----------------------------------------------------------+")
-	fmt.Println("| Welcome to puppsev, your Severeum private network manager |")
+	fmt.Println("| Welcome to puppeth, your Severeum private network manager |")
 	fmt.Println("|                                                           |")
 	fmt.Println("| This tool lets you create a new Severeum network down to  |")
-	fmt.Println("| the genesis block, bootnodes, miners and sevstats servers |")
+	fmt.Println("| the genesis block, bootnodes, miners and ethstats servers |")
 	fmt.Println("| without the hassle that it would normally entail.         |")
 	fmt.Println("|                                                           |")
-	fmt.Println("| Puppsev uses SSH to dial in to remote servers, and builds |")
+	fmt.Println("| Puppeth uses SSH to dial in to remote servers, and builds |")
 	fmt.Println("| its network components out of Docker containers using the |")
 	fmt.Println("| docker-compose toolset.                                   |")
 	fmt.Println("+-----------------------------------------------------------+")
@@ -74,7 +74,7 @@ func (w *wizard) run() {
 	log.Info("Administering Severeum network", "name", w.network)
 
 	// Load initial configurations and connect to all live servers
-	w.conf.path = filepath.Join(os.Getenv("HOME"), ".puppsev", w.network)
+	w.conf.path = filepath.Join(os.Getenv("HOME"), ".puppeth", w.network)
 
 	blob, err := ioutil.ReadFile(w.conf.path)
 	if err != nil {
@@ -143,7 +143,7 @@ func (w *wizard) run() {
 				case choice == "2":
 					w.importGenesis()
 				default:
-					log.Error("That's not somseving I can do")
+					log.Error("That's not something I can do")
 				}
 			} else {
 				w.manageGenesis()
@@ -163,7 +163,7 @@ func (w *wizard) run() {
 				w.manageComponents()
 			}
 		default:
-			log.Error("That's not somseving I can do")
+			log.Error("That's not something I can do")
 		}
 	}
 }

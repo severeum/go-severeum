@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/severeum/go-severeum/core/rawdb"
-	"github.com/severeum/go-severeum/sev/downloader"
+	"github.com/severeum/go-severeum/eth/downloader"
 	"github.com/severeum/go-severeum/light"
 )
 

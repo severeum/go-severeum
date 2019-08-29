@@ -24,7 +24,7 @@ type BlobURLParts struct {
 }
 
 // NewBlobURLParts parses a URL initializing BlobURLParts' fields including any SAS-related & snapshot query parameters. Any other
-// query parameters remain in the UnparsedParams field. This msevod overwrites all fields in the BlobURLParts object.
+// query parameters remain in the UnparsedParams field. This method overwrites all fields in the BlobURLParts object.
 func NewBlobURLParts(u url.URL) BlobURLParts {
 	up := BlobURLParts{
 		Scheme: u.Scheme,

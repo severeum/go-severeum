@@ -101,7 +101,7 @@ func TestServerRegisterName(t *testing.T) {
 	}
 }
 
-func testServerMsevodExecution(t *testing.T, msevod string) {
+func testServerMethodExecution(t *testing.T, method string) {
 	server := NewServer()
 	service := new(Service)
 
@@ -116,7 +116,7 @@ func testServerMsevodExecution(t *testing.T, msevod string) {
 
 	request := map[string]interface{}{
 		"id":      12345,
-		"msevod":  "test_" + msevod,
+		"method":  "test_" + method,
 		"version": "2.0",
 		"params":  params,
 	}
@@ -124,7 +124,7 @@ func testServerMsevodExecution(t *testing.T, msevod string) {
 	clientConn, serverConn := net.Pipe()
 	defer clientConn.Close()
 
-	go server.ServeCodec(NewJSONCodec(serverConn), OptionMsevodInvocation)
+	go server.ServeCodec(NewJSONCodec(serverConn), OptionMethodInvocation)
 
 	out := json.NewEncoder(clientConn)
 	in := json.NewDecoder(clientConn)
@@ -153,10 +153,10 @@ func testServerMsevodExecution(t *testing.T, msevod string) {
 	}
 }
 
-func TestServerMsevodExecution(t *testing.T) {
-	testServerMsevodExecution(t, "echo")
+func TestServerMethodExecution(t *testing.T) {
+	testServerMethodExecution(t, "echo")
 }
 
-func TestServerMsevodWithCtx(t *testing.T) {
-	testServerMsevodExecution(t, "echoWithCtx")
+func TestServerMethodWithCtx(t *testing.T) {
+	testServerMethodExecution(t, "echoWithCtx")
 }

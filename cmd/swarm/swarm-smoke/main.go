@@ -22,7 +22,7 @@ import (
 	"sort"
 
 	"github.com/severeum/go-severeum/cmd/utils"
-	ssevmetrics "github.com/severeum/go-severeum/metrics"
+	sethmetrics "github.com/severeum/go-severeum/metrics"
 	"github.com/severeum/go-severeum/metrics/influxdb"
 	swarmmetrics "github.com/severeum/go-severeum/swarm/metrics"
 	"github.com/severeum/go-severeum/swarm/tracing"
@@ -90,7 +90,7 @@ func main() {
 		},
 		cli.BoolFlag{
 			Name:        "include-localhost",
-			Usage:       "whsever to include localhost:8500 as an endpoint",
+			Usage:       "whether to include localhost:8500 as an endpoint",
 			Destination: &includeLocalhost,
 		},
 		cli.IntFlag{
@@ -119,7 +119,7 @@ func main() {
 		},
 		cli.BoolFlag{
 			Name:        "single",
-			Usage:       "whsever to fetch content from a single node or from all nodes",
+			Usage:       "whether to fetch content from a single node or from all nodes",
 			Destination: &single,
 		},
 	}
@@ -177,7 +177,7 @@ func main() {
 }
 
 func emitMetrics(ctx *cli.Context) error {
-	if ssevmetrics.Enabled {
+	if sethmetrics.Enabled {
 		var (
 			endpoint = ctx.GlobalString(swarmmetrics.MetricsInfluxDBEndpointFlag.Name)
 			database = ctx.GlobalString(swarmmetrics.MetricsInfluxDBDatabaseFlag.Name)
@@ -185,7 +185,7 @@ func emitMetrics(ctx *cli.Context) error {
 			password = ctx.GlobalString(swarmmetrics.MetricsInfluxDBPasswordFlag.Name)
 			hosttag  = ctx.GlobalString(swarmmetrics.MetricsInfluxDBHostTagFlag.Name)
 		)
-		return influxdb.InfluxDBWithTagsOnce(ssevmetrics.DefaultRegistry, endpoint, database, username, password, "swarm-smoke.", map[string]string{
+		return influxdb.InfluxDBWithTagsOnce(sethmetrics.DefaultRegistry, endpoint, database, username, password, "swarm-smoke.", map[string]string{
 			"host":     hosttag,
 			"version":  gitCommit,
 			"filesize": fmt.Sprintf("%v", filesize),

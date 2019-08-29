@@ -23,7 +23,7 @@ import (
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/rawdb"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 )
 
 // FakePeer is a mock downloader peer that operates on a local database instance
@@ -31,13 +31,13 @@ import (
 // sync commands from an existing local database.
 type FakePeer struct {
 	id string
-	db sevdb.Database
+	db ethdb.Database
 	hc *core.HeaderChain
 	dl *Downloader
 }
 
 // NewFakePeer creates a new mock downloader peer with the given data sources.
-func NewFakePeer(id string, db sevdb.Database, hc *core.HeaderChain, dl *Downloader) *FakePeer {
+func NewFakePeer(id string, db ethdb.Database, hc *core.HeaderChain, dl *Downloader) *FakePeer {
 	return &FakePeer{id: id, db: db, hc: hc, dl: dl}
 }
 

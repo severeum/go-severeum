@@ -28,7 +28,7 @@ import (
 	"github.com/severeum/go-severeum/core/bloombits"
 	"github.com/severeum/go-severeum/core/rawdb"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/node"
 )
@@ -64,10 +64,10 @@ func BenchmarkBloomBits32k(b *testing.B) {
 const benchFilterCnt = 2000
 
 func benchmarkBloomBits(b *testing.B, sectionSize uint64) {
-	benchDataDir := node.DefaultDataDir() + "/ssev/chaindata"
+	benchDataDir := node.DefaultDataDir() + "/seth/chaindata"
 	fmt.Println("Running bloombits benchmark   section size:", sectionSize)
 
-	db, err := sevdb.NewLDBDatabase(benchDataDir, 128, 1024)
+	db, err := ethdb.NewLDBDatabase(benchDataDir, 128, 1024)
 	if err != nil {
 		b.Fatalf("error opening database at %v: %v", benchDataDir, err)
 	}
@@ -129,7 +129,7 @@ func benchmarkBloomBits(b *testing.B, sectionSize uint64) {
 	for i := 0; i < benchFilterCnt; i++ {
 		if i%20 == 0 {
 			db.Close()
-			db, _ = sevdb.NewLDBDatabase(benchDataDir, 128, 1024)
+			db, _ = ethdb.NewLDBDatabase(benchDataDir, 128, 1024)
 			backend = &testBackend{mux, db, cnt, new(event.Feed), new(event.Feed), new(event.Feed), new(event.Feed)}
 		}
 		var addr common.Address
@@ -146,8 +146,8 @@ func benchmarkBloomBits(b *testing.B, sectionSize uint64) {
 	db.Close()
 }
 
-func forEachKey(db sevdb.Database, startPrefix, endPrefix []byte, fn func(key []byte)) {
-	it := db.(*sevdb.LDBDatabase).NewIterator()
+func forEachKey(db ethdb.Database, startPrefix, endPrefix []byte, fn func(key []byte)) {
+	it := db.(*ethdb.LDBDatabase).NewIterator()
 	it.Seek(startPrefix)
 	for it.Valid() {
 		key := it.Key()
@@ -166,7 +166,7 @@ func forEachKey(db sevdb.Database, startPrefix, endPrefix []byte, fn func(key []
 
 var bloomBitsPrefix = []byte("bloomBits-")
 
-func clearBloomBits(db sevdb.Database) {
+func clearBloomBits(db ethdb.Database) {
 	fmt.Println("Clearing bloombits data...")
 	forEachKey(db, bloomBitsPrefix, bloomBitsPrefix, func(key []byte) {
 		db.Delete(key)
@@ -174,9 +174,9 @@ func clearBloomBits(db sevdb.Database) {
 }
 
 func BenchmarkNoBloomBits(b *testing.B) {
-	benchDataDir := node.DefaultDataDir() + "/ssev/chaindata"
+	benchDataDir := node.DefaultDataDir() + "/seth/chaindata"
 	fmt.Println("Running benchmark without bloombits")
-	db, err := sevdb.NewLDBDatabase(benchDataDir, 128, 1024)
+	db, err := ethdb.NewLDBDatabase(benchDataDir, 128, 1024)
 	if err != nil {
 		b.Fatalf("error opening database at %v: %v", benchDataDir, err)
 	}

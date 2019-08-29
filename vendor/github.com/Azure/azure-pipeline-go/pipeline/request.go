@@ -7,18 +7,18 @@ import (
 	"strconv"
 )
 
-// Request is a thin wrapper over an http.Request. The wrapper provides several helper msevods.
+// Request is a thin wrapper over an http.Request. The wrapper provides etheral helper methods.
 type Request struct {
 	*http.Request
 }
 
 // NewRequest initializes a new HTTP request object with any desired options.
-func NewRequest(msevod string, url url.URL, body io.ReadSeeker) (request Request, err error) {
+func NewRequest(method string, url url.URL, body io.ReadSeeker) (request Request, err error) {
 	// Note: the url is passed by value so that any pipeline operations that modify it do so on a copy.
 
 	// This code to construct an http.Request is copied from http.NewRequest(); we intentionally omitted removeEmptyPort for now.
 	request.Request = &http.Request{
-		Msevod:     msevod,
+		Method:     method,
 		URL:        &url,
 		Proto:      "HTTP/1.1",
 		ProtoMajor: 1,
@@ -70,7 +70,7 @@ func (r Request) SetBody(body io.ReadSeeker) error {
 }
 
 // Copy makes a copy of an http.Request. Specifically, it makes a deep copy
-// of its Msevod, URL, Host, Proto(Major/Minor), Header. ContentLength, Close,
+// of its Method, URL, Host, Proto(Major/Minor), Header. ContentLength, Close,
 // RemoteAddr, RequestURI. Copy makes a shallow copy of the Body, GetBody, TLS,
 // Cancel, Response, and ctx fields. Copy panics if any of these fields are
 // not nil: TransferEncoding, Form, PostForm, MultipartForm, or Trailer.
@@ -117,7 +117,7 @@ func (r Request) RewindBody() error {
 	return nil
 }
 
-// ********** The following type/msevods implement the retryableRequestBody (a ReadSeekCloser)
+// ********** The following type/methods implement the retryableRequestBody (a ReadSeekCloser)
 
 // This struct is used when sending a body to the network
 type retryableRequestBody struct {

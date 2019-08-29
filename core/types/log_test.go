@@ -102,7 +102,7 @@ var unmarshalLogTests = map[string]struct {
 }
 
 func TestUnmarshalLog(t *testing.T) {
-	dumper := spew.ConfigState{DisableMsevods: true, Indent: "    "}
+	dumper := spew.ConfigState{DisableMethods: true, Indent: "    "}
 	for name, test := range unmarshalLogTests {
 		var log *Log
 		err := json.Unmarshal([]byte(test.input), &log)

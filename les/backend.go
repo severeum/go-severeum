@@ -30,12 +30,12 @@ import (
 	"github.com/severeum/go-severeum/core/bloombits"
 	"github.com/severeum/go-severeum/core/rawdb"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sev"
-	"github.com/severeum/go-severeum/sev/downloader"
-	"github.com/severeum/go-severeum/sev/filters"
-	"github.com/severeum/go-severeum/sev/gasprice"
+	"github.com/severeum/go-severeum/eth"
+	"github.com/severeum/go-severeum/eth/downloader"
+	"github.com/severeum/go-severeum/eth/filters"
+	"github.com/severeum/go-severeum/eth/gasprice"
 	"github.com/severeum/go-severeum/event"
-	"github.com/severeum/go-severeum/internal/sevapi"
+	"github.com/severeum/go-severeum/internal/ethapi"
 	"github.com/severeum/go-severeum/light"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/node"
@@ -72,13 +72,13 @@ type LightSevereum struct {
 	accountManager *accounts.Manager
 
 	networkId     uint64
-	netRPCService *sevapi.PublicNetAPI
+	netRPCService *ethapi.PublicNetAPI
 
 	wg sync.WaitGroup
 }
 
-func New(ctx *node.ServiceContext, config *sev.Config) (*LightSevereum, error) {
-	chainDb, err := sev.CreateDB(ctx, config, "lightchaindata")
+func New(ctx *node.ServiceContext, config *eth.Config) (*LightSevereum, error) {
+	chainDb, err := eth.CreateDB(ctx, config, "lightchaindata")
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func New(ctx *node.ServiceContext, config *sev.Config) (*LightSevereum, error) {
 	peers := newPeerSet()
 	quitSync := make(chan struct{})
 
-	lsev := &LightSevereum{
+	leth := &LightSevereum{
 		lesCommons: lesCommons{
 			chainDb: chainDb,
 			config:  config,
@@ -102,50 +102,50 @@ func New(ctx *node.ServiceContext, config *sev.Config) (*LightSevereum, error) {
 		peers:          peers,
 		reqDist:        newRequestDistributor(peers, quitSync),
 		accountManager: ctx.AccountManager,
-		engine:         sev.CreateConsensusEngine(ctx, chainConfig, &config.Sevash, nil, false, chainDb),
+		engine:         eth.CreateConsensusEngine(ctx, chainConfig, &config.Sevash, nil, false, chainDb),
 		shutdownChan:   make(chan bool),
 		networkId:      config.NetworkId,
 		bloomRequests:  make(chan chan *bloombits.Retrieval),
-		bloomIndexer:   sev.NewBloomIndexer(chainDb, params.BloomBitsBlocksClient, params.HelperTrieConfirmations),
+		bloomIndexer:   eth.NewBloomIndexer(chainDb, params.BloomBitsBlocksClient, params.HelperTrieConfirmations),
 	}
 
-	lsev.relay = NewLesTxRelay(peers, lsev.reqDist)
-	lsev.serverPool = newServerPool(chainDb, quitSync, &lsev.wg)
-	lsev.retriever = newRetrieveManager(peers, lsev.reqDist, lsev.serverPool)
+	leth.relay = NewLesTxRelay(peers, leth.reqDist)
+	leth.serverPool = newServerPool(chainDb, quitSync, &leth.wg)
+	leth.retriever = newRetrieveManager(peers, leth.reqDist, leth.serverPool)
 
-	lsev.odr = NewLesOdr(chainDb, light.DefaultClientIndexerConfig, lsev.retriever)
-	lsev.chtIndexer = light.NewChtIndexer(chainDb, lsev.odr, params.CHTFrequencyClient, params.HelperTrieConfirmations)
-	lsev.bloomTrieIndexer = light.NewBloomTrieIndexer(chainDb, lsev.odr, params.BloomBitsBlocksClient, params.BloomTrieFrequency)
-	lsev.odr.SetIndexers(lsev.chtIndexer, lsev.bloomTrieIndexer, lsev.bloomIndexer)
+	leth.odr = NewLesOdr(chainDb, light.DefaultClientIndexerConfig, leth.retriever)
+	leth.chtIndexer = light.NewChtIndexer(chainDb, leth.odr, params.CHTFrequencyClient, params.HelperTrieConfirmations)
+	leth.bloomTrieIndexer = light.NewBloomTrieIndexer(chainDb, leth.odr, params.BloomBitsBlocksClient, params.BloomTrieFrequency)
+	leth.odr.SetIndexers(leth.chtIndexer, leth.bloomTrieIndexer, leth.bloomIndexer)
 
 	// Note: NewLightChain adds the trusted checkpoint so it needs an ODR with
 	// indexers already set but not started yet
-	if lsev.blockchain, err = light.NewLightChain(lsev.odr, lsev.chainConfig, lsev.engine); err != nil {
+	if leth.blockchain, err = light.NewLightChain(leth.odr, leth.chainConfig, leth.engine); err != nil {
 		return nil, err
 	}
 	// Note: AddChildIndexer starts the update process for the child
-	lsev.bloomIndexer.AddChildIndexer(lsev.bloomTrieIndexer)
-	lsev.chtIndexer.Start(lsev.blockchain)
-	lsev.bloomIndexer.Start(lsev.blockchain)
+	leth.bloomIndexer.AddChildIndexer(leth.bloomTrieIndexer)
+	leth.chtIndexer.Start(leth.blockchain)
+	leth.bloomIndexer.Start(leth.blockchain)
 
 	// Rewind the chain in case of an incompatible config upgrade.
 	if compat, ok := genesisErr.(*params.ConfigCompatError); ok {
 		log.Warn("Rewinding chain to upgrade configuration", "err", compat)
-		lsev.blockchain.SetHead(compat.RewindTo)
+		leth.blockchain.SetHead(compat.RewindTo)
 		rawdb.WriteChainConfig(chainDb, genesisHash, chainConfig)
 	}
 
-	lsev.txPool = light.NewTxPool(lsev.chainConfig, lsev.blockchain, lsev.relay)
-	if lsev.protocolManager, err = NewProtocolManager(lsev.chainConfig, light.DefaultClientIndexerConfig, true, config.NetworkId, lsev.eventMux, lsev.engine, lsev.peers, lsev.blockchain, nil, chainDb, lsev.odr, lsev.relay, lsev.serverPool, quitSync, &lsev.wg); err != nil {
+	leth.txPool = light.NewTxPool(leth.chainConfig, leth.blockchain, leth.relay)
+	if leth.protocolManager, err = NewProtocolManager(leth.chainConfig, light.DefaultClientIndexerConfig, true, config.NetworkId, leth.eventMux, leth.engine, leth.peers, leth.blockchain, nil, chainDb, leth.odr, leth.relay, leth.serverPool, quitSync, &leth.wg); err != nil {
 		return nil, err
 	}
-	lsev.ApiBackend = &LesApiBackend{lsev, nil}
+	leth.ApiBackend = &LesApiBackend{leth, nil}
 	gpoParams := config.GPO
 	if gpoParams.Default == nil {
 		gpoParams.Default = config.MinerGasPrice
 	}
-	lsev.ApiBackend.gpo = gasprice.NewOracle(lsev.ApiBackend, gpoParams)
-	return lsev, nil
+	leth.ApiBackend.gpo = gasprice.NewOracle(leth.ApiBackend, gpoParams)
+	return leth, nil
 }
 
 func lesTopic(genesisHash common.Hash, protocolVersion uint) discv5.Topic {
@@ -186,19 +186,19 @@ func (s *LightDummyAPI) Mining() bool {
 // APIs returns the collection of RPC services the severeum package offers.
 // NOTE, some of these services probably need to be moved to somewhere else.
 func (s *LightSevereum) APIs() []rpc.API {
-	return append(sevapi.GetAPIs(s.ApiBackend), []rpc.API{
+	return append(ethapi.GetAPIs(s.ApiBackend), []rpc.API{
 		{
-			Namespace: "sev",
+			Namespace: "eth",
 			Version:   "1.0",
 			Service:   &LightDummyAPI{},
 			Public:    true,
 		}, {
-			Namespace: "sev",
+			Namespace: "eth",
 			Version:   "1.0",
 			Service:   downloader.NewPublicDownloaderAPI(s.protocolManager.downloader, s.eventMux),
 			Public:    true,
 		}, {
-			Namespace: "sev",
+			Namespace: "eth",
 			Version:   "1.0",
 			Service:   filters.NewPublicFilterAPI(s.ApiBackend, true),
 			Public:    true,
@@ -233,7 +233,7 @@ func (s *LightSevereum) Protocols() []p2p.Protocol {
 func (s *LightSevereum) Start(srvr *p2p.Server) error {
 	log.Warn("Light client mode is an experimental feature")
 	s.startBloomHandlers(params.BloomBitsBlocksClient)
-	s.netRPCService = sevapi.NewPublicNetAPI(srvr, s.networkId)
+	s.netRPCService = ethapi.NewPublicNetAPI(srvr, s.networkId)
 	// clients are searching for the first advertised protocol in the list
 	protocolVersion := AdvertiseProtocolVersions[0]
 	s.serverPool.start(srvr, lesTopic(s.blockchain.Genesis().Hash(), protocolVersion))

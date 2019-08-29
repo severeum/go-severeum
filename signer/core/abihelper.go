@@ -66,7 +66,7 @@ func (cd decodedCallData) String() string {
 func parseCallData(calldata []byte, abidata string) (*decodedCallData, error) {
 
 	if len(calldata) < 4 {
-		return nil, fmt.Errorf("Invalid ABI-data, incomplete msevod signature of (%d bytes)", len(calldata))
+		return nil, fmt.Errorf("Invalid ABI-data, incomplete method signature of (%d bytes)", len(calldata))
 	}
 
 	sigdata, argdata := calldata[:4], calldata[4:]
@@ -79,21 +79,21 @@ func parseCallData(calldata []byte, abidata string) (*decodedCallData, error) {
 		return nil, fmt.Errorf("Failed parsing JSON ABI: %v, abidata: %v", err, abidata)
 	}
 
-	msevod, err := abispec.MsevodById(sigdata)
+	method, err := abispec.MethodById(sigdata)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err := msevod.Inputs.UnpackValues(argdata)
+	v, err := method.Inputs.UnpackValues(argdata)
 	if err != nil {
 		return nil, err
 	}
 
-	decoded := decodedCallData{signature: msevod.Sig(), name: msevod.Name}
+	decoded := decodedCallData{signature: method.Sig(), name: method.Name}
 
-	for n, argument := range msevod.Inputs {
+	for n, argument := range method.Inputs {
 		if err != nil {
-			return nil, fmt.Errorf("Failed to decode argument %d (signature %v): %v", n, msevod.Sig(), err)
+			return nil, fmt.Errorf("Failed to decode argument %d (signature %v): %v", n, method.Sig(), err)
 		}
 		decodedArg := decodedArgument{
 			soltype: argument,
@@ -109,7 +109,7 @@ func parseCallData(calldata []byte, abidata string) (*decodedCallData, error) {
 	var (
 		encoded []byte
 	)
-	encoded, err = msevod.Inputs.PackValues(v)
+	encoded, err = method.Inputs.PackValues(v)
 
 	if err != nil {
 		return nil, err
@@ -118,14 +118,14 @@ func parseCallData(calldata []byte, abidata string) (*decodedCallData, error) {
 	if !bytes.Equal(encoded, argdata) {
 		was := common.Bytes2Hex(encoded)
 		exp := common.Bytes2Hex(argdata)
-		return nil, fmt.Errorf("WARNING: Supplied data is stuffed with extra data. \nWant %s\nHave %s\nfor msevod %v", exp, was, msevod.Sig())
+		return nil, fmt.Errorf("WARNING: Supplied data is stuffed with extra data. \nWant %s\nHave %s\nfor method %v", exp, was, method.Sig())
 	}
 	return &decoded, nil
 }
 
-// MsevodSelectorToAbi converts a msevod selector into an ABI struct. The returned data is a valid json string
+// MethodSelectorToAbi converts a method selector into an ABI struct. The returned data is a valid json string
 // which can be consumed by the standard abi package.
-func MsevodSelectorToAbi(selector string) ([]byte, error) {
+func MethodSelectorToAbi(selector string) ([]byte, error) {
 
 	re := regexp.MustCompile(`^([^\)]+)\(([a-z0-9,\[\]]*)\)`)
 
@@ -206,9 +206,9 @@ func NewAbiDBFromFiles(standard, custom string) (*AbiDb, error) {
 	return db, nil
 }
 
-// LookupMsevodSelector checks the given 4byte-sequence against the known ABI msevods.
-// OBS: This msevod does not validate the match, it's assumed the caller will do so
-func (db *AbiDb) LookupMsevodSelector(id []byte) (string, error) {
+// LookupMethodSelector checks the given 4byte-sequence against the known ABI methods.
+// OBS: This method does not validate the match, it's assumed the caller will do so
+func (db *AbiDb) LookupMethodSelector(id []byte) (string, error) {
 	if len(id) < 4 {
 		return "", fmt.Errorf("Expected 4-byte id, got %d", len(id))
 	}
@@ -240,13 +240,13 @@ func (db *AbiDb) saveCustomAbi(selector, signature string) error {
 }
 
 // AddSignature to the database, if custom database saving is enabled.
-// OBS: This msevod does _not_ validate the correctness of the data,
+// OBS: This method does _not_ validate the correctness of the data,
 // it is assumed that the caller has already done so
 func (db *AbiDb) AddSignature(selector string, data []byte) error {
 	if len(data) < 4 {
 		return nil
 	}
-	_, err := db.LookupMsevodSelector(data[:4])
+	_, err := db.LookupMethodSelector(data[:4])
 	if err == nil {
 		return nil
 	}

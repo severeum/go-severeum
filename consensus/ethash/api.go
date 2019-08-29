@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sevash
+package ethash
 
 import (
 	"errors"
@@ -24,11 +24,11 @@ import (
 	"github.com/severeum/go-severeum/core/types"
 )
 
-var errSevashStopped = errors.New("sevash stopped")
+var errSevashStopped = errors.New("ethash stopped")
 
-// API exposes sevash related msevods for the RPC interface.
+// API exposes ethash related methods for the RPC interface.
 type API struct {
-	sevash *Sevash // Make sure the mode of sevash is normal.
+	ethash *Sevash // Make sure the mode of ethash is normal.
 }
 
 // GetWork returns a work package for external miner.
@@ -39,7 +39,7 @@ type API struct {
 //   result[2] - 32 bytes hex encoded boundary condition ("target"), 2^256/difficulty
 //   result[3] - hex encoded block number
 func (api *API) GetWork() ([4]string, error) {
-	if api.sevash.config.PowMode != ModeNormal && api.sevash.config.PowMode != ModeTest {
+	if api.ethash.config.PowMode != ModeNormal && api.ethash.config.PowMode != ModeTest {
 		return [4]string{}, errors.New("not supported")
 	}
 
@@ -49,8 +49,8 @@ func (api *API) GetWork() ([4]string, error) {
 	)
 
 	select {
-	case api.sevash.fetchWorkCh <- &sealWork{errc: errc, res: workCh}:
-	case <-api.sevash.exitCh:
+	case api.ethash.fetchWorkCh <- &sealWork{errc: errc, res: workCh}:
+	case <-api.ethash.exitCh:
 		return [4]string{}, errSevashStopped
 	}
 
@@ -66,20 +66,20 @@ func (api *API) GetWork() ([4]string, error) {
 // It returns an indication if the work was accepted.
 // Note either an invalid solution, a stale work a non-existent work will return false.
 func (api *API) SubmitWork(nonce types.BlockNonce, hash, digest common.Hash) bool {
-	if api.sevash.config.PowMode != ModeNormal && api.sevash.config.PowMode != ModeTest {
+	if api.ethash.config.PowMode != ModeNormal && api.ethash.config.PowMode != ModeTest {
 		return false
 	}
 
 	var errc = make(chan error, 1)
 
 	select {
-	case api.sevash.submitWorkCh <- &mineResult{
+	case api.ethash.submitWorkCh <- &mineResult{
 		nonce:     nonce,
 		mixDigest: digest,
 		hash:      hash,
 		errc:      errc,
 	}:
-	case <-api.sevash.exitCh:
+	case <-api.ethash.exitCh:
 		return false
 	}
 
@@ -94,15 +94,15 @@ func (api *API) SubmitWork(nonce types.BlockNonce, hash, digest common.Hash) boo
 // It accepts the miner hash rate and an identifier which must be unique
 // between nodes.
 func (api *API) SubmitHashRate(rate hexutil.Uint64, id common.Hash) bool {
-	if api.sevash.config.PowMode != ModeNormal && api.sevash.config.PowMode != ModeTest {
+	if api.ethash.config.PowMode != ModeNormal && api.ethash.config.PowMode != ModeTest {
 		return false
 	}
 
 	var done = make(chan struct{}, 1)
 
 	select {
-	case api.sevash.submitRateCh <- &hashrate{done: done, rate: uint64(rate), id: id}:
-	case <-api.sevash.exitCh:
+	case api.ethash.submitRateCh <- &hashrate{done: done, rate: uint64(rate), id: id}:
+	case <-api.ethash.exitCh:
 		return false
 	}
 
@@ -114,5 +114,5 @@ func (api *API) SubmitHashRate(rate hexutil.Uint64, id common.Hash) bool {
 
 // GetHashrate returns the current hashrate for local CPU miner and remote miner.
 func (api *API) GetHashrate() uint64 {
-	return uint64(api.sevash.Hashrate())
+	return uint64(api.ethash.Hashrate())
 }

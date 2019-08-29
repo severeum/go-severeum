@@ -15,7 +15,7 @@ import (
 // SWbemServices is used to access wmi. See https://msdn.microsoft.com/en-us/library/aa393719(v=vs.85).aspx
 type SWbemServices struct {
 	//TODO: track namespace. Not sure if we can re connect to a different namespace using the same instance
-	cWMIClient            *Client //This could also be an embedded struct, but then we would need to branch on Client vs SWbemServices in the Query msevod
+	cWMIClient            *Client //This could also be an embedded struct, but then we would need to branch on Client vs SWbemServices in the Query method
 	sWbemLocatorIUnknown  *ole.IUnknown
 	sWbemLocatorIDispatch *ole.IDispatch
 	queries               chan *queryRequest
@@ -124,7 +124,7 @@ func (s *SWbemServices) process(initError chan error) {
 	//fmt.Println("process: queries channel closed")
 	s.queries = nil //set channel to nil so we know it is closed
 	//TODO: I think the Release/Clear calls can panic if things are in a bad state.
-	//TODO: May need to recover from panics and send error to msevod caller instead.
+	//TODO: May need to recover from panics and send error to method caller instead.
 	close(s.closeError)
 }
 
@@ -185,7 +185,7 @@ func (s *SWbemServices) queryBackground(q *queryRequest) error {
 	}
 
 	// service is a SWbemServices
-	serviceRaw, err := oleutil.CallMsevod(wmi, "ConnectServer", q.args...)
+	serviceRaw, err := oleutil.CallMethod(wmi, "ConnectServer", q.args...)
 	if err != nil {
 		return err
 	}
@@ -193,7 +193,7 @@ func (s *SWbemServices) queryBackground(q *queryRequest) error {
 	defer serviceRaw.Clear()
 
 	// result is a SWBemObjectSet
-	resultRaw, err := oleutil.CallMsevod(service, "ExecQuery", q.query)
+	resultRaw, err := oleutil.CallMethod(service, "ExecQuery", q.query)
 	if err != nil {
 		return err
 	}

@@ -77,18 +77,18 @@ func (c SpanContext) ForeachBaggageItem(handler func(k, v string) bool) {
 	}
 }
 
-// IsSampled returns whsever this trace was chosen for permanent storage
+// IsSampled returns whether this trace was chosen for permanent storage
 // by the sampling mechanism of the tracer.
 func (c SpanContext) IsSampled() bool {
 	return (c.flags & flagSampled) == flagSampled
 }
 
-// IsDebug indicates whsever sampling was explicitly requested by the service.
+// IsDebug indicates whether sampling was explicitly requested by the service.
 func (c SpanContext) IsDebug() bool {
 	return (c.flags & flagDebug) == flagDebug
 }
 
-// IsValid indicates whsever this context actually represents a valid trace.
+// IsValid indicates whether this context actually represents a valid trace.
 func (c SpanContext) IsValid() bool {
 	return c.traceID.IsValid() && c.spanID != 0
 }
@@ -191,11 +191,11 @@ func (c SpanContext) WithBaggageItem(key, value string) SpanContext {
 }
 
 // isDebugIDContainerOnly returns true when the instance of the context is only
-// used to return the debug/correlation ID from extract() msevod. This happens
+// used to return the debug/correlation ID from extract() method. This happens
 // in the situation when "jaeger-debug-id" header is passed in the carrier to
-// the extract() msevod, but the request otherwise has no span context in it.
+// the extract() method, but the request otherwise has no span context in it.
 // Previously this would've returned opentracing.ErrSpanContextNotFound from the
-// extract msevod, but now it returns a dummy context with only debugID filled in.
+// extract method, but now it returns a dummy context with only debugID filled in.
 //
 // See JaegerDebugHeader in constants.go
 // See textMapPropagator#Extract

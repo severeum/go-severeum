@@ -64,20 +64,20 @@ import (
 )
 
 var (
-	// Files that end up in the ssev*.zip archive.
-	ssevArchiveFiles = []string{
+	// Files that end up in the seth*.zip archive.
+	sethArchiveFiles = []string{
 		"COPYING",
-		executablePath("ssev"),
+		executablePath("seth"),
 	}
 
-	// Files that end up in the ssev-alltools*.zip archive.
+	// Files that end up in the seth-alltools*.zip archive.
 	allToolsArchiveFiles = []string{
 		"COPYING",
 		executablePath("abigen"),
 		executablePath("bootnode"),
 		executablePath("evm"),
-		executablePath("ssev"),
-		executablePath("puppsev"),
+		executablePath("seth"),
+		executablePath("puppeth"),
 		executablePath("rlpdump"),
 		executablePath("wnode"),
 	}
@@ -103,11 +103,11 @@ var (
 			Description: "Developer utility version of the EVM (Severeum Virtual Machine) that is capable of running bytecode snippets within a configurable environment and execution mode.",
 		},
 		{
-			BinaryName:  "ssev",
+			BinaryName:  "seth",
 			Description: "Severeum CLI client.",
 		},
 		{
-			BinaryName:  "puppsev",
+			BinaryName:  "puppeth",
 			Description: "Severeum private network manager.",
 		},
 		{
@@ -320,7 +320,7 @@ func goToolArch(arch string, cc string, subcmd string, args ...string) *exec.Cmd
 // "tests" also includes static analysis tools such as vet.
 
 func doTest(cmdline []string) {
-	coverage := flag.Bool("coverage", false, "Whsever to record code coverage")
+	coverage := flag.Bool("coverage", false, "Whether to record code coverage")
 	flag.CommandLine.Parse(cmdline)
 	env := build.Env()
 
@@ -355,7 +355,7 @@ func doLint(cmdline []string) {
 	build.MustRun(goTool("get", "gopkg.in/alecthomas/gometalinter.v2"))
 	build.MustRunCommand(filepath.Join(GOBIN, "gometalinter.v2"), "--install")
 
-	// Run fast linters batched tossever
+	// Run fast linters batched tosether
 	configs := []string{
 		"--vendor",
 		"--tests",
@@ -384,7 +384,7 @@ func doArchive(cmdline []string) {
 		arch   = flag.String("arch", runtime.GOARCH, "Architecture cross packaging")
 		atype  = flag.String("type", "zip", "Type of archive to write (zip|tar)")
 		signer = flag.String("signer", "", `Environment variable holding the signing key (e.g. LINUX_SIGNING_KEY)`)
-		upload = flag.String("upload", "", `Destination to upload the archives (usually "ssevstore/builds")`)
+		upload = flag.String("upload", "", `Destination to upload the archives (usually "sethstore/builds")`)
 		ext    string
 	)
 	flag.CommandLine.Parse(cmdline)
@@ -400,15 +400,15 @@ func doArchive(cmdline []string) {
 	var (
 		env = build.Env()
 
-		basessev = archiveBasename(*arch, params.ArchiveVersion(env.Commit))
-		ssev     = "ssev-" + basessev + ext
-		alltools = "ssev-alltools-" + basessev + ext
+		baseseth = archiveBasename(*arch, params.ArchiveVersion(env.Commit))
+		seth     = "seth-" + baseseth + ext
+		alltools = "seth-alltools-" + baseseth + ext
 
 		baseswarm = archiveBasename(*arch, sv.ArchiveVersion(env.Commit))
 		swarm     = "swarm-" + baseswarm + ext
 	)
 	maybeSkipArchive(env)
-	if err := build.WriteArchive(ssev, ssevArchiveFiles); err != nil {
+	if err := build.WriteArchive(seth, sethArchiveFiles); err != nil {
 		log.Fatal(err)
 	}
 	if err := build.WriteArchive(alltools, allToolsArchiveFiles); err != nil {
@@ -417,7 +417,7 @@ func doArchive(cmdline []string) {
 	if err := build.WriteArchive(swarm, swarmArchiveFiles); err != nil {
 		log.Fatal(err)
 	}
-	for _, archive := range []string{ssev, alltools, swarm} {
+	for _, archive := range []string{seth, alltools, swarm} {
 		if err := archiveUpload(archive, *upload, *signer); err != nil {
 			log.Fatal(err)
 		}
@@ -534,7 +534,7 @@ func makeWorkdir(wdflag string) string {
 	if wdflag != "" {
 		err = os.MkdirAll(wdflag, 0744)
 	} else {
-		wdflag, err = ioutil.TempDir("", "ssev-build-")
+		wdflag, err = ioutil.TempDir("", "seth-build-")
 	}
 	if err != nil {
 		log.Fatal(err)
@@ -690,7 +690,7 @@ func doWindowsInstaller(cmdline []string) {
 	var (
 		arch    = flag.String("arch", runtime.GOARCH, "Architecture for cross build packaging")
 		signer  = flag.String("signer", "", `Environment variable holding the signing key (e.g. WINDOWS_SIGNING_KEY)`)
-		upload  = flag.String("upload", "", `Destination to upload the archives (usually "ssevstore/builds")`)
+		upload  = flag.String("upload", "", `Destination to upload the archives (usually "sethstore/builds")`)
 		workdir = flag.String("workdir", "", `Output directory for packages (uses temp dir if unset)`)
 	)
 	flag.CommandLine.Parse(cmdline)
@@ -702,28 +702,28 @@ func doWindowsInstaller(cmdline []string) {
 	var (
 		devTools []string
 		allTools []string
-		ssevTool string
+		sethTool string
 	)
 	for _, file := range allToolsArchiveFiles {
 		if file == "COPYING" { // license, copied later
 			continue
 		}
 		allTools = append(allTools, filepath.Base(file))
-		if filepath.Base(file) == "ssev.exe" {
-			ssevTool = file
+		if filepath.Base(file) == "seth.exe" {
+			sethTool = file
 		} else {
 			devTools = append(devTools, file)
 		}
 	}
 
 	// Render NSIS scripts: Installer NSIS contains two installer sections,
-	// first section contains the ssev binary, second section holds the dev tools.
+	// first section contains the seth binary, second section holds the dev tools.
 	templateData := map[string]interface{}{
 		"License":  "COPYING",
-		"Ssev":     ssevTool,
+		"Seth":     sethTool,
 		"DevTools": devTools,
 	}
-	build.Render("build/nsis.ssev.nsi", filepath.Join(*workdir, "ssev.nsi"), 0644, nil)
+	build.Render("build/nsis.seth.nsi", filepath.Join(*workdir, "seth.nsi"), 0644, nil)
 	build.Render("build/nsis.install.nsh", filepath.Join(*workdir, "install.nsh"), 0644, templateData)
 	build.Render("build/nsis.uninstall.nsh", filepath.Join(*workdir, "uninstall.nsh"), 0644, allTools)
 	build.Render("build/nsis.pathupdate.nsh", filepath.Join(*workdir, "PathUpdate.nsh"), 0644, nil)
@@ -738,14 +738,14 @@ func doWindowsInstaller(cmdline []string) {
 	if env.Commit != "" {
 		version[2] += "-" + env.Commit[:8]
 	}
-	installer, _ := filepath.Abs("ssev-" + archiveBasename(*arch, params.ArchiveVersion(env.Commit)) + ".exe")
+	installer, _ := filepath.Abs("seth-" + archiveBasename(*arch, params.ArchiveVersion(env.Commit)) + ".exe")
 	build.MustRunCommand("makensis.exe",
 		"/DOUTPUTFILE="+installer,
 		"/DMAJORVERSION="+version[0],
 		"/DMINORVERSION="+version[1],
 		"/DBUILDVERSION="+version[2],
 		"/DARCH="+*arch,
-		filepath.Join(*workdir, "ssev.nsi"),
+		filepath.Join(*workdir, "seth.nsi"),
 	)
 
 	// Sign and publish installer.
@@ -758,10 +758,10 @@ func doWindowsInstaller(cmdline []string) {
 
 func doAndroidArchive(cmdline []string) {
 	var (
-		local  = flag.Bool("local", false, `Flag whsever we're only doing a local build (skip Maven artifacts)`)
+		local  = flag.Bool("local", false, `Flag whether we're only doing a local build (skip Maven artifacts)`)
 		signer = flag.String("signer", "", `Environment variable holding the signing key (e.g. ANDROID_SIGNING_KEY)`)
 		deploy = flag.String("deploy", "", `Destination to deploy the archive (usually "https://oss.sonatype.org")`)
-		upload = flag.String("upload", "", `Destination to upload the archive (usually "ssevstore/builds")`)
+		upload = flag.String("upload", "", `Destination to upload the archive (usually "sethstore/builds")`)
 	)
 	flag.CommandLine.Parse(cmdline)
 	env := build.Env()
@@ -780,7 +780,7 @@ func doAndroidArchive(cmdline []string) {
 
 	if *local {
 		// If we're building locally, copy bundle to build dir and skip Maven
-		os.Rename("ssev.aar", filepath.Join(GOBIN, "ssev.aar"))
+		os.Rename("seth.aar", filepath.Join(GOBIN, "seth.aar"))
 		return
 	}
 	meta := newMavenMetadata(env)
@@ -790,8 +790,8 @@ func doAndroidArchive(cmdline []string) {
 	maybeSkipArchive(env)
 
 	// Sign and upload the archive to Azure
-	archive := "ssev-" + archiveBasename("android", params.ArchiveVersion(env.Commit)) + ".aar"
-	os.Rename("ssev.aar", archive)
+	archive := "seth-" + archiveBasename("android", params.ArchiveVersion(env.Commit)) + ".aar"
+	os.Rename("seth.aar", archive)
 
 	if err := archiveUpload(archive, *upload, *signer); err != nil {
 		log.Fatal(err)
@@ -881,7 +881,7 @@ func newMavenMetadata(env build.Environment) mavenMetadata {
 	}
 	return mavenMetadata{
 		Version:      version,
-		Package:      "ssev-" + version,
+		Package:      "seth-" + version,
 		Develop:      isUnstableBuild(env),
 		Contributors: contribs,
 	}
@@ -891,10 +891,10 @@ func newMavenMetadata(env build.Environment) mavenMetadata {
 
 func doXCodeFramework(cmdline []string) {
 	var (
-		local  = flag.Bool("local", false, `Flag whsever we're only doing a local build (skip Maven artifacts)`)
+		local  = flag.Bool("local", false, `Flag whether we're only doing a local build (skip Maven artifacts)`)
 		signer = flag.String("signer", "", `Environment variable holding the signing key (e.g. IOS_SIGNING_KEY)`)
 		deploy = flag.String("deploy", "", `Destination to deploy the archive (usually "trunk")`)
-		upload = flag.String("upload", "", `Destination to upload the archives (usually "ssevstore/builds")`)
+		upload = flag.String("upload", "", `Destination to upload the archives (usually "sethstore/builds")`)
 	)
 	flag.CommandLine.Parse(cmdline)
 	env := build.Env()
@@ -910,7 +910,7 @@ func doXCodeFramework(cmdline []string) {
 		build.MustRun(bind)
 		return
 	}
-	archive := "ssev-" + archiveBasename("ios", params.ArchiveVersion(env.Commit))
+	archive := "seth-" + archiveBasename("ios", params.ArchiveVersion(env.Commit))
 	if err := os.Mkdir(archive, os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
@@ -928,8 +928,8 @@ func doXCodeFramework(cmdline []string) {
 	// Prepare and upload a PodSpec to CocoaPods
 	if *deploy != "" {
 		meta := newPodMetadata(env, archive)
-		build.Render("build/pod.podspec", "Ssev.podspec", 0755, meta)
-		build.MustRunCommand("pod", *deploy, "push", "Ssev.podspec", "--allow-warnings", "--verbose")
+		build.Render("build/pod.podspec", "Seth.podspec", 0755, meta)
+		build.MustRunCommand("pod", *deploy, "push", "Seth.podspec", "--allow-warnings", "--verbose")
 	}
 }
 
@@ -982,7 +982,7 @@ func newPodMetadata(env build.Environment, archive string) podMetadata {
 
 func doXgo(cmdline []string) {
 	var (
-		alltools = flag.Bool("alltools", false, `Flag whsever we're building all known tools, or only on in particular`)
+		alltools = flag.Bool("alltools", false, `Flag whether we're building all known tools, or only on in particular`)
 	)
 	flag.CommandLine.Parse(cmdline)
 	env := build.Env()
@@ -1034,7 +1034,7 @@ func xgoTool(args []string) *exec.Cmd {
 
 func doPurge(cmdline []string) {
 	var (
-		store = flag.String("store", "", `Destination from where to purge archives (usually "ssevstore/builds")`)
+		store = flag.String("store", "", `Destination from where to purge archives (usually "sethstore/builds")`)
 		limit = flag.Int("days", 30, `Age threshold above which to delete unstable archives`)
 	)
 	flag.CommandLine.Parse(cmdline)

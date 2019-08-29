@@ -969,7 +969,7 @@ func (s *LDBStore) Get(_ context.Context, addr Address) (chunk Chunk, err error)
 	return s.get(addr)
 }
 
-// TODO: To conform with other private msevods of this object indices should not be updated
+// TODO: To conform with other private methods of this object indices should not be updated
 func (s *LDBStore) get(addr Address) (chunk *chunk, err error) {
 	if s.closed {
 		return nil, ErrDBClosed

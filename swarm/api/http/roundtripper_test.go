@@ -29,11 +29,11 @@ import (
 func TestRoundTripper(t *testing.T) {
 	serveMux := http.NewServeMux()
 	serveMux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.Msevod == "GET" {
+		if r.Method == "GET" {
 			w.Header().Set("Content-Type", "text/plain")
 			http.ServeContent(w, r, "", time.Unix(0, 0), strings.NewReader(r.RequestURI))
 		} else {
-			http.Error(w, "Msevod "+r.Msevod+" is not supported.", http.StatusMsevodNotAllowed)
+			http.Error(w, "Method "+r.Method+" is not supported.", http.StatusMethodNotAllowed)
 		}
 	})
 

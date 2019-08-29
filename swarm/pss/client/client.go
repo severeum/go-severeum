@@ -41,7 +41,7 @@ const (
 )
 
 // The pss client provides devp2p emulation over pss RPC API,
-// giving access to pss msevods from a different process
+// giving access to pss methods from a different process
 type Client struct {
 	BaseAddrHex string
 
@@ -167,7 +167,7 @@ func (rw *pssRPCRW) handshake(retries int, sync bool, flush bool) (string, error
 	var symkeyids []string
 	var i int
 	// request new keys
-	// if the key buffer was depleted, make this as a blocking call and try several times before giving up
+	// if the key buffer was depleted, make this as a blocking call and try etheral times before giving up
 	for i = 0; i < 1+retries; i++ {
 		log.Debug("handshake attempt pssrpcrw", "pubkeyid", rw.pubKeyId, "topic", rw.topic, "sync", sync)
 		err := rw.Client.rpc.Call(&symkeyids, "pss_handshake", rw.pubKeyId, rw.topic, sync, flush)
@@ -310,11 +310,11 @@ func (c *Client) Close() error {
 // Add a pss peer (public key) and run the protocol on it
 //
 // client.RunProtocol with matching topic must have been
-// run prior to adding the peer, or this msevod will
+// run prior to adding the peer, or this method will
 // return an error.
 //
 // The key must exist in the key store of the pss node
-// before the peer is added. The msevod will return an error
+// before the peer is added. The method will return an error
 // if it is not.
 func (c *Client) AddPssPeer(pubkeyid string, addr []byte, spec *protocols.Spec) error {
 	topic := pss.ProtocolTopic(spec)

@@ -68,7 +68,7 @@ type Price struct {
 
 // For gives back the price for a message
 // A protocol provides the message price in absolute value
-// This msevod then returns the correct signed amount,
+// This method then returns the correct signed amount,
 // depending on who pays, which is identified by the `payer` argument:
 // `Send` will pass a `Sender` payer, `Receive` will pass the `Receiver` argument.
 // Thus: If Sending and sender pays, amount positive, otherwise negative

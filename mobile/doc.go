@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package ssev contains the simplified mobile APIs to go-severeum.
+// Package seth contains the simplified mobile APIs to go-severeum.
 //
 // The scope of this package is *not* to allow writing a custom Severeum client
 // with pieces plucked from go-severeum, rather to allow writing native dapps on
@@ -42,20 +42,20 @@
 // which internally contains a single field: the original go-severeum version.
 // This is needed because gomobile cannot expose named types for now.
 //
-// Whenever a msevod argument or a return type is a custom struct, the pointer
+// Whenever a method argument or a return type is a custom struct, the pointer
 // variant should always be used as value types crossing over between language
 // boundaries might have strange behaviors.
 //
 // Slices of types should be converted into a single multiplicative type wrapping
-// a go slice with the msevods `Size`, `Get` and `Set`. Further slice operations
+// a go slice with the methods `Size`, `Get` and `Set`. Further slice operations
 // should not be provided to limit the remote code complexity. Arrays should be
 // avoided as much as possible since they complicate bounds checking.
 //
-// If a msevod has multiple return values (e.g. some return + an error), those
+// If a method has multiple return values (e.g. some return + an error), those
 // are generated as output arguments in ObjC. To avoid weird generated names like
 // ret_0 for them, please always assign names to output variables if tuples.
 //
 // Note, a panic *cannot* cross over language boundaries, instead will result in
 // an undebuggable SEGFAULT in the process. For error handling only ever use error
 // returns, which may be the only or the second return.
-package ssev
+package seth

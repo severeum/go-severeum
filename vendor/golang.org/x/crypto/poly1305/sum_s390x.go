@@ -6,11 +6,11 @@
 
 package poly1305
 
-// hasVectorFacility reports whsever the machine supports
+// hasVectorFacility reports whether the machine supports
 // the vector facility (vx).
 func hasVectorFacility() bool
 
-// hasVMSLFacility reports whsever the machine supports
+// hasVMSLFacility reports whether the machine supports
 // Vector Multiply Sum Logical (VMSL).
 func hasVMSLFacility() bool
 

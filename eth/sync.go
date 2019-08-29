@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sev
+package eth
 
 import (
 	"math/rand"
@@ -23,7 +23,7 @@ import (
 
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sev/downloader"
+	"github.com/severeum/go-severeum/eth/downloader"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/p2p/enode"
 )
@@ -65,7 +65,7 @@ func (pm *ProtocolManager) syncTransactions(p *peer) {
 func (pm *ProtocolManager) txsyncLoop() {
 	var (
 		pending = make(map[enode.ID]*txsync)
-		sending = false               // whsever a send is active
+		sending = false               // whether a send is active
 		pack    = new(txsync)         // the pack that is being sent
 		done    = make(chan error, 1) // result of the send
 	)

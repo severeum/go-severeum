@@ -40,11 +40,11 @@ ADD genesis.json /genesis.json
 	ADD signer.pass /signer.pass
 {{end}}
 RUN \
-  echo 'ssev --cache 512 init /genesis.json' > ssev.sh && \{{if .Unlock}}
-	echo 'mkdir -p /root/.severeum/keystore/ && cp /signer.json /root/.severeum/keystore/' >> ssev.sh && \{{end}}
-	echo $'exec ssev --networkid {{.NetworkID}} --cache 512 --port {{.Port}} --nat extip:{{.IP}} --maxpeers {{.Peers}} {{.LightFlag}} --sevstats \'{{.Sevstats}}\' {{if .Bootnodes}}--bootnodes {{.Bootnodes}}{{end}} {{if .Severbase}}--miner.severbase {{.Severbase}} --mine --miner.threads 1{{end}} {{if .Unlock}}--unlock 0 --password /signer.pass --mine{{end}} --miner.gastarget {{.GasTarget}} --miner.gaslimit {{.GasLimit}} --miner.gasprice {{.GasPrice}}' >> ssev.sh
+  echo 'seth --cache 512 init /genesis.json' > seth.sh && \{{if .Unlock}}
+	echo 'mkdir -p /root/.severeum/keystore/ && cp /signer.json /root/.severeum/keystore/' >> seth.sh && \{{end}}
+	echo $'exec seth --networkid {{.NetworkID}} --cache 512 --port {{.Port}} --nat extip:{{.IP}} --maxpeers {{.Peers}} {{.LightFlag}} --ethstats \'{{.Sevstats}}\' {{if .Bootnodes}}--bootnodes {{.Bootnodes}}{{end}} {{if .Severbase}}--miner.etherbase {{.Severbase}} --mine --miner.threads 1{{end}} {{if .Unlock}}--unlock 0 --password /signer.pass --mine{{end}} --miner.gastarget {{.GasTarget}} --miner.gaslimit {{.GasLimit}} --miner.gasprice {{.GasPrice}}' >> seth.sh
 
-ENTRYPOINT ["/bin/sh", "ssev.sh"]
+ENTRYPOINT ["/bin/sh", "seth.sh"]
 `
 
 // nodeComposefile is the docker-compose.yml file required to deploy and maintain
@@ -61,7 +61,7 @@ services:
       - "{{.Port}}:{{.Port}}/udp"
     volumes:
       - {{.Datadir}}:/root/.severeum{{if .Sevashdir}}
-      - {{.Sevashdir}}:/root/.sevash{{end}}
+      - {{.Sevashdir}}:/root/.ethash{{end}}
     environment:
       - PORT={{.Port}}/tcp
       - TOTAL_PEERS={{.TotalPeers}}
@@ -84,7 +84,7 @@ services:
 // already exists there, it will be overwritten!
 func deployNode(client *sshClient, network string, bootnodes []string, config *nodeInfos, nocache bool) ([]byte, error) {
 	kind := "sealnode"
-	if config.keyJSON == "" && config.severbase == "" {
+	if config.keyJSON == "" && config.etherbase == "" {
 		kind = "bootnode"
 		bootnodes = make([]string, 0)
 	}
@@ -104,8 +104,8 @@ func deployNode(client *sshClient, network string, bootnodes []string, config *n
 		"Peers":     config.peersTotal,
 		"LightFlag": lightFlag,
 		"Bootnodes": strings.Join(bootnodes, ","),
-		"Sevstats":  config.sevstats,
-		"Severbase": config.severbase,
+		"Sevstats":  config.ethstats,
+		"Severbase": config.etherbase,
 		"GasTarget": uint64(1000000 * config.gasTarget),
 		"GasLimit":  uint64(1000000 * config.gasLimit),
 		"GasPrice":  uint64(1000000000 * config.gasPrice),
@@ -117,14 +117,14 @@ func deployNode(client *sshClient, network string, bootnodes []string, config *n
 	template.Must(template.New("").Parse(nodeComposefile)).Execute(composefile, map[string]interface{}{
 		"Type":       kind,
 		"Datadir":    config.datadir,
-		"Sevashdir":  config.sevashdir,
+		"Sevashdir":  config.ethashdir,
 		"Network":    network,
 		"Port":       config.port,
 		"TotalPeers": config.peersTotal,
 		"Light":      config.peersLight > 0,
 		"LightPeers": config.peersLight,
-		"Sevstats":   config.sevstats[:strings.Index(config.sevstats, ":")],
-		"Severbase":  config.severbase,
+		"Sevstats":   config.ethstats[:strings.Index(config.ethstats, ":")],
+		"Severbase":  config.etherbase,
 		"GasTarget":  config.gasTarget,
 		"GasLimit":   config.gasLimit,
 		"GasPrice":   config.gasPrice,
@@ -155,13 +155,13 @@ type nodeInfos struct {
 	genesis    []byte
 	network    int64
 	datadir    string
-	sevashdir  string
-	sevstats   string
+	ethashdir  string
+	ethstats   string
 	port       int
 	enode      string
 	peersTotal int
 	peersLight int
-	severbase  string
+	etherbase  string
 	keyJSON    string
 	keyPass    string
 	gasTarget  float64
@@ -177,7 +177,7 @@ func (info *nodeInfos) Report() map[string]string {
 		"Listener port":            strconv.Itoa(info.port),
 		"Peer count (all total)":   strconv.Itoa(info.peersTotal),
 		"Peer count (light nodes)": strconv.Itoa(info.peersLight),
-		"Sevstats username":        info.sevstats,
+		"Sevstats username":        info.ethstats,
 	}
 	if info.gasTarget > 0 {
 		// Miner or signer node
@@ -185,10 +185,10 @@ func (info *nodeInfos) Report() map[string]string {
 		report["Gas floor (baseline target)"] = fmt.Sprintf("%0.3f MGas", info.gasTarget)
 		report["Gas ceil  (target maximum)"] = fmt.Sprintf("%0.3f MGas", info.gasLimit)
 
-		if info.severbase != "" {
+		if info.etherbase != "" {
 			// Sevash proof-of-work miner
-			report["Sevash directory"] = info.sevashdir
-			report["Miner account"] = info.severbase
+			report["Sevash directory"] = info.ethashdir
+			report["Miner account"] = info.etherbase
 		}
 		if info.keyJSON != "" {
 			// Clique proof-of-authority signer
@@ -206,7 +206,7 @@ func (info *nodeInfos) Report() map[string]string {
 }
 
 // checkNode does a health-check against a boot or seal node server to verify
-// whsever it's running, and if yes, whsever it's responsive.
+// whether it's running, and if yes, whether it's responsive.
 func checkNode(client *sshClient, network string, boot bool) (*nodeInfos, error) {
 	kind := "bootnode"
 	if !boot {
@@ -229,7 +229,7 @@ func checkNode(client *sshClient, network string, boot bool) (*nodeInfos, error)
 
 	// Container available, retrieve its node ID and its genesis json
 	var out []byte
-	if out, err = client.Run(fmt.Sprintf("docker exec %s_%s_1 ssev --exec admin.nodeInfo.enode --cache=16 attach", network, kind)); err != nil {
+	if out, err = client.Run(fmt.Sprintf("docker exec %s_%s_1 seth --exec admin.nodeInfo.enode --cache=16 attach", network, kind)); err != nil {
 		return nil, ErrServiceUnreachable
 	}
 	enode := bytes.Trim(bytes.TrimSpace(out), "\"")
@@ -255,12 +255,12 @@ func checkNode(client *sshClient, network string, boot bool) (*nodeInfos, error)
 	stats := &nodeInfos{
 		genesis:    genesis,
 		datadir:    infos.volumes["/root/.severeum"],
-		sevashdir:  infos.volumes["/root/.sevash"],
+		ethashdir:  infos.volumes["/root/.ethash"],
 		port:       port,
 		peersTotal: totalPeers,
 		peersLight: lightPeers,
-		sevstats:   infos.envvars["STATS_NAME"],
-		severbase:  infos.envvars["MINER_NAME"],
+		ethstats:   infos.envvars["STATS_NAME"],
+		etherbase:  infos.envvars["MINER_NAME"],
 		keyJSON:    keyJSON,
 		keyPass:    keyPass,
 		gasTarget:  gasTarget,

@@ -164,7 +164,7 @@ func (t *testResolveValidator) HeaderByNumber(context.Context, *big.Int) (header
 // TestAPIResolve tests resolving URIs which can either contain content hashes
 // or ENS names
 func TestAPIResolve(t *testing.T) {
-	ensAddr := "swarm.sev"
+	ensAddr := "swarm.eth"
 	hashAddr := "1111111111111111111111111111111111111111111111111111111111111111"
 	resolvedAddr := "2222222222222222222222222222222222222222222222222222222222222222"
 	doesResolve := newTestResolveValidator(resolvedAddr)
@@ -190,7 +190,7 @@ func TestAPIResolve(t *testing.T) {
 			desc:      "DNS not configured, ENS address, returns error",
 			dns:       nil,
 			addr:      ensAddr,
-			expectErr: errors.New(`no DNS to resolve name: "swarm.sev"`),
+			expectErr: errors.New(`no DNS to resolve name: "swarm.eth"`),
 		},
 		{
 			desc:   "DNS configured, hash address, hash resolves, returns resolved address",
@@ -222,13 +222,13 @@ func TestAPIResolve(t *testing.T) {
 			dns:       doesResolve,
 			addr:      ensAddr,
 			immutable: true,
-			expectErr: errors.New(`immutable address not a content hash: "swarm.sev"`),
+			expectErr: errors.New(`immutable address not a content hash: "swarm.eth"`),
 		},
 		{
 			desc:      "DNS configured, ENS address, name doesn't resolve, returns error",
 			dns:       doesntResolve,
 			addr:      ensAddr,
-			expectErr: errors.New(`DNS name not found: "swarm.sev"`),
+			expectErr: errors.New(`DNS name not found: "swarm.eth"`),
 		},
 	}
 	for _, x := range tests {
@@ -261,9 +261,9 @@ func TestAPIResolve(t *testing.T) {
 func TestMultiResolver(t *testing.T) {
 	doesntResolve := newTestResolveValidator("")
 
-	sevAddr := "swarm.sev"
-	sevHash := "0x2222222222222222222222222222222222222222222222222222222222222222"
-	sevResolve := newTestResolveValidator(sevHash)
+	ethAddr := "swarm.eth"
+	ethHash := "0x2222222222222222222222222222222222222222222222222222222222222222"
+	ethResolve := newTestResolveValidator(ethHash)
 
 	testAddr := "swarm.test"
 	testHash := "0x1111111111111111111111111111111111111111111111111111111111111111"
@@ -283,70 +283,70 @@ func TestMultiResolver(t *testing.T) {
 		},
 		{
 			desc:   "One default resolver, returns resolved address",
-			r:      NewMultiResolver(MultiResolverOptionWithResolver(sevResolve, "")),
-			addr:   sevAddr,
-			result: sevHash,
+			r:      NewMultiResolver(MultiResolverOptionWithResolver(ethResolve, "")),
+			addr:   ethAddr,
+			result: ethHash,
 		},
 		{
 			desc: "Two default resolvers, returns resolved address",
 			r: NewMultiResolver(
-				MultiResolverOptionWithResolver(sevResolve, ""),
-				MultiResolverOptionWithResolver(sevResolve, ""),
+				MultiResolverOptionWithResolver(ethResolve, ""),
+				MultiResolverOptionWithResolver(ethResolve, ""),
 			),
-			addr:   sevAddr,
-			result: sevHash,
+			addr:   ethAddr,
+			result: ethHash,
 		},
 		{
 			desc: "Two default resolvers, first doesn't resolve, returns resolved address",
 			r: NewMultiResolver(
 				MultiResolverOptionWithResolver(doesntResolve, ""),
-				MultiResolverOptionWithResolver(sevResolve, ""),
+				MultiResolverOptionWithResolver(ethResolve, ""),
 			),
-			addr:   sevAddr,
-			result: sevHash,
+			addr:   ethAddr,
+			result: ethHash,
 		},
 		{
 			desc: "Default resolver doesn't resolve, tld resolver resolve, returns resolved address",
 			r: NewMultiResolver(
 				MultiResolverOptionWithResolver(doesntResolve, ""),
-				MultiResolverOptionWithResolver(sevResolve, "sev"),
+				MultiResolverOptionWithResolver(ethResolve, "eth"),
 			),
-			addr:   sevAddr,
-			result: sevHash,
+			addr:   ethAddr,
+			result: ethHash,
 		},
 		{
 			desc: "Three TLD resolvers, third resolves, returns resolved address",
 			r: NewMultiResolver(
-				MultiResolverOptionWithResolver(doesntResolve, "sev"),
-				MultiResolverOptionWithResolver(doesntResolve, "sev"),
-				MultiResolverOptionWithResolver(sevResolve, "sev"),
+				MultiResolverOptionWithResolver(doesntResolve, "eth"),
+				MultiResolverOptionWithResolver(doesntResolve, "eth"),
+				MultiResolverOptionWithResolver(ethResolve, "eth"),
 			),
-			addr:   sevAddr,
-			result: sevHash,
+			addr:   ethAddr,
+			result: ethHash,
 		},
 		{
 			desc: "One TLD resolver doesn't resolve, returns error",
 			r: NewMultiResolver(
 				MultiResolverOptionWithResolver(doesntResolve, ""),
-				MultiResolverOptionWithResolver(sevResolve, "sev"),
+				MultiResolverOptionWithResolver(ethResolve, "eth"),
 			),
-			addr:   sevAddr,
-			result: sevHash,
+			addr:   ethAddr,
+			result: ethHash,
 		},
 		{
 			desc: "One defautl and one TLD resolver, all doesn't resolve, returns error",
 			r: NewMultiResolver(
 				MultiResolverOptionWithResolver(doesntResolve, ""),
-				MultiResolverOptionWithResolver(doesntResolve, "sev"),
+				MultiResolverOptionWithResolver(doesntResolve, "eth"),
 			),
-			addr:   sevAddr,
-			result: sevHash,
-			err:    errors.New(`DNS name not found: "swarm.sev"`),
+			addr:   ethAddr,
+			result: ethHash,
+			err:    errors.New(`DNS name not found: "swarm.eth"`),
 		},
 		{
 			desc: "Two TLD resolvers, both resolve, returns resolved address",
 			r: NewMultiResolver(
-				MultiResolverOptionWithResolver(sevResolve, "sev"),
+				MultiResolverOptionWithResolver(ethResolve, "eth"),
 				MultiResolverOptionWithResolver(testResolve, "test"),
 			),
 			addr:   testAddr,
@@ -355,7 +355,7 @@ func TestMultiResolver(t *testing.T) {
 		{
 			desc: "One TLD resolver, no default resolver, returns error for different TLD",
 			r: NewMultiResolver(
-				MultiResolverOptionWithResolver(sevResolve, "sev"),
+				MultiResolverOptionWithResolver(ethResolve, "eth"),
 			),
 			addr: testAddr,
 			err:  NewNoResolverError("test"),

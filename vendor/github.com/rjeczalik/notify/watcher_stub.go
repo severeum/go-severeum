@@ -6,7 +6,7 @@ package notify
 
 type watcherStub struct{ error }
 
-// Following msevods implement notify.watcher interface.
+// Following methods implement notify.watcher interface.
 func (s watcherStub) Watch(string, Event) error          { return s }
 func (s watcherStub) Rewatch(string, Event, Event) error { return s }
 func (s watcherStub) Unwatch(string) (err error)         { return s }

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sevash
+package ethash
 
 import (
 	"encoding/binary"
@@ -48,7 +48,7 @@ const (
 	loopAccesses       = 64      // Number of accesses in hashimoto loop
 )
 
-// cacheSize returns the size of the sevash verification cache that belongs to a certain
+// cacheSize returns the size of the ethash verification cache that belongs to a certain
 // block number.
 func cacheSize(block uint64) uint64 {
 	epoch := int(block / epochLength)
@@ -69,7 +69,7 @@ func calcCacheSize(epoch int) uint64 {
 	return size
 }
 
-// datasetSize returns the size of the sevash mining dataset that belongs to a certain
+// datasetSize returns the size of the ethash mining dataset that belongs to a certain
 // block number.
 func datasetSize(block uint64) uint64 {
 	epoch := int(block / epochLength)
@@ -106,7 +106,7 @@ func makeHasher(h hash.Hash) hasher {
 	}
 	rh, ok := h.(readerHash)
 	if !ok {
-		panic("can't find Read msevod on hash")
+		panic("can't find Read method on hash")
 	}
 	outputLen := rh.Size()
 	return func(dest []byte, data []byte) {
@@ -135,7 +135,7 @@ func seedHash(block uint64) []byte {
 // memory, then performing two passes of Sergio Demian Lerner's RandMemoHash
 // algorithm from Strict Memory Hard Hashing Functions (2014). The output is a
 // set of 524288 64-byte values.
-// This msevod places the result into dest in machine byte order.
+// This method places the result into dest in machine byte order.
 func generateCache(dest []uint32, epoch uint64, seed []byte) {
 	// Print some debug logs to allow analysis on low end devices
 	logger := log.New("epoch", epoch)
@@ -148,7 +148,7 @@ func generateCache(dest []uint32, epoch uint64, seed []byte) {
 		if elapsed > 3*time.Second {
 			logFn = logger.Info
 		}
-		logFn("Generated sevash verification cache", "elapsed", common.PrettyDuration(elapsed))
+		logFn("Generated ethash verification cache", "elapsed", common.PrettyDuration(elapsed))
 	}()
 	// Convert our destination slice to a byte buffer
 	header := *(*reflect.SliceHeader)(unsafe.Pointer(&dest))
@@ -156,7 +156,7 @@ func generateCache(dest []uint32, epoch uint64, seed []byte) {
 	header.Cap *= 4
 	cache := *(*[]byte)(unsafe.Pointer(&header))
 
-	// Calculate the number of theoretical rows (we'll store in one buffer nonseveless)
+	// Calculate the number of theoretical rows (we'll store in one buffer nonetheless)
 	size := uint64(len(cache))
 	rows := int(size) / hashBytes
 
@@ -172,7 +172,7 @@ func generateCache(dest []uint32, epoch uint64, seed []byte) {
 			case <-done:
 				return
 			case <-time.After(3 * time.Second):
-				logger.Info("Generating sevash verification cache", "percentage", atomic.LoadUint32(&progress)*100/uint32(rows)/4, "elapsed", common.PrettyDuration(time.Since(start)))
+				logger.Info("Generating ethash verification cache", "percentage", atomic.LoadUint32(&progress)*100/uint32(rows)/4, "elapsed", common.PrettyDuration(time.Since(start)))
 			}
 		}
 	}()
@@ -222,7 +222,7 @@ func fnv(a, b uint32) uint32 {
 	return a*0x01000193 ^ b
 }
 
-// fnvHash mixes in data into mix using the sevash fnv msevod.
+// fnvHash mixes in data into mix using the ethash fnv method.
 func fnvHash(mix []uint32, data []uint32) {
 	for i := 0; i < len(mix); i++ {
 		mix[i] = mix[i]*0x01000193 ^ data[i]
@@ -232,7 +232,7 @@ func fnvHash(mix []uint32, data []uint32) {
 // generateDatasetItem combines data from 256 pseudorandomly selected cache nodes,
 // and hashes that to compute a single dataset node.
 func generateDatasetItem(cache []uint32, index uint32, keccak512 hasher) []byte {
-	// Calculate the number of theoretical rows (we use one buffer nonseveless)
+	// Calculate the number of theoretical rows (we use one buffer nonetheless)
 	rows := uint32(len(cache) / hashWords)
 
 	// Initialize the mix
@@ -262,8 +262,8 @@ func generateDatasetItem(cache []uint32, index uint32, keccak512 hasher) []byte 
 	return mix
 }
 
-// generateDataset generates the entire sevash dataset for mining.
-// This msevod places the result into dest in machine byte order.
+// generateDataset generates the entire ethash dataset for mining.
+// This method places the result into dest in machine byte order.
 func generateDataset(dest []uint32, epoch uint64, cache []uint32) {
 	// Print some debug logs to allow analysis on low end devices
 	logger := log.New("epoch", epoch)
@@ -276,10 +276,10 @@ func generateDataset(dest []uint32, epoch uint64, cache []uint32) {
 		if elapsed > 3*time.Second {
 			logFn = logger.Info
 		}
-		logFn("Generated sevash verification cache", "elapsed", common.PrettyDuration(elapsed))
+		logFn("Generated ethash verification cache", "elapsed", common.PrettyDuration(elapsed))
 	}()
 
-	// Figure out whsever the bytes need to be swapped for the machine
+	// Figure out whether the bytes need to be swapped for the machine
 	swapped := !isLittleEndian()
 
 	// Convert our destination slice to a byte buffer
@@ -332,7 +332,7 @@ func generateDataset(dest []uint32, epoch uint64, cache []uint32) {
 // hashimoto aggregates data from the full dataset in order to produce our final
 // value for a particular header hash and nonce.
 func hashimoto(hash []byte, nonce uint64, size uint64, lookup func(index uint32) []uint32) ([]byte, []byte) {
-	// Calculate the number of theoretical rows (we use one buffer nonseveless)
+	// Calculate the number of theoretical rows (we use one buffer nonetheless)
 	rows := uint32(size / mixBytes)
 
 	// Combine header+nonce into a 64 byte seed
@@ -402,7 +402,7 @@ func hashimotoFull(dataset []uint32, hash []byte, nonce uint64) ([]byte, []byte)
 
 const maxEpoch = 2048
 
-// datasetSizes is a lookup table for the sevash dataset size for the first 2048
+// datasetSizes is a lookup table for the ethash dataset size for the first 2048
 // epochs (i.e. 61440000 blocks).
 var datasetSizes = [maxEpoch]uint64{
 	1073739904, 1082130304, 1090514816, 1098906752, 1107293056,
@@ -816,7 +816,7 @@ var datasetSizes = [maxEpoch]uint64{
 	18186498944, 18194886784, 18203275648, 18211666048, 18220048768,
 	18228444544, 18236833408, 18245220736}
 
-// cacheSizes is a lookup table for the sevash verification cache size for the
+// cacheSizes is a lookup table for the ethash verification cache size for the
 // first 2048 epochs (i.e. 61440000 blocks).
 var cacheSizes = [maxEpoch]uint64{
 	16776896, 16907456, 17039296, 17170112, 17301056, 17432512, 17563072,

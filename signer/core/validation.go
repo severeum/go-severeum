@@ -42,7 +42,7 @@ func testSelector(selector string, data []byte) (*decodedCallData, error) {
 	if selector == "" {
 		return nil, fmt.Errorf("selector not found")
 	}
-	abiData, err := MsevodSelectorToAbi(selector)
+	abiData, err := MethodSelectorToAbi(selector)
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +54,8 @@ func testSelector(selector string, data []byte) (*decodedCallData, error) {
 
 }
 
-// validateCallData checks if the ABI-data + msevodselector (if given) can be parsed and seems to match
-func (v *Validator) validateCallData(msgs *ValidationMessages, data []byte, msevodSelector *string) {
+// validateCallData checks if the ABI-data + methodselector (if given) can be parsed and seems to match
+func (v *Validator) validateCallData(msgs *ValidationMessages, data []byte, methodSelector *string) {
 	if len(data) == 0 {
 		return
 	}
@@ -71,19 +71,19 @@ func (v *Validator) validateCallData(msgs *ValidationMessages, data []byte, msev
 		err  error
 	)
 	// Check the provided one
-	if msevodSelector != nil {
-		info, err = testSelector(*msevodSelector, data)
+	if methodSelector != nil {
+		info, err = testSelector(*methodSelector, data)
 		if err != nil {
 			msgs.warn(fmt.Sprintf("Tx contains data, but provided ABI signature could not be matched: %v", err))
 		} else {
 			msgs.info(info.String())
 			//Successfull match. add to db if not there already (ignore errors there)
-			v.db.AddSignature(*msevodSelector, data[:4])
+			v.db.AddSignature(*methodSelector, data[:4])
 		}
 		return
 	}
 	// Check the db
-	selector, err := v.db.LookupMsevodSelector(data[:4])
+	selector, err := v.db.LookupMethodSelector(data[:4])
 	if err != nil {
 		msgs.warn(fmt.Sprintf("Tx contains data, but the ABI signature could not be found: %v", err))
 		return
@@ -97,7 +97,7 @@ func (v *Validator) validateCallData(msgs *ValidationMessages, data []byte, msev
 }
 
 // validateSemantics checks if the transactions 'makes sense', and generate warnings for a couple of typical scenarios
-func (v *Validator) validate(msgs *ValidationMessages, txargs *SendTxArgs, msevodSelector *string) error {
+func (v *Validator) validate(msgs *ValidationMessages, txargs *SendTxArgs, methodSelector *string) error {
 	// Prevent accidental erroneous usage of both 'input' and 'data'
 	if txargs.Data != nil && txargs.Input != nil && !bytes.Equal(*txargs.Data, *txargs.Input) {
 		// This is a showstopper
@@ -121,7 +121,7 @@ func (v *Validator) validate(msgs *ValidationMessages, txargs *SendTxArgs, msevo
 		// e.g. https://github.com/severeum/go-severeum/issues/16106
 		if len(data) == 0 {
 			if txargs.Value.ToInt().Cmp(big.NewInt(0)) > 0 {
-				// Sending sever into black hole
+				// Sending ether into black hole
 				return errors.New("Tx will create contract with value but empty code!")
 			}
 			// No value submitted at least
@@ -129,9 +129,9 @@ func (v *Validator) validate(msgs *ValidationMessages, txargs *SendTxArgs, msevo
 		} else if len(data) < 40 { //Arbitrary limit
 			msgs.warn(fmt.Sprintf("Tx will will create contract, but payload is suspiciously small (%d b)", len(data)))
 		}
-		// msevodSelector should be nil for contract creation
-		if msevodSelector != nil {
-			msgs.warn("Tx will create contract, but msevod selector supplied; indicating intent to call a msevod.")
+		// methodSelector should be nil for contract creation
+		if methodSelector != nil {
+			msgs.warn("Tx will create contract, but method selector supplied; indicating intent to call a method.")
 		}
 
 	} else {
@@ -144,16 +144,16 @@ func (v *Validator) validate(msgs *ValidationMessages, txargs *SendTxArgs, msevo
 			msgs.crit("Tx destination is the zero address!")
 		}
 		// Validate calldata
-		v.validateCallData(msgs, data, msevodSelector)
+		v.validateCallData(msgs, data, methodSelector)
 	}
 	return nil
 }
 
 // ValidateTransaction does a number of checks on the supplied transaction, and returns either a list of warnings,
 // or an error, indicating that the transaction should be immediately rejected
-func (v *Validator) ValidateTransaction(txArgs *SendTxArgs, msevodSelector *string) (*ValidationMessages, error) {
+func (v *Validator) ValidateTransaction(txArgs *SendTxArgs, methodSelector *string) (*ValidationMessages, error) {
 	msgs := &ValidationMessages{}
-	return msgs, v.validate(msgs, txArgs, msevodSelector)
+	return msgs, v.validate(msgs, txArgs, methodSelector)
 }
 
 var Printable7BitAscii = regexp.MustCompile("^[A-Za-z0-9!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ]+$")

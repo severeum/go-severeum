@@ -41,7 +41,7 @@ func TestWaitTillHealthy(t *testing.T) {
 			}
 			kad := network.NewKademlia(addr.Over(), network.NewKadParams())
 			// store kademlia in node's bucket under BucketKeyKademlia
-			// so that it can be found by WaitTillHealthy msevod.
+			// so that it can be found by WaitTillHealthy method.
 			b.Store(BucketKeyKademlia, kad)
 			return network.NewBzz(config, kad, nil, nil, nil), nil, nil
 		},

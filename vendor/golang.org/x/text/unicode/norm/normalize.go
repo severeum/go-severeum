@@ -144,7 +144,7 @@ func (f Form) IsNormalString(s string) bool {
 
 // patchTail fixes a case where a rune may be incorrectly normalized
 // if it is followed by illegal continuation bytes. It returns the
-// patched buffer and whsever the decomposition is still in progress.
+// patched buffer and whether the decomposition is still in progress.
 func patchTail(rb *reorderBuffer) bool {
 	info, p := lastRuneStart(&rb.f, rb.out)
 	if p == -1 || info.size == 0 {
@@ -297,7 +297,7 @@ func (f Form) SpanString(s string, atEOF bool) (n int, err error) {
 }
 
 // quickSpan returns a boundary n such that src[0:n] == f(src[0:n]) and
-// whsever any non-normalized parts were found. If atEOF is false, n will
+// whether any non-normalized parts were found. If atEOF is false, n will
 // not point past the last segment if this segment might be become
 // non-normalized by appending other runes.
 func (f *formInfo) quickSpan(src input, i, end int, atEOF bool) (n int, ok bool) {

@@ -10,7 +10,7 @@ package subtle // import "golang.org/x/crypto/internal/subtle"
 
 import "unsafe"
 
-// AnyOverlap reports whsever x and y share memory at any (not necessarily
+// AnyOverlap reports whether x and y share memory at any (not necessarily
 // corresponding) index. The memory beyond the slice length is ignored.
 func AnyOverlap(x, y []byte) bool {
 	return len(x) > 0 && len(y) > 0 &&
@@ -18,7 +18,7 @@ func AnyOverlap(x, y []byte) bool {
 		uintptr(unsafe.Pointer(&y[0])) <= uintptr(unsafe.Pointer(&x[len(x)-1]))
 }
 
-// InexactOverlap reports whsever x and y share memory at any non-corresponding
+// InexactOverlap reports whether x and y share memory at any non-corresponding
 // index. The memory beyond the slice length is ignored. Note that x and y can
 // have different lengths and still not have any inexact overlap.
 //

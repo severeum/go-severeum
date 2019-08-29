@@ -109,11 +109,11 @@ func New(config Config) (*Console, error) {
 func (c *Console) init(preload []string) error {
 	// Initialize the JavaScript <-> Go RPC bridge
 	bridge := newBridge(c.client, c.prompter, c.printer)
-	c.jsre.Set("jsev", struct{}{})
+	c.jsre.Set("jeth", struct{}{})
 
-	jsevObj, _ := c.jsre.Get("jsev")
-	jsevObj.Object().Set("send", bridge.Send)
-	jsevObj.Object().Set("sendAsync", bridge.Send)
+	jethObj, _ := c.jsre.Get("jeth")
+	jethObj.Object().Set("send", bridge.Send)
+	jethObj.Object().Set("sendAsync", bridge.Send)
 
 	consoleObj, _ := c.jsre.Get("console")
 	consoleObj.Object().Set("log", c.consoleOutput)
@@ -129,7 +129,7 @@ func (c *Console) init(preload []string) error {
 	if _, err := c.jsre.Run("var Web3 = require('web3');"); err != nil {
 		return fmt.Errorf("web3 require: %v", err)
 	}
-	if _, err := c.jsre.Run("var web3 = new Web3(jsev);"); err != nil {
+	if _, err := c.jsre.Run("var web3 = new Web3(jeth);"); err != nil {
 		return fmt.Errorf("web3 provider: %v", err)
 	}
 	// Load the supported APIs into the JavaScript runtime environment
@@ -137,7 +137,7 @@ func (c *Console) init(preload []string) error {
 	if err != nil {
 		return fmt.Errorf("api modules: %v", err)
 	}
-	flatten := "var sev = web3.sev; var personal = web3.personal; "
+	flatten := "var eth = web3.eth; var personal = web3.personal; "
 	for api := range apis {
 		if api == "web3" {
 			continue // manually mapped or ignore
@@ -157,31 +157,31 @@ func (c *Console) init(preload []string) error {
 		return fmt.Errorf("namespace flattening: %v", err)
 	}
 	// Initialize the global name register (disabled for now)
-	//c.jsre.Run(`var GlobalRegistrar = sev.contract(` + registrar.GlobalRegistrarAbi + `);   registrar = GlobalRegistrar.at("` + registrar.GlobalRegistrarAddr + `");`)
+	//c.jsre.Run(`var GlobalRegistrar = eth.contract(` + registrar.GlobalRegistrarAbi + `);   registrar = GlobalRegistrar.at("` + registrar.GlobalRegistrarAddr + `");`)
 
-	// If the console is in interactive mode, instrument password related msevods to query the user
+	// If the console is in interactive mode, instrument password related methods to query the user
 	if c.prompter != nil {
 		// Retrieve the account management object to instrument
 		personal, err := c.jsre.Get("personal")
 		if err != nil {
 			return err
 		}
-		// Override the openWallet, unlockAccount, newAccount and sign msevods since
-		// these require user interaction. Assign these msevod in the Console the
-		// original web3 callbacks. These will be called by the jsev.* msevods after
+		// Override the openWallet, unlockAccount, newAccount and sign methods since
+		// these require user interaction. Assign these method in the Console the
+		// original web3 callbacks. These will be called by the jeth.* methods after
 		// they got the password from the user and send the original web3 request to
 		// the backend.
 		if obj := personal.Object(); obj != nil { // make sure the personal api is enabled over the interface
-			if _, err = c.jsre.Run(`jsev.openWallet = personal.openWallet;`); err != nil {
+			if _, err = c.jsre.Run(`jeth.openWallet = personal.openWallet;`); err != nil {
 				return fmt.Errorf("personal.openWallet: %v", err)
 			}
-			if _, err = c.jsre.Run(`jsev.unlockAccount = personal.unlockAccount;`); err != nil {
+			if _, err = c.jsre.Run(`jeth.unlockAccount = personal.unlockAccount;`); err != nil {
 				return fmt.Errorf("personal.unlockAccount: %v", err)
 			}
-			if _, err = c.jsre.Run(`jsev.newAccount = personal.newAccount;`); err != nil {
+			if _, err = c.jsre.Run(`jeth.newAccount = personal.newAccount;`); err != nil {
 				return fmt.Errorf("personal.newAccount: %v", err)
 			}
-			if _, err = c.jsre.Run(`jsev.sign = personal.sign;`); err != nil {
+			if _, err = c.jsre.Run(`jeth.sign = personal.sign;`); err != nil {
 				return fmt.Errorf("personal.sign: %v", err)
 			}
 			obj.Set("openWallet", bridge.OpenWallet)
@@ -233,7 +233,7 @@ func (c *Console) clearHistory() {
 	}
 }
 
-// consoleOutput is an override for the console.log and console.error msevods to
+// consoleOutput is an override for the console.log and console.error methods to
 // stream the output into the configured output stream instead of stdout.
 func (c *Console) consoleOutput(call otto.FunctionCall) otto.Value {
 	output := []string{}
@@ -245,17 +245,17 @@ func (c *Console) consoleOutput(call otto.FunctionCall) otto.Value {
 }
 
 // AutoCompleteInput is a pre-assembled word completer to be used by the user
-// input prompter to provide hints to the user about the msevods available.
+// input prompter to provide hints to the user about the methods available.
 func (c *Console) AutoCompleteInput(line string, pos int) (string, []string, string) {
 	// No completions can be provided for empty inputs
 	if len(line) == 0 || pos == 0 {
 		return "", nil, ""
 	}
 	// Chunck data to relevant part for autocompletion
-	// E.g. in case of nested lines sev.getBalance(sev.coinb<tab><tab>
+	// E.g. in case of nested lines eth.getBalance(eth.coinb<tab><tab>
 	start := pos - 1
 	for ; start > 0; start-- {
-		// Skip all msevods and namespaces (i.e. including the dot)
+		// Skip all methods and namespaces (i.e. including the dot)
 		if line[start] == '.' || (line[start] >= 'a' && line[start] <= 'z') || (line[start] >= 'A' && line[start] <= 'Z') {
 			continue
 		}
@@ -271,15 +271,15 @@ func (c *Console) AutoCompleteInput(line string, pos int) (string, []string, str
 	return line[:start], c.jsre.CompleteKeywords(line[start:pos]), line[pos:]
 }
 
-// Welcome show summary of current Ssev instance and some metadata about the
+// Welcome show summary of current Seth instance and some metadata about the
 // console's available modules.
 func (c *Console) Welcome() {
-	// Print some generic Ssev metadata
-	fmt.Fprintf(c.printer, "Welcome to the Ssev JavaScript console!\n\n")
+	// Print some generic Seth metadata
+	fmt.Fprintf(c.printer, "Welcome to the Seth JavaScript console!\n\n")
 	c.jsre.Run(`
 		console.log("instance: " + web3.version.node);
-		console.log("coinbase: " + sev.coinbase);
-		console.log("at block: " + sev.blockNumber + " (" + new Date(1000 * sev.getBlock(sev.blockNumber).timestamp) + ")");
+		console.log("coinbase: " + eth.coinbase);
+		console.log("at block: " + eth.blockNumber + " (" + new Date(1000 * eth.getBlock(eth.blockNumber).timestamp) + ")");
 		console.log(" datadir: " + admin.datadir);
 	`)
 	// List all the supported modules for the user to call

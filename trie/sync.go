@@ -22,7 +22,7 @@ import (
 
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/common/prque"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 )
 
 // ErrNotRequested is returned by the trie sync when it's requested to process a
@@ -37,7 +37,7 @@ var ErrAlreadyProcessed = errors.New("already processed")
 type request struct {
 	hash common.Hash // Hash of the node data content to retrieve
 	data []byte      // Data content of the node, cached until all subtrees complete
-	raw  bool        // Whsever this is a raw entry (code) or a trie node
+	raw  bool        // Whether this is a raw entry (code) or a trie node
 
 	parents []*request // Parent state nodes referencing this entry (notify all upon completion)
 	depth   int        // Depth level within the trie the node is located to prioritise DFS
@@ -110,7 +110,7 @@ func (s *Sync) AddSubTrie(root common.Hash, depth int, parent common.Hash, callb
 		depth:    depth,
 		callback: callback,
 	}
-	// If this sub-trie has a designated parent, link them tossever
+	// If this sub-trie has a designated parent, link them tosether
 	if parent != (common.Hash{}) {
 		ancestor := s.requests[parent]
 		if ancestor == nil {
@@ -124,7 +124,7 @@ func (s *Sync) AddSubTrie(root common.Hash, depth int, parent common.Hash, callb
 
 // AddRawEntry schedules the direct retrieval of a state entry that should not be
 // interpreted as a trie node, but rather accepted and stored into the database
-// as is. This msevod's goal is to support misc state metadata retrievals (e.g.
+// as is. This method's goal is to support misc state metadata retrievals (e.g.
 // contract code).
 func (s *Sync) AddRawEntry(hash common.Hash, depth int, parent common.Hash) {
 	// Short circuit if the entry is empty or already known
@@ -143,7 +143,7 @@ func (s *Sync) AddRawEntry(hash common.Hash, depth int, parent common.Hash) {
 		raw:   true,
 		depth: depth,
 	}
-	// If this sub-trie has a designated parent, link them tossever
+	// If this sub-trie has a designated parent, link them tosether
 	if parent != (common.Hash{}) {
 		ancestor := s.requests[parent]
 		if ancestor == nil {
@@ -164,7 +164,7 @@ func (s *Sync) Missing(max int) []common.Hash {
 	return requests
 }
 
-// Process injects a batch of retrieved trie nodes data, returning if somseving
+// Process injects a batch of retrieved trie nodes data, returning if something
 // was committed to the database and also the index of an entry if processing of
 // it failed.
 func (s *Sync) Process(results []SyncResult) (bool, int, error) {
@@ -213,7 +213,7 @@ func (s *Sync) Process(results []SyncResult) (bool, int, error) {
 
 // Commit flushes the data stored in the internal membatch out to persistent
 // storage, returning the number of items written and any occurred error.
-func (s *Sync) Commit(dbw sevdb.Putter) (int, error) {
+func (s *Sync) Commit(dbw ethdb.Putter) (int, error) {
 	// Dump the membatch into a database dbw
 	for i, key := range s.membatch.order {
 		if err := dbw.Put(key[:], s.membatch.batch[key]); err != nil {
@@ -249,7 +249,7 @@ func (s *Sync) schedule(req *request) {
 // children retrieves all the missing children of a state trie entry for future
 // retrieval scheduling.
 func (s *Sync) children(req *request, object node) ([]*request, error) {
-	// Gather all the children of the node, irrelevant whsever known or not
+	// Gather all the children of the node, irrelevant whether known or not
 	type child struct {
 		node  node
 		depth int

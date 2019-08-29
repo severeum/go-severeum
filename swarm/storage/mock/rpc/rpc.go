@@ -16,7 +16,7 @@
 
 // Package rpc implements an RPC client that connect to a centralized mock store.
 // Centralazied mock store can be any other mock store implementation that is
-// registered to Severeum RPC server under mockStore name. Msevods that defines
+// registered to Severeum RPC server under mockStore name. Methods that defines
 // mock.GlobalStore are the same that are used by RPC. Example:
 //
 //   server := rpc.NewServer()
@@ -57,7 +57,7 @@ func (s *GlobalStore) NewNodeStore(addr common.Address) *mock.NodeStore {
 	return mock.NewNodeStore(addr, s)
 }
 
-// Get calls a Get msevod to RPC server.
+// Get calls a Get method to RPC server.
 func (s *GlobalStore) Get(addr common.Address, key []byte) (data []byte, err error) {
 	err = s.client.Call(&data, "mockStore_get", addr, key)
 	if err != nil && err.Error() == "not found" {
@@ -67,19 +67,19 @@ func (s *GlobalStore) Get(addr common.Address, key []byte) (data []byte, err err
 	return data, err
 }
 
-// Put calls a Put msevod to RPC server.
+// Put calls a Put method to RPC server.
 func (s *GlobalStore) Put(addr common.Address, key []byte, data []byte) error {
 	err := s.client.Call(nil, "mockStore_put", addr, key, data)
 	return err
 }
 
-// Delete calls a Delete msevod to RPC server.
+// Delete calls a Delete method to RPC server.
 func (s *GlobalStore) Delete(addr common.Address, key []byte) error {
 	err := s.client.Call(nil, "mockStore_delete", addr, key)
 	return err
 }
 
-// HasKey calls a HasKey msevod to RPC server.
+// HasKey calls a HasKey method to RPC server.
 func (s *GlobalStore) HasKey(addr common.Address, key []byte) bool {
 	var has bool
 	if err := s.client.Call(&has, "mockStore_hasKey", addr, key); err != nil {

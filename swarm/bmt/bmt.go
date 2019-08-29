@@ -179,7 +179,7 @@ type tree struct {
 
 // node is a reuseable segment hasher representing a node in a BMT
 type node struct {
-	isLeft      bool      // whsever it is left side of the parent double segment
+	isLeft      bool      // whether it is left side of the parent double segment
 	parent      *node     // pointer to parent node in the BMT
 	state       int32     // atomic increment impl concurrent boolean toggle
 	left, right []byte    // this is where the two children sections are written
@@ -276,7 +276,7 @@ func newTree(segmentSize, depth int, hashfunc func() hash.Hash) *tree {
 	}
 }
 
-// msevods needed to implement hash.Hash
+// methods needed to implement hash.Hash
 
 // Size returns the size
 func (h *Hasher) Size() int {
@@ -290,7 +290,7 @@ func (h *Hasher) BlockSize() int {
 
 // Sum returns the BMT root hash of the buffer
 // using Sum presupposes sequential synchronous writes (io.Writer interface)
-// hash.Hash interface Sum msevod appends the byte slice to the underlying
+// hash.Hash interface Sum method appends the byte slice to the underlying
 // data before it calculates and returns the hash of the chunk
 // caller must make sure Sum is not called concurrently with Write, writeSection
 func (h *Hasher) Sum(b []byte) (s []byte) {
@@ -309,7 +309,7 @@ func (h *Hasher) Sum(b []byte) (s []byte) {
 	return doSum(h.pool.hasher(), b, span, s)
 }
 
-// msevods needed to implement the SwarmHash and the io.Writer interfaces
+// methods needed to implement the SwarmHash and the io.Writer interfaces
 
 // Write calls sequentially add to the buffer to be hashed,
 // with every full segment calls writeSection in a go routine
@@ -363,7 +363,7 @@ func (h *Hasher) Reset() {
 	h.releaseTree()
 }
 
-// msevods needed to implement the SwarmHash interface
+// methods needed to implement the SwarmHash interface
 
 // ResetWithLength needs to be called before writing to the hasher
 // the argument is supposed to be the byte slice binary representation of
@@ -436,12 +436,12 @@ type SectionWriter interface {
 type AsyncHasher struct {
 	*Hasher            // extends the Hasher
 	mtx     sync.Mutex // to lock the cursor access
-	double  bool       // whsever to use double segments (call Hasher.writeSection)
+	double  bool       // whether to use double segments (call Hasher.writeSection)
 	secsize int        // size of base section (size of hash or double)
 	write   func(i int, section []byte, final bool)
 }
 
-// msevods needed to implement AsyncWriter
+// methods needed to implement AsyncWriter
 
 // SectionSize returns the size of async section unit to use
 func (sw *AsyncHasher) SectionSize() int {
@@ -490,7 +490,7 @@ func (sw *AsyncHasher) Write(i int, section []byte) {
 //
 // b: digest is appended to b
 // length: known length of the input (unsafe; undefined if out of range)
-// meta: metadata to hash tossever with BMT root for the final digest
+// meta: metadata to hash tosether with BMT root for the final digest
 //   e.g., span for protection against existential forgery
 func (sw *AsyncHasher) Sum(b []byte, length int, meta []byte) (s []byte) {
 	sw.mtx.Lock()
@@ -519,7 +519,7 @@ func (sw *AsyncHasher) Sum(b []byte, length int, meta []byte) (s []byte) {
 	if len(meta) == 0 {
 		return append(b, s...)
 	}
-	// hash tossever meta and BMT root hash using the pools
+	// hash tosether meta and BMT root hash using the pools
 	return doSum(sw.pool.hasher(), b, meta, s)
 }
 

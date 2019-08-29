@@ -28,12 +28,12 @@ import (
 	"github.com/severeum/go-severeum/common/hexutil"
 	"github.com/severeum/go-severeum/common/math"
 	"github.com/severeum/go-severeum/consensus"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/state"
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/core/vm"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/params"
 	"github.com/severeum/go-severeum/rlp"
 )
@@ -101,7 +101,7 @@ func (t *BlockTest) Run() error {
 	}
 
 	// import pre accounts & construct test genesis block & state root
-	db := sevdb.NewMemDatabase()
+	db := ethdb.NewMemDatabase()
 	gblock, err := t.genesis(config).Commit(db)
 	if err != nil {
 		return err
@@ -114,9 +114,9 @@ func (t *BlockTest) Run() error {
 	}
 	var engine consensus.Engine
 	if t.json.SealEngine == "NoProof" {
-		engine = sevash.NewFaker()
+		engine = ethash.NewFaker()
 	} else {
-		engine = sevash.NewShared()
+		engine = ethash.NewShared()
 	}
 	chain, err := core.NewBlockChain(db, &core.CacheConfig{TrieCleanLimit: 0}, config, engine, vm.Config{}, nil)
 	if err != nil {
@@ -160,7 +160,7 @@ func (t *BlockTest) genesis(config *params.ChainConfig) *core.Genesis {
 
 /* See https://github.com/severeum/tests/wiki/Blockchain-Tests-II
 
-   Whsever a block is valid or not is a bit subtle, it's defined by presence of
+   Whether a block is valid or not is a bit subtle, it's defined by presence of
    blockHeader, transactions and uncleHeaders fields. If they are missing, the block is
    invalid and we must verify that we do not accept it.
 

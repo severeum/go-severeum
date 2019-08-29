@@ -254,7 +254,7 @@ func TestCache(t *testing.T) {
 	}
 }
 
-// matching of address hints; whsever a message could be or is for the node
+// matching of address hints; whether a message could be or is for the node
 func TestAddressMatch(t *testing.T) {
 
 	localaddr := network.RandomAddr().Over()
@@ -521,7 +521,7 @@ func TestAddressMatchProx(t *testing.T) {
 		false,
 	}
 
-	// first the unit test on the msevod that calculates possible receipient using prox
+	// first the unit test on the method that calculates possible receipient using prox
 	for i, distance := range remoteDistances {
 		pssMsg := newPssMsg(&msgParams{})
 		pssMsg.To = make([]byte, len(localAddr))

@@ -25,7 +25,7 @@ const (
 
 // Field instances are constructed via LogBool, LogString, and so on.
 // Tracing implementations may then handle them via the Field.Marshal
-// msevod.
+// method.
 //
 // "heavily influenced by" (i.e., partially stolen from)
 // https://github.com/uber-go/zap
@@ -192,7 +192,7 @@ type Encoder interface {
 }
 
 // Marshal passes a Field instance through to the appropriate
-// field-type-specific msevod of an Encoder.
+// field-type-specific method of an Encoder.
 func (lf Field) Marshal(visitor Encoder) {
 	switch lf.fieldType {
 	case stringType:

@@ -1,13 +1,13 @@
 # Ownership by go packages
 
 swarm
-├── api ─────────────────── seversphere
+├── api ─────────────────── ethersphere
 ├── bmt ─────────────────── @zelig
 ├── dev ─────────────────── @lmars
 ├── fuse ────────────────── @jmozah, @holisticode
 ├── grafana_dashboards ──── @nonsense
 ├── metrics ─────────────── @nonsense, @holisticode
-├── network ─────────────── seversphere
+├── network ─────────────── ethersphere
 │   ├── bitvector ───────── @zelig, @janos, @gbalint
 │   ├── priorityqueue ───── @zelig, @janos, @gbalint
 │   ├── simulations ─────── @zelig
@@ -18,7 +18,7 @@ swarm
 ├── pss ─────────────────── @nolash, @zelig, @nonsense
 ├── services ────────────── @zelig
 ├── state ───────────────── @justelad
-├── storage ─────────────── seversphere
+├── storage ─────────────── ethersphere
 │   ├── encryption ──────── @gbalint, @zelig, @nagydani
 │   ├── mock ────────────── @janos
 │   └── feed ────────────── @nolash, @jpeletier

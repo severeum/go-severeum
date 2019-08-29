@@ -91,12 +91,12 @@ func (p *BaggageRestrictionManagerClient) recvGetBaggageRestrictions() (value []
 		iprot = p.ProtocolFactory.GetProtocol(p.Transport)
 		p.InputProtocol = iprot
 	}
-	msevod, mTypeId, seqId, err := iprot.ReadMessageBegin()
+	method, mTypeId, seqId, err := iprot.ReadMessageBegin()
 	if err != nil {
 		return
 	}
-	if msevod != "getBaggageRestrictions" {
-		err = thrift.NewTApplicationException(thrift.WRONG_MSEVOD_NAME, "getBaggageRestrictions failed: wrong msevod name")
+	if method != "getBaggageRestrictions" {
+		err = thrift.NewTApplicationException(thrift.WRONG_MSEVOD_NAME, "getBaggageRestrictions failed: wrong method name")
 		return
 	}
 	if p.SeqId != seqId {

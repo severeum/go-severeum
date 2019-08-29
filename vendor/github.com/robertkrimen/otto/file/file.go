@@ -30,7 +30,7 @@ func (self *Position) isValid() bool {
 	return self.Line > 0
 }
 
-// String returns a string in one of several forms:
+// String returns a string in one of etheral forms:
 //
 //	file:line:column    A valid position with filename
 //	line:column         A valid position without filename
@@ -61,7 +61,7 @@ type FileSet struct {
 
 // AddFile adds a new file with the given filename and src.
 //
-// This an internal msevod, but exported for cross-package use.
+// This an internal method, but exported for cross-package use.
 func (self *FileSet) AddFile(filename, src string) int {
 	base := self.nextBase()
 	file := &File{

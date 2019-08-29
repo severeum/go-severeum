@@ -26,7 +26,7 @@ import (
 )
 
 // -----------------------------------------------------------------------
-// Internal type which deals with suite msevod calling.
+// Internal type which deals with suite method calling.
 
 const (
 	fixtureKd = iota
@@ -46,40 +46,40 @@ const (
 
 type funcStatus uint32
 
-// A msevod value can't reach its own Msevod structure.
-type msevodType struct {
+// A method value can't reach its own Method structure.
+type methodType struct {
 	reflect.Value
-	Info reflect.Msevod
+	Info reflect.Method
 }
 
-func newMsevod(receiver reflect.Value, i int) *msevodType {
-	return &msevodType{receiver.Msevod(i), receiver.Type().Msevod(i)}
+func newMethod(receiver reflect.Value, i int) *methodType {
+	return &methodType{receiver.Method(i), receiver.Type().Method(i)}
 }
 
-func (msevod *msevodType) PC() uintptr {
-	return msevod.Info.Func.Pointer()
+func (method *methodType) PC() uintptr {
+	return method.Info.Func.Pointer()
 }
 
-func (msevod *msevodType) suiteName() string {
-	t := msevod.Info.Type.In(0)
+func (method *methodType) suiteName() string {
+	t := method.Info.Type.In(0)
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
 	}
 	return t.Name()
 }
 
-func (msevod *msevodType) String() string {
-	return msevod.suiteName() + "." + msevod.Info.Name
+func (method *methodType) String() string {
+	return method.suiteName() + "." + method.Info.Name
 }
 
-func (msevod *msevodType) matches(re *regexp.Regexp) bool {
-	return (re.MatchString(msevod.Info.Name) ||
-		re.MatchString(msevod.suiteName()) ||
-		re.MatchString(msevod.String()))
+func (method *methodType) matches(re *regexp.Regexp) bool {
+	return (re.MatchString(method.Info.Name) ||
+		re.MatchString(method.suiteName()) ||
+		re.MatchString(method.String()))
 }
 
 type C struct {
-	msevod    *msevodType
+	method    *methodType
 	kind      funcKind
 	testName  string
 	_status   funcStatus
@@ -281,7 +281,7 @@ func (c *C) logCaller(skip int) {
 	}
 	var testFile string
 	var testLine int
-	testFunc := runtime.FuncForPC(c.msevod.PC())
+	testFunc := runtime.FuncForPC(c.method.PC())
 	if runtime.FuncForPC(pc) != testFunc {
 		for {
 			skip++
@@ -349,9 +349,9 @@ func (c *C) logSoftPanic(issue string) {
 	c.log("... Panic: ", issue)
 }
 
-func (c *C) logArgPanic(msevod *msevodType, expectedType string) {
+func (c *C) logArgPanic(method *methodType, expectedType string) {
 	c.logf("... Panic: %s argument should be %s",
-		niceFuncName(msevod.PC()), expectedType)
+		niceFuncName(method.PC()), expectedType)
 }
 
 // -----------------------------------------------------------------------
@@ -512,9 +512,9 @@ func (tracker *resultTracker) _loopRoutine() {
 
 type suiteRunner struct {
 	suite                     interface{}
-	setUpSuite, tearDownSuite *msevodType
-	setUpTest, tearDownTest   *msevodType
-	tests                     []*msevodType
+	setUpSuite, tearDownSuite *methodType
+	setUpTest, tearDownTest   *methodType
+	tests                     []*methodType
 	tracker                   *resultTracker
 	tempDir                   *tempDir
 	keepDir                   bool
@@ -535,7 +535,7 @@ type RunConf struct {
 	KeepWorkDir   bool
 }
 
-// Create a new suiteRunner able to run all msevods in the given suite.
+// Create a new suiteRunner able to run all methods in the given suite.
 func newSuiteRunner(suite interface{}, runConf *RunConf) *suiteRunner {
 	var conf RunConf
 	if runConf != nil {
@@ -549,7 +549,7 @@ func newSuiteRunner(suite interface{}, runConf *RunConf) *suiteRunner {
 	}
 
 	suiteType := reflect.TypeOf(suite)
-	suiteNumMsevods := suiteType.NumMsevod()
+	suiteNumMethods := suiteType.NumMethod()
 	suiteValue := reflect.ValueOf(suite)
 
 	runner := &suiteRunner{
@@ -560,7 +560,7 @@ func newSuiteRunner(suite interface{}, runConf *RunConf) *suiteRunner {
 		benchMem:  conf.BenchmarkMem,
 		tempDir:   &tempDir{},
 		keepDir:   conf.KeepWorkDir,
-		tests:     make([]*msevodType, 0, suiteNumMsevods),
+		tests:     make([]*methodType, 0, suiteNumMethods),
 	}
 	if runner.benchTime == 0 {
 		runner.benchTime = 1 * time.Second
@@ -577,34 +577,34 @@ func newSuiteRunner(suite interface{}, runConf *RunConf) *suiteRunner {
 		filterRegexp = regexp
 	}
 
-	for i := 0; i != suiteNumMsevods; i++ {
-		msevod := newMsevod(suiteValue, i)
-		switch msevod.Info.Name {
+	for i := 0; i != suiteNumMethods; i++ {
+		method := newMethod(suiteValue, i)
+		switch method.Info.Name {
 		case "SetUpSuite":
-			runner.setUpSuite = msevod
+			runner.setUpSuite = method
 		case "TearDownSuite":
-			runner.tearDownSuite = msevod
+			runner.tearDownSuite = method
 		case "SetUpTest":
-			runner.setUpTest = msevod
+			runner.setUpTest = method
 		case "TearDownTest":
-			runner.tearDownTest = msevod
+			runner.tearDownTest = method
 		default:
 			prefix := "Test"
 			if conf.Benchmark {
 				prefix = "Benchmark"
 			}
-			if !strings.HasPrefix(msevod.Info.Name, prefix) {
+			if !strings.HasPrefix(method.Info.Name, prefix) {
 				continue
 			}
-			if filterRegexp == nil || msevod.matches(filterRegexp) {
-				runner.tests = append(runner.tests, msevod)
+			if filterRegexp == nil || method.matches(filterRegexp) {
+				runner.tests = append(runner.tests, method)
 			}
 		}
 	}
 	return runner
 }
 
-// Run all msevods in the given suite.
+// Run all methods in the given suite.
 func (runner *suiteRunner) run() *Result {
 	if runner.tracker.result.RunError == nil && len(runner.tests) > 0 {
 		runner.tracker.start()
@@ -637,9 +637,9 @@ func (runner *suiteRunner) run() *Result {
 	return &runner.tracker.result
 }
 
-// Create a call object with the given suite msevod, and fork a
+// Create a call object with the given suite method, and fork a
 // goroutine with the provided dispatcher for running it.
-func (runner *suiteRunner) forkCall(msevod *msevodType, kind funcKind, testName string, logb *logger, dispatcher func(c *C)) *C {
+func (runner *suiteRunner) forkCall(method *methodType, kind funcKind, testName string, logb *logger, dispatcher func(c *C)) *C {
 	var logw io.Writer
 	if runner.output.Stream {
 		logw = runner.output
@@ -648,7 +648,7 @@ func (runner *suiteRunner) forkCall(msevod *msevodType, kind funcKind, testName 
 		logb = new(logger)
 	}
 	c := &C{
-		msevod:    msevod,
+		method:    method,
 		kind:      kind,
 		testName:  testName,
 		logb:      logb,
@@ -669,8 +669,8 @@ func (runner *suiteRunner) forkCall(msevod *msevodType, kind funcKind, testName 
 }
 
 // Same as forkCall(), but wait for call to finish before returning.
-func (runner *suiteRunner) runFunc(msevod *msevodType, kind funcKind, testName string, logb *logger, dispatcher func(c *C)) *C {
-	c := runner.forkCall(msevod, kind, testName, logb, dispatcher)
+func (runner *suiteRunner) runFunc(method *methodType, kind funcKind, testName string, logb *logger, dispatcher func(c *C)) *C {
+	c := runner.forkCall(method, kind, testName, logb, dispatcher)
 	<-c.done
 	return c
 }
@@ -709,78 +709,78 @@ func (runner *suiteRunner) callDone(c *C) {
 }
 
 // Runs a fixture call synchronously.  The fixture will still be run in a
-// goroutine like all suite msevods, but this msevod will not return
+// goroutine like all suite methods, but this method will not return
 // while the fixture goroutine is not done, because the fixture must be
 // run in a desired order.
-func (runner *suiteRunner) runFixture(msevod *msevodType, testName string, logb *logger) *C {
-	if msevod != nil {
-		c := runner.runFunc(msevod, fixtureKd, testName, logb, func(c *C) {
+func (runner *suiteRunner) runFixture(method *methodType, testName string, logb *logger) *C {
+	if method != nil {
+		c := runner.runFunc(method, fixtureKd, testName, logb, func(c *C) {
 			c.ResetTimer()
 			c.StartTimer()
 			defer c.StopTimer()
-			c.msevod.Call([]reflect.Value{reflect.ValueOf(c)})
+			c.method.Call([]reflect.Value{reflect.ValueOf(c)})
 		})
 		return c
 	}
 	return nil
 }
 
-// Run the fixture msevod with runFixture(), but panic with a fixturePanic{}
-// in case the fixture msevod panics.  This makes it easier to track the
-// fixture panic tossever with other call panics within forkTest().
-func (runner *suiteRunner) runFixtureWithPanic(msevod *msevodType, testName string, logb *logger, skipped *bool) *C {
+// Run the fixture method with runFixture(), but panic with a fixturePanic{}
+// in case the fixture method panics.  This makes it easier to track the
+// fixture panic tosether with other call panics within forkTest().
+func (runner *suiteRunner) runFixtureWithPanic(method *methodType, testName string, logb *logger, skipped *bool) *C {
 	if skipped != nil && *skipped {
 		return nil
 	}
-	c := runner.runFixture(msevod, testName, logb)
+	c := runner.runFixture(method, testName, logb)
 	if c != nil && c.status() != succeededSt {
 		if skipped != nil {
 			*skipped = c.status() == skippedSt
 		}
-		panic(&fixturePanic{c.status(), msevod})
+		panic(&fixturePanic{c.status(), method})
 	}
 	return c
 }
 
 type fixturePanic struct {
 	status funcStatus
-	msevod *msevodType
+	method *methodType
 }
 
-// Run the suite test msevod, tossever with the test-specific fixture,
+// Run the suite test method, tosether with the test-specific fixture,
 // asynchronously.
-func (runner *suiteRunner) forkTest(msevod *msevodType) *C {
-	testName := msevod.String()
-	return runner.forkCall(msevod, testKd, testName, nil, func(c *C) {
+func (runner *suiteRunner) forkTest(method *methodType) *C {
+	testName := method.String()
+	return runner.forkCall(method, testKd, testName, nil, func(c *C) {
 		var skipped bool
 		defer runner.runFixtureWithPanic(runner.tearDownTest, testName, nil, &skipped)
 		defer c.StopTimer()
 		benchN := 1
 		for {
 			runner.runFixtureWithPanic(runner.setUpTest, testName, c.logb, &skipped)
-			mt := c.msevod.Type()
+			mt := c.method.Type()
 			if mt.NumIn() != 1 || mt.In(0) != reflect.TypeOf(c) {
 				// Rather than a plain panic, provide a more helpful message when
 				// the argument type is incorrect.
 				c.setStatus(panickedSt)
-				c.logArgPanic(c.msevod, "*check.C")
+				c.logArgPanic(c.method, "*check.C")
 				return
 			}
-			if strings.HasPrefix(c.msevod.Info.Name, "Test") {
+			if strings.HasPrefix(c.method.Info.Name, "Test") {
 				c.ResetTimer()
 				c.StartTimer()
-				c.msevod.Call([]reflect.Value{reflect.ValueOf(c)})
+				c.method.Call([]reflect.Value{reflect.ValueOf(c)})
 				return
 			}
-			if !strings.HasPrefix(c.msevod.Info.Name, "Benchmark") {
-				panic("unexpected msevod prefix: " + c.msevod.Info.Name)
+			if !strings.HasPrefix(c.method.Info.Name, "Benchmark") {
+				panic("unexpected method prefix: " + c.method.Info.Name)
 			}
 
 			runtime.GC()
 			c.N = benchN
 			c.ResetTimer()
 			c.StartTimer()
-			c.msevod.Call([]reflect.Value{reflect.ValueOf(c)})
+			c.method.Call([]reflect.Value{reflect.ValueOf(c)})
 			c.StopTimer()
 			if c.status() != succeededSt || c.duration >= c.benchTime || benchN >= 1e9 {
 				return
@@ -805,8 +805,8 @@ func (runner *suiteRunner) forkTest(msevod *msevodType) *C {
 }
 
 // Same as forkTest(), but wait for the test to finish before returning.
-func (runner *suiteRunner) runTest(msevod *msevodType) *C {
-	c := runner.forkTest(msevod)
+func (runner *suiteRunner) runTest(method *methodType) *C {
+	c := runner.forkTest(method)
 	<-c.done
 	return c
 }
@@ -814,26 +814,26 @@ func (runner *suiteRunner) runTest(msevod *msevodType) *C {
 // Helper to mark tests as skipped or missed.  A bit heavy for what
 // it does, but it enables homogeneous handling of tracking, including
 // nice verbose output.
-func (runner *suiteRunner) skipTests(status funcStatus, msevods []*msevodType) {
-	for _, msevod := range msevods {
-		runner.runFunc(msevod, testKd, "", nil, func(c *C) {
+func (runner *suiteRunner) skipTests(status funcStatus, methods []*methodType) {
+	for _, method := range methods {
+		runner.runFunc(method, testKd, "", nil, func(c *C) {
 			c.setStatus(status)
 		})
 	}
 }
 
 // Verify if the fixture arguments are *check.C.  In case of errors,
-// log the error as a panic in the fixture msevod call, and return false.
+// log the error as a panic in the fixture method call, and return false.
 func (runner *suiteRunner) checkFixtureArgs() bool {
 	succeeded := true
 	argType := reflect.TypeOf(&C{})
-	for _, msevod := range []*msevodType{runner.setUpSuite, runner.tearDownSuite, runner.setUpTest, runner.tearDownTest} {
-		if msevod != nil {
-			mt := msevod.Type()
+	for _, method := range []*methodType{runner.setUpSuite, runner.tearDownSuite, runner.setUpTest, runner.tearDownTest} {
+		if method != nil {
+			mt := method.Type()
 			if mt.NumIn() != 1 || mt.In(0) != argType {
 				succeeded = false
-				runner.runFunc(msevod, fixtureKd, "", nil, func(c *C) {
-					c.logArgPanic(msevod, "*check.C")
+				runner.runFunc(method, fixtureKd, "", nil, func(c *C) {
+					c.logArgPanic(method, "*check.C")
 					c.setStatus(panickedSt)
 				})
 			}

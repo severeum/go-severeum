@@ -18,7 +18,7 @@ func (f credentialFunc) New(next pipeline.Policy, po *pipeline.PolicyOptions) pi
 	return f(next, po)
 }
 
-// credentialMarker is a package-internal msevod that exists just to satisfy the Credential interface.
+// credentialMarker is a package-internal method that exists just to satisfy the Credential interface.
 func (credentialFunc) credentialMarker() {}
 
 //////////////////////////////
@@ -40,7 +40,7 @@ func (f *anonymousCredentialPolicyFactory) New(next pipeline.Policy, po *pipelin
 	return &anonymousCredentialPolicy{next: next}
 }
 
-// credentialMarker is a package-internal msevod that exists just to satisfy the Credential interface.
+// credentialMarker is a package-internal method that exists just to satisfy the Credential interface.
 func (*anonymousCredentialPolicyFactory) credentialMarker() {}
 
 // anonymousCredentialPolicy is the credential's policy object.

@@ -54,7 +54,7 @@ func (self *FileSet) AddFile(filename, src string) int
 ```
 AddFile adds a new file with the given filename and src.
 
-This an internal msevod, but exported for cross-package use.
+This an internal method, but exported for cross-package use.
 
 #### func (*FileSet) File
 
@@ -99,7 +99,7 @@ and column location.
 ```go
 func (self *Position) String() string
 ```
-String returns a string in one of several forms:
+String returns a string in one of etheral forms:
 
     file:line:column    A valid position with filename
     line:column         A valid position without filename

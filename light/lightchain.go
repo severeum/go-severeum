@@ -30,7 +30,7 @@ import (
 	"github.com/severeum/go-severeum/core/rawdb"
 	"github.com/severeum/go-severeum/core/state"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/params"
@@ -49,7 +49,7 @@ var (
 type LightChain struct {
 	hc            *core.HeaderChain
 	indexerConfig *IndexerConfig
-	chainDb       sevdb.Database
+	chainDb       ethdb.Database
 	odr           OdrBackend
 	chainFeed     event.Feed
 	chainSideFeed event.Feed
@@ -141,7 +141,7 @@ func (self *LightChain) Odr() OdrBackend {
 	return self.odr
 }
 
-// loadLastState loads the last known chain state from the database. This msevod
+// loadLastState loads the last known chain state from the database. This method
 // assumes that the chain manager mutex is held.
 func (self *LightChain) loadLastState() error {
 	if head := rawdb.ReadHeadHeaderHash(self.chainDb); head == (common.Hash{}) {
@@ -346,7 +346,7 @@ func (self *LightChain) postChainEvents(events []interface{}) {
 // chain, possibly creating a reorg. If an error is returned, it will return the
 // index number of the failing header as well an error describing what went wrong.
 //
-// The verify parameter can be used to fine tune whsever nonce verification
+// The verify parameter can be used to fine tune whether nonce verification
 // should be done or not. The reason behind the optional check is because some
 // of the header retrieval mechanisms already need to verfy nonces, as well as
 // because nonces can be verified sparsely, not needing to check each.

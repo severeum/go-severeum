@@ -31,7 +31,7 @@ import (
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/common/hexutil"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/internal/sevapi"
+	"github.com/severeum/go-severeum/internal/ethapi"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/rlp"
 )
@@ -46,7 +46,7 @@ type ExternalAPI interface {
 	// New request to create a new account
 	New(ctx context.Context) (accounts.Account, error)
 	// SignTransaction request to sign the specified transaction
-	SignTransaction(ctx context.Context, args SendTxArgs, msevodSelector *string) (*sevapi.SignTransactionResult, error)
+	SignTransaction(ctx context.Context, args SendTxArgs, methodSelector *string) (*ethapi.SignTransactionResult, error)
 	// Sign - request to sign the given data (plus prefix)
 	Sign(ctx context.Context, addr common.MixedcaseAddress, data hexutil.Bytes) (hexutil.Bytes, error)
 	// Export - request to export an account
@@ -57,7 +57,7 @@ type ExternalAPI interface {
 	//Import(ctx context.Context, keyJSON json.RawMessage) (Account, error)
 }
 
-// SignerUI specifies what msevod a UI needs to implement to be able to be used as a UI for the signer
+// SignerUI specifies what method a UI needs to implement to be able to be used as a UI for the signer
 type SignerUI interface {
 	// ApproveTx prompt the user for confirmation to request to sign Transaction
 	ApproveTx(request *SignTxRequest) (SignTxResponse, error)
@@ -77,8 +77,8 @@ type SignerUI interface {
 	// ShowInfo displays info message to user
 	ShowInfo(message string)
 	// OnApprovedTx notifies the UI about a transaction having been successfully signed.
-	// This msevod can be used by a UI to keep track of e.g. how much has been sent to a particular recipient.
-	OnApprovedTx(tx sevapi.SignTransactionResult)
+	// This method can be used by a UI to keep track of e.g. how much has been sent to a particular recipient.
+	OnApprovedTx(tx ethapi.SignTransactionResult)
 	// OnSignerStartup is invoked when the signer boots, and tells the UI info about external API location and version
 	// information
 	OnSignerStartup(info StartupInfo)
@@ -450,12 +450,12 @@ func logDiff(original *SignTxRequest, new *SignTxResponse) bool {
 }
 
 // SignTransaction signs the given Transaction and returns it both as json and rlp-encoded form
-func (api *SignerAPI) SignTransaction(ctx context.Context, args SendTxArgs, msevodSelector *string) (*sevapi.SignTransactionResult, error) {
+func (api *SignerAPI) SignTransaction(ctx context.Context, args SendTxArgs, methodSelector *string) (*ethapi.SignTransactionResult, error) {
 	var (
 		err    error
 		result SignTxResponse
 	)
-	msgs, err := api.validator.ValidateTransaction(&args, msevodSelector)
+	msgs, err := api.validator.ValidateTransaction(&args, methodSelector)
 	if err != nil {
 		return nil, err
 	}
@@ -501,7 +501,7 @@ func (api *SignerAPI) SignTransaction(ctx context.Context, args SendTxArgs, msev
 	}
 
 	rlpdata, err := rlp.EncodeToBytes(signedTx)
-	response := sevapi.SignTransactionResult{Raw: rlpdata, Tx: signedTx}
+	response := ethapi.SignTransactionResult{Raw: rlpdata, Tx: signedTx}
 
 	// Finally, send the signed tx to the UI
 	api.UI.OnApprovedTx(response)
@@ -584,7 +584,7 @@ func (api *SignerAPI) Export(ctx context.Context, addr common.Address) (json.Raw
 // Import tries to import the given keyJSON in the local keystore. The keyJSON data is expected to be
 // in web3 keystore format. It will decrypt the keyJSON with the given passphrase and on successful
 // decryption it will encrypt the key with the given newPassphrase and store it in the keystore.
-// OBS! This msevod is removed from the public API. It should not be exposed on the external API
+// OBS! This method is removed from the public API. It should not be exposed on the external API
 // for a couple of reasons:
 // 1. Even though it is encrypted, it should still be seen as sensitive data
 // 2. It can be used to DoS clef, by using malicious data with e.g. extreme large

@@ -8,7 +8,7 @@ First, initialize the master seed.
 WARNING!
 
 The signer is alpha software, and not yet publically released. This software has _not_ been audited, and there
-are no guarantees about the workings of this software. It may contain severe flaws. You should not use this software
+are no guarantees about the workings of this software. It may contain ethere flaws. You should not use this software
 unless you agree to take full responsibility for doing so, and know what you are doing.
 
 TLDR; THIS IS NOT PRODUCTION-READY SOFTWARE!
@@ -148,7 +148,7 @@ In this example:
     * auto-rejected if it does not.
 * Any other signing-requests will be passed along for manual approve/reject.
 
-_Note: make sure that `0x694...` is an account you have access to. You can create it either via the clef or the traditional account cli tool. If the latter was chosen, make sure both clef and ssev use the same keystore by specifing `--keystore path/to/your/keystore` when running clef._
+_Note: make sure that `0x694...` is an account you have access to. You can create it either via the clef or the traditional account cli tool. If the latter was chosen, make sure both clef and seth use the same keystore by specifing `--keystore path/to/your/keystore` when running clef._
 
 Attest the new file...
 ```text
@@ -186,10 +186,10 @@ INFO [09-25|21:02:16.478] IPC endpoint opened                      url=<nil>
 And then test signing, once with `bazonk` and once without:
 
 ```
-#curl -H "Content-Type: application/json" -X POST --data "{\"jsonrpc\":\"2.0\",\"msevod\":\"account_sign\",\"params\":[\"0x694267f14675d7e1b9494fd8d72fefe1755710fa\",\"0x$(xxd -pu <<< '  bazonk baz gaz')\"],\"id\":67}" http://localhost:8550/
+#curl -H "Content-Type: application/json" -X POST --data "{\"jsonrpc\":\"2.0\",\"method\":\"account_sign\",\"params\":[\"0x694267f14675d7e1b9494fd8d72fefe1755710fa\",\"0x$(xxd -pu <<< '  bazonk baz gaz')\"],\"id\":67}" http://localhost:8550/
 {"jsonrpc":"2.0","id":67,"result":"0x93e6161840c3ae1efc26dc68dedab6e8fc233bb3fefa1b4645dbf6609b93dace160572ea4ab33240256bb6d3dadb60dcd9c515d6374d3cf614ee897408d41d541c"}
 
-#curl -H "Content-Type: application/json" -X POST --data "{\"jsonrpc\":\"2.0\",\"msevod\":\"account_sign\",\"params\":[\"0x694267f14675d7e1b9494fd8d72fefe1755710fa\",\"0x$(xxd -pu <<< '  bonk baz gaz')\"],\"id\":67}" http://localhost:8550/
+#curl -H "Content-Type: application/json" -X POST --data "{\"jsonrpc\":\"2.0\",\"method\":\"account_sign\",\"params\":[\"0x694267f14675d7e1b9494fd8d72fefe1755710fa\",\"0x$(xxd -pu <<< '  bonk baz gaz')\"],\"id\":67}" http://localhost:8550/
 {"jsonrpc":"2.0","id":67,"error":{"code":-32000,"message":"Request denied"}}
 
 ```

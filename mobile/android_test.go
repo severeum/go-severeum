@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package ssev
+package seth
 
 import (
 	"io/ioutil"
@@ -40,21 +40,21 @@ import android.test.MoreAsserts;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import org.severeum.ssev.*;
+import org.severeum.seth.*;
 
 public class AndroidTest extends InstrumentationTestCase {
 	public AndroidTest() {}
 
 	public void testAccountManagement() {
 		// Create an encrypted keystore with light crypto parameters.
-		KeyStore ks = new KeyStore(getInstrumentation().getContext().getFilesDir() + "/keystore", Ssev.LightScryptN, Ssev.LightScryptP);
+		KeyStore ks = new KeyStore(getInstrumentation().getContext().getFilesDir() + "/keystore", Seth.LightScryptN, Seth.LightScryptP);
 
 		try {
 			// Create a new account with the specified encryption passphrase.
 			Account newAcc = ks.newAccount("Creation password");
 
 			// Export the newly created account with a different passphrase. The returned
-			// data from this msevod invocation is a JSON encoded, encrypted key-file.
+			// data from this method invocation is a JSON encoded, encrypted key-file.
 			byte[] jsonAcc = ks.exportKey(newAcc, "Creation password", "Export password");
 
 			// Update the passphrase on the account created above inside the local keystore.
@@ -153,9 +153,9 @@ public class AndroidTest extends InstrumentationTestCase {
 // through ANDROID_HOME environment variable. To successfully run the tests, an Android
 // device must also be available with debugging enabled.
 //
-// This msevod has been adapted from golang.org/x/mobile/bind/java/seq_test.go/runTest
+// This method has been adapted from golang.org/x/mobile/bind/java/seq_test.go/runTest
 func TestAndroid(t *testing.T) {
-	// Skip tests on Windows altossever
+	// Skip tests on Windows altosether
 	if runtime.GOOS == "windows" {
 		t.Skip("cannot test Android bindings on Windows, skipping")
 	}
@@ -184,7 +184,7 @@ func TestAndroid(t *testing.T) {
 		t.Logf("initialization took %v", time.Since(start))
 	}
 	// Create and switch to a temporary workspace
-	workspace, err := ioutil.TempDir("", "ssev-android-")
+	workspace, err := ioutil.TempDir("", "seth-android-")
 	if err != nil {
 		t.Fatalf("failed to create temporary workspace: %v", err)
 	}
@@ -200,21 +200,21 @@ func TestAndroid(t *testing.T) {
 	defer os.Chdir(pwd)
 
 	// Create the skeleton of the Android project
-	for _, dir := range []string{"src/main", "src/androidTest/java/org/severeum/ssevtest", "libs"} {
+	for _, dir := range []string{"src/main", "src/androidTest/java/org/severeum/sethtest", "libs"} {
 		err = os.MkdirAll(dir, os.ModePerm)
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
-	// Generate the mobile bindings for Ssev and add the tester class
+	// Generate the mobile bindings for Seth and add the tester class
 	gobind := exec.Command("gomobile", "bind", "-javapkg", "org.severeum", "github.com/severeum/go-severeum/mobile")
 	if output, err := gobind.CombinedOutput(); err != nil {
 		t.Logf("%s", output)
 		t.Fatalf("failed to run gomobile bind: %v", err)
 	}
-	build.CopyFile(filepath.Join("libs", "ssev.aar"), "ssev.aar", os.ModePerm)
+	build.CopyFile(filepath.Join("libs", "seth.aar"), "seth.aar", os.ModePerm)
 
-	if err = ioutil.WriteFile(filepath.Join("src", "androidTest", "java", "org", "severeum", "ssevtest", "AndroidTest.java"), []byte(androidTestClass), os.ModePerm); err != nil {
+	if err = ioutil.WriteFile(filepath.Join("src", "androidTest", "java", "org", "severeum", "sethtest", "AndroidTest.java"), []byte(androidTestClass), os.ModePerm); err != nil {
 		t.Fatalf("failed to write Android test class: %v", err)
 	}
 	// Finish creating the project and run the tests via gradle
@@ -232,7 +232,7 @@ func TestAndroid(t *testing.T) {
 
 const androidManifest = `<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.severeum.ssevtest"
+          package="org.severeum.sethtest"
 	  android:versionCode="1"
 	  android:versionName="1.0">
 
@@ -261,6 +261,6 @@ repositories {
 }
 dependencies {
     compile 'com.android.support:appcompat-v7:19.0.0'
-    compile(name: "ssev", ext: "aar")
+    compile(name: "seth", ext: "aar")
 }
 `

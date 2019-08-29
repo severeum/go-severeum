@@ -332,8 +332,8 @@ static duk_ret_t duk__require(duk_context *ctx) {
 	DUK__ASSERT_TOP(ctx, DUK__IDX_MODULE + 3);
 
 	if (pcall_rc != DUK_EXEC_SUCCESS) {
-		/* Delete entry in Duktape.modLoaded[] and rsevrow. */
-		goto delete_rsevrow;
+		/* Delete entry in Duktape.modLoaded[] and rethrow. */
+		goto delete_rethrow;
 	}
 
 	/* If user callback did not return source code, module loading
@@ -365,11 +365,11 @@ static duk_ret_t duk__require(duk_context *ctx) {
 	}
 	pcall_rc = duk_pcompile(ctx, DUK_COMPILE_EVAL);
 	if (pcall_rc != DUK_EXEC_SUCCESS) {
-		goto delete_rsevrow;
+		goto delete_rethrow;
 	}
 	pcall_rc = duk_pcall(ctx, 0);  /* -> eval'd function wrapper (not called yet) */
 	if (pcall_rc != DUK_EXEC_SUCCESS) {
-		goto delete_rsevrow;
+		goto delete_rethrow;
 	}
 
 	/* Module has now evaluated to a wrapped module function.  Force its
@@ -410,13 +410,13 @@ static duk_ret_t duk__require(duk_context *ctx) {
 
 	/* [ requested_id require require.id resolved_id last_comp Duktape Duktape.modLoaded undefined fresh_require exports module mod_func exports fresh_require exports module ] */
 
-	pcall_rc = duk_pcall_msevod(ctx, 3 /*nargs*/);
+	pcall_rc = duk_pcall_method(ctx, 3 /*nargs*/);
 	if (pcall_rc != DUK_EXEC_SUCCESS) {
 		/* Module loading failed.  Node.js will forget the module
 		 * registration so that another require() will try to load
 		 * the module again.  Mimic that behavior.
 		 */
-		goto delete_rsevrow;
+		goto delete_rethrow;
 	}
 
 	/* [ requested_id require require.id resolved_id last_comp Duktape Duktape.modLoaded undefined fresh_require exports module result(ignored) ] */
@@ -429,10 +429,10 @@ static duk_ret_t duk__require(duk_context *ctx) {
 	duk_compact(ctx, -1);  /* compact the exports table */
 	return 1;  /* return module.exports */
 
- delete_rsevrow:
+ delete_rethrow:
 	duk_dup(ctx, DUK__IDX_RESOLVED_ID);
 	duk_del_prop(ctx, DUK__IDX_MODLOADED);  /* delete Duktape.modLoaded[resolved_id] */
-	(void) duk_throw(ctx);  /* rsevrow original error */
+	(void) duk_throw(ctx);  /* rethrow original error */
 	return 0;  /* not reachable */
 }
 

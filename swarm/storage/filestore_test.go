@@ -143,7 +143,7 @@ func testFileStoreCapacity(toEncrypt bool, t *testing.T) {
 	}
 	// Clear memStore
 	memStore.setCapacity(0)
-	// check whsever it is, indeed, empty
+	// check whether it is, indeed, empty
 	fileStore.ChunkStore = memStore
 	resultReader, isEncrypted = fileStore.Retrieve(context.TODO(), key)
 	if isEncrypted != toEncrypt {

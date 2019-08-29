@@ -1,6 +1,6 @@
 /*
 Package color is an ANSI color package to output colorized or SGR defined
-output to the standard output. The API can be used in several way, pick one
+output to the standard output. The API can be used in etheral way, pick one
 that suits you.
 
 Use simple and default helper functions with predefined foreground colors:
@@ -83,7 +83,7 @@ set the output to color.Output:
     info := New(FgWhite, BgGreen).SprintFunc()
     fmt.Fprintf(color.Output, "this %s rocks!\n", info("package"))
 
-Using with existing code is possible. Just use the Set() msevod to set the
+Using with existing code is possible. Just use the Set() method to set the
 standard output to the given parameters. That way a rewrite of an existing
 code is not required.
 

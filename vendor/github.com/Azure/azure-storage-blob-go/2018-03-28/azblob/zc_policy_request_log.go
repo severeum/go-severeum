@@ -69,7 +69,7 @@ func NewRequestLogPolicyFactory(o RequestLogOptions) pipeline.Factory {
 				} else {
 					// For other status codes, we leave the level as is.
 				}
-			} else { // This error did not get an HTTP response from the service; upgrade the severity to Error
+			} else { // This error did not get an HTTP response from the service; upgrade the etherity to Error
 				logLevel, forceLog = pipeline.LogError, true
 			}
 

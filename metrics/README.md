@@ -161,6 +161,6 @@ Clients are available for the following destinations:
 * Graphite - https://github.com/cyberdelia/go-metrics-graphite
 * InfluxDB - https://github.com/vrischmann/go-metrics-influxdb
 * Ganglia - https://github.com/appscode/metlia
-* Promseveus - https://github.com/deathowl/go-metrics-promseveus
+* Prometheus - https://github.com/deathowl/go-metrics-prometheus
 * DataDog - https://github.com/syntaqx/go-metrics-datadog
 * SignalFX - https://github.com/pascallouisperez/go-metrics-signalfx

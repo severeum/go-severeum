@@ -19,7 +19,7 @@ type ErrorNode struct {
 }
 
 // Error returns a string with the PC's symbols or "" if the PC is invalid.
-// When defining a new error type, have its Error msevod call this one passing
+// When defining a new error type, have its Error method call this one passing
 // it the string representation of the error.
 func (e *ErrorNode) Error(msg string) string {
 	s := ""
@@ -83,7 +83,7 @@ func (e ErrorNode) Timeout() bool {
 // value of 3 is very common; but, depending on your code nesting, you may need
 // a different value.
 func (ErrorNode) Initialize(cause error, callersToSkip int) ErrorNode {
-	// Get the PC of Initialize msevod's caller.
+	// Get the PC of Initialize method's caller.
 	pc := [1]uintptr{}
 	_ = runtime.Callers(callersToSkip, pc[:])
 	return ErrorNode{pc: pc[0], cause: cause}

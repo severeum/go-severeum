@@ -40,7 +40,7 @@ var (
 
 // BuiltinFormat is used to demarcate the values within package `opentracing`
 // that are intended for use with the Tracer.Inject() and Tracer.Extract()
-// msevods.
+// methods.
 type BuiltinFormat byte
 
 const (

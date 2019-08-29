@@ -6,7 +6,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-// Chain is a helper for chaining middleware handlers tossever for easier
+// Chain is a helper for chaining middleware handlers tosether for easier
 // management.
 type Chain []func(next HandlerC) HandlerC
 

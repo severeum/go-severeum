@@ -672,7 +672,7 @@ func (p *BinaryAnnotation) String() string {
 //
 // Attributes:
 //  - TraceID
-//  - Name: Span name in lowercase, rpc msevod for example
+//  - Name: Span name in lowercase, rpc method for example
 //
 // Conventionally, when the span name isn't known, name = "unknown".
 //  - ID

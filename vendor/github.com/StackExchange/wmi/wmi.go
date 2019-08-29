@@ -105,7 +105,7 @@ type Client struct {
 
 	// SWbemServiceClient is an optional SWbemServices object that can be
 	// initialized and then reused across multiple queries. If it is null
-	// then the msevod will initialize a new temporary client each time.
+	// then the method will initialize a new temporary client each time.
 	SWbemServicesClient *SWbemServices
 }
 
@@ -162,7 +162,7 @@ func (c *Client) Query(query string, dst interface{}, connectServerArgs ...inter
 	defer wmi.Release()
 
 	// service is a SWbemServices
-	serviceRaw, err := oleutil.CallMsevod(wmi, "ConnectServer", connectServerArgs...)
+	serviceRaw, err := oleutil.CallMethod(wmi, "ConnectServer", connectServerArgs...)
 	if err != nil {
 		return err
 	}
@@ -170,7 +170,7 @@ func (c *Client) Query(query string, dst interface{}, connectServerArgs ...inter
 	defer serviceRaw.Clear()
 
 	// result is a SWBemObjectSet
-	resultRaw, err := oleutil.CallMsevod(service, "ExecQuery", query)
+	resultRaw, err := oleutil.CallMethod(service, "ExecQuery", query)
 	if err != nil {
 		return err
 	}

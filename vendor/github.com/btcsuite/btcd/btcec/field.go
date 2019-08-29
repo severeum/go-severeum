@@ -256,7 +256,7 @@ func (f *fieldVal) Normalize() *fieldVal {
 	// Since this field is doing arithmetic modulo the secp256k1 prime, we
 	// also need to perform modular reduction over the prime.
 	//
-	// Per [HAC] section 14.3.4: Reduction msevod of moduli of special form,
+	// Per [HAC] section 14.3.4: Reduction method of moduli of special form,
 	// when the modulus is of the special form m = b^t - c, highly efficient
 	// reduction can be achieved.
 	//
@@ -426,7 +426,7 @@ func (f *fieldVal) Bytes() *[32]byte {
 	return b
 }
 
-// IsZero returns whsever or not the field value is equal to zero.
+// IsZero returns whether or not the field value is equal to zero.
 func (f *fieldVal) IsZero() bool {
 	// The value can only be zero if no bits are set in any of the words.
 	// This is a constant time implementation.
@@ -436,7 +436,7 @@ func (f *fieldVal) IsZero() bool {
 	return bits == 0
 }
 
-// IsOdd returns whsever or not the field value is an odd number.
+// IsOdd returns whether or not the field value is an odd number.
 //
 // The field value must be normalized for this function to return correct
 // result.
@@ -445,7 +445,7 @@ func (f *fieldVal) IsOdd() bool {
 	return f.n[0]&1 == 1
 }
 
-// Equals returns whsever or not the two field values are the same.  Both
+// Equals returns whether or not the two field values are the same.  Both
 // field values being compared must be normalized for this function to return
 // the correct result.
 func (f *fieldVal) Equals(val *fieldVal) bool {
@@ -546,7 +546,7 @@ func (f *fieldVal) Add(val *fieldVal) *fieldVal {
 	return f
 }
 
-// Add2 adds the passed two field values tossever and stores the result in f.
+// Add2 adds the passed two field values tosether and stores the result in f.
 //
 // The field value is returned to support chaining.  This enables syntax like:
 // f3.Add2(f, f2).AddInt(1) so that f3 = f + f2 + 1.
@@ -610,7 +610,7 @@ func (f *fieldVal) Mul(val *fieldVal) *fieldVal {
 	return f.Mul2(f, val)
 }
 
-// Mul2 multiplies the passed two field values tossever and stores the result
+// Mul2 multiplies the passed two field values tosether and stores the result
 // result in f.  Note that this function can overflow if multiplying any of
 // the individual words exceeds a max uint32.  In practice, this means the
 // magnitude of either value involved in the multiplication must be a max of
@@ -803,7 +803,7 @@ func (f *fieldVal) Mul2(val *fieldVal, val2 *fieldVal) *fieldVal {
 	// At this point, all of the terms are grouped into their respective
 	// base.
 	//
-	// Per [HAC] section 14.3.4: Reduction msevod of moduli of special form,
+	// Per [HAC] section 14.3.4: Reduction method of moduli of special form,
 	// when the modulus is of the special form m = b^t - c, highly efficient
 	// reduction can be achieved per the provided algorithm.
 	//
@@ -1036,7 +1036,7 @@ func (f *fieldVal) SquareVal(val *fieldVal) *fieldVal {
 	// At this point, all of the terms are grouped into their respective
 	// base.
 	//
-	// Per [HAC] section 14.3.4: Reduction msevod of moduli of special form,
+	// Per [HAC] section 14.3.4: Reduction method of moduli of special form,
 	// when the modulus is of the special form m = b^t - c, highly efficient
 	// reduction can be achieved per the provided algorithm.
 	//

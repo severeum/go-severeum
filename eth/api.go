@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sev
+package eth
 
 import (
 	"compress/gzip"
@@ -34,7 +34,7 @@ import (
 	"github.com/severeum/go-severeum/core/rawdb"
 	"github.com/severeum/go-severeum/core/state"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/internal/sevapi"
+	"github.com/severeum/go-severeum/internal/ethapi"
 	"github.com/severeum/go-severeum/params"
 	"github.com/severeum/go-severeum/rlp"
 	"github.com/severeum/go-severeum/rpc"
@@ -77,7 +77,7 @@ func (api *PublicSevereumAPI) ChainId() hexutil.Uint64 {
 }
 
 // PublicMinerAPI provides an API to control the miner.
-// It offers only msevods that operate on data that pose no security risk when it is publicly accessible.
+// It offers only methods that operate on data that pose no security risk when it is publicly accessible.
 type PublicMinerAPI struct {
 	e *Severeum
 }
@@ -92,8 +92,8 @@ func (api *PublicMinerAPI) Mining() bool {
 	return api.e.IsMining()
 }
 
-// PrivateMinerAPI provides private RPC msevods to control the miner.
-// These msevods can be abused by external users and must be considered insecure for use by untrusted users.
+// PrivateMinerAPI provides private RPC methods to control the miner.
+// These methods can be abused by external users and must be considered insecure for use by untrusted users.
 type PrivateMinerAPI struct {
 	e *Severeum
 }
@@ -105,7 +105,7 @@ func NewPrivateMinerAPI(e *Severeum) *PrivateMinerAPI {
 
 // Start starts the miner with the given number of threads. If threads is nil,
 // the number of workers started is equal to the number of logical CPUs that are
-// usable by this process. If mining is already running, this msevod adjust the
+// usable by this process. If mining is already running, this method adjust the
 // number of threads allowed to use and updates the minimum price required by the
 // transaction pool.
 func (api *PrivateMinerAPI) Start(threads *int) error {
@@ -139,9 +139,9 @@ func (api *PrivateMinerAPI) SetGasPrice(gasPrice hexutil.Big) bool {
 	return true
 }
 
-// SetSeverbase sets the severbase of the miner
-func (api *PrivateMinerAPI) SetSeverbase(severbase common.Address) bool {
-	api.e.SetSeverbase(severbase)
+// SetSeverbase sets the etherbase of the miner
+func (api *PrivateMinerAPI) SetSeverbase(etherbase common.Address) bool {
+	api.e.SetSeverbase(etherbase)
 	return true
 }
 
@@ -158,13 +158,13 @@ func (api *PrivateMinerAPI) GetHashrate() uint64 {
 // PrivateAdminAPI is the collection of Severeum full node-related APIs
 // exposed over the private admin endpoint.
 type PrivateAdminAPI struct {
-	sev *Severeum
+	eth *Severeum
 }
 
 // NewPrivateAdminAPI creates a new API definition for the full node private
-// admin msevods of the Severeum service.
-func NewPrivateAdminAPI(sev *Severeum) *PrivateAdminAPI {
-	return &PrivateAdminAPI{sev: sev}
+// admin methods of the Severeum service.
+func NewPrivateAdminAPI(eth *Severeum) *PrivateAdminAPI {
+	return &PrivateAdminAPI{eth: eth}
 }
 
 // ExportChain exports the current blockchain into a local file.
@@ -183,7 +183,7 @@ func (api *PrivateAdminAPI) ExportChain(file string) (bool, error) {
 	}
 
 	// Export the blockchain
-	if err := api.sev.BlockChain().Export(writer); err != nil {
+	if err := api.eth.BlockChain().Export(writer); err != nil {
 		return false, err
 	}
 	return true, nil
@@ -235,12 +235,12 @@ func (api *PrivateAdminAPI) ImportChain(file string) (bool, error) {
 			break
 		}
 
-		if hasAllBlocks(api.sev.BlockChain(), blocks) {
+		if hasAllBlocks(api.eth.BlockChain(), blocks) {
 			blocks = blocks[:0]
 			continue
 		}
 		// Import the batch and reset the buffer
-		if _, err := api.sev.BlockChain().InsertChain(blocks); err != nil {
+		if _, err := api.eth.BlockChain().InsertChain(blocks); err != nil {
 			return false, fmt.Errorf("batch %d: failed to insert: %v", batch, err)
 		}
 		blocks = blocks[:0]
@@ -251,13 +251,13 @@ func (api *PrivateAdminAPI) ImportChain(file string) (bool, error) {
 // PublicDebugAPI is the collection of Severeum full node APIs exposed
 // over the public debugging endpoint.
 type PublicDebugAPI struct {
-	sev *Severeum
+	eth *Severeum
 }
 
 // NewPublicDebugAPI creates a new API definition for the full node-
-// related public debug msevods of the Severeum service.
-func NewPublicDebugAPI(sev *Severeum) *PublicDebugAPI {
-	return &PublicDebugAPI{sev: sev}
+// related public debug methods of the Severeum service.
+func NewPublicDebugAPI(eth *Severeum) *PublicDebugAPI {
+	return &PublicDebugAPI{eth: eth}
 }
 
 // DumpBlock retrieves the entire state of the database at a given block.
@@ -266,19 +266,19 @@ func (api *PublicDebugAPI) DumpBlock(blockNr rpc.BlockNumber) (state.Dump, error
 		// If we're dumping the pending state, we need to request
 		// both the pending block as well as the pending state from
 		// the miner and operate on those
-		_, stateDb := api.sev.miner.Pending()
+		_, stateDb := api.eth.miner.Pending()
 		return stateDb.RawDump(), nil
 	}
 	var block *types.Block
 	if blockNr == rpc.LatestBlockNumber {
-		block = api.sev.blockchain.CurrentBlock()
+		block = api.eth.blockchain.CurrentBlock()
 	} else {
-		block = api.sev.blockchain.GetBlockByNumber(uint64(blockNr))
+		block = api.eth.blockchain.GetBlockByNumber(uint64(blockNr))
 	}
 	if block == nil {
 		return state.Dump{}, fmt.Errorf("block #%d not found", blockNr)
 	}
-	stateDb, err := api.sev.BlockChain().StateAt(block.Root())
+	stateDb, err := api.eth.BlockChain().StateAt(block.Root())
 	if err != nil {
 		return state.Dump{}, err
 	}
@@ -289,18 +289,18 @@ func (api *PublicDebugAPI) DumpBlock(blockNr rpc.BlockNumber) (state.Dump, error
 // the private debugging endpoint.
 type PrivateDebugAPI struct {
 	config *params.ChainConfig
-	sev    *Severeum
+	eth    *Severeum
 }
 
 // NewPrivateDebugAPI creates a new API definition for the full node-related
-// private debug msevods of the Severeum service.
-func NewPrivateDebugAPI(config *params.ChainConfig, sev *Severeum) *PrivateDebugAPI {
-	return &PrivateDebugAPI{config: config, sev: sev}
+// private debug methods of the Severeum service.
+func NewPrivateDebugAPI(config *params.ChainConfig, eth *Severeum) *PrivateDebugAPI {
+	return &PrivateDebugAPI{config: config, eth: eth}
 }
 
 // Preimage is a debug API function that returns the preimage for a sha3 hash, if known.
 func (api *PrivateDebugAPI) Preimage(ctx context.Context, hash common.Hash) (hexutil.Bytes, error) {
-	if preimage := rawdb.ReadPreimage(api.sev.ChainDb(), hash); preimage != nil {
+	if preimage := rawdb.ReadPreimage(api.eth.ChainDb(), hash); preimage != nil {
 		return preimage, nil
 	}
 	return nil, errors.New("unknown preimage")
@@ -316,7 +316,7 @@ type BadBlockArgs struct {
 // GetBadBlocks returns a list of the last 'bad blocks' that the client has seen on the network
 // and returns them as a JSON list of block-hashes
 func (api *PrivateDebugAPI) GetBadBlocks(ctx context.Context) ([]*BadBlockArgs, error) {
-	blocks := api.sev.BlockChain().BadBlocks()
+	blocks := api.eth.BlockChain().BadBlocks()
 	results := make([]*BadBlockArgs, len(blocks))
 
 	var err error
@@ -329,7 +329,7 @@ func (api *PrivateDebugAPI) GetBadBlocks(ctx context.Context) ([]*BadBlockArgs, 
 		} else {
 			results[i].RLP = fmt.Sprintf("0x%x", rlpBytes)
 		}
-		if results[i].Block, err = sevapi.RPCMarshalBlock(block, true, true); err != nil {
+		if results[i].Block, err = ethapi.RPCMarshalBlock(block, true, true); err != nil {
 			results[i].Block = map[string]interface{}{"error": err.Error()}
 		}
 	}
@@ -393,19 +393,19 @@ func storageRangeAt(st state.Trie, start []byte, maxResult int) (StorageRangeRes
 func (api *PrivateDebugAPI) GetModifiedAccountsByNumber(startNum uint64, endNum *uint64) ([]common.Address, error) {
 	var startBlock, endBlock *types.Block
 
-	startBlock = api.sev.blockchain.GetBlockByNumber(startNum)
+	startBlock = api.eth.blockchain.GetBlockByNumber(startNum)
 	if startBlock == nil {
 		return nil, fmt.Errorf("start block %x not found", startNum)
 	}
 
 	if endNum == nil {
 		endBlock = startBlock
-		startBlock = api.sev.blockchain.GetBlockByHash(startBlock.ParentHash())
+		startBlock = api.eth.blockchain.GetBlockByHash(startBlock.ParentHash())
 		if startBlock == nil {
 			return nil, fmt.Errorf("block %x has no parent", endBlock.Number())
 		}
 	} else {
-		endBlock = api.sev.blockchain.GetBlockByNumber(*endNum)
+		endBlock = api.eth.blockchain.GetBlockByNumber(*endNum)
 		if endBlock == nil {
 			return nil, fmt.Errorf("end block %d not found", *endNum)
 		}
@@ -420,19 +420,19 @@ func (api *PrivateDebugAPI) GetModifiedAccountsByNumber(startNum uint64, endNum 
 // With one parameter, returns the list of accounts modified in the specified block.
 func (api *PrivateDebugAPI) GetModifiedAccountsByHash(startHash common.Hash, endHash *common.Hash) ([]common.Address, error) {
 	var startBlock, endBlock *types.Block
-	startBlock = api.sev.blockchain.GetBlockByHash(startHash)
+	startBlock = api.eth.blockchain.GetBlockByHash(startHash)
 	if startBlock == nil {
 		return nil, fmt.Errorf("start block %x not found", startHash)
 	}
 
 	if endHash == nil {
 		endBlock = startBlock
-		startBlock = api.sev.blockchain.GetBlockByHash(startBlock.ParentHash())
+		startBlock = api.eth.blockchain.GetBlockByHash(startBlock.ParentHash())
 		if startBlock == nil {
 			return nil, fmt.Errorf("block %x has no parent", endBlock.Number())
 		}
 	} else {
-		endBlock = api.sev.blockchain.GetBlockByHash(*endHash)
+		endBlock = api.eth.blockchain.GetBlockByHash(*endHash)
 		if endBlock == nil {
 			return nil, fmt.Errorf("end block %x not found", *endHash)
 		}
@@ -444,7 +444,7 @@ func (api *PrivateDebugAPI) getModifiedAccounts(startBlock, endBlock *types.Bloc
 	if startBlock.Number().Uint64() >= endBlock.Number().Uint64() {
 		return nil, fmt.Errorf("start block height (%d) must be less than end block height (%d)", startBlock.Number().Uint64(), endBlock.Number().Uint64())
 	}
-	triedb := api.sev.BlockChain().StateCache().TrieDB()
+	triedb := api.eth.BlockChain().StateCache().TrieDB()
 
 	oldTrie, err := trie.NewSecure(startBlock.Root(), triedb, 0)
 	if err != nil {

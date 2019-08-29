@@ -43,18 +43,18 @@ const (
 
 // startBloomHandlers starts a batch of goroutines to accept bloom bit database
 // retrievals from possibly a range of filters and serving the data to satisfy.
-func (sev *LightSevereum) startBloomHandlers(sectionSize uint64) {
+func (eth *LightSevereum) startBloomHandlers(sectionSize uint64) {
 	for i := 0; i < bloomServiceThreads; i++ {
 		go func() {
 			for {
 				select {
-				case <-sev.shutdownChan:
+				case <-eth.shutdownChan:
 					return
 
-				case request := <-sev.bloomRequests:
+				case request := <-eth.bloomRequests:
 					task := <-request
 					task.Bitsets = make([][]byte, len(task.Sections))
-					compVectors, err := light.GetBloomBits(task.Context, sev.odr, task.Bit, task.Sections)
+					compVectors, err := light.GetBloomBits(task.Context, eth.odr, task.Bit, task.Sections)
 					if err == nil {
 						for i := range task.Sections {
 							if blob, err := bitutil.DecompressBytes(compVectors[i], int(sectionSize/8)); err == nil {

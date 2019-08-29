@@ -33,9 +33,9 @@ const (
 	defaultMaxOperations           = 2000
 )
 
-// Sampler decides whsever a new trace should be sampled or not.
+// Sampler decides whether a new trace should be sampled or not.
 type Sampler interface {
-	// IsSampled decides whsever a trace with given `id` and `operation`
+	// IsSampled decides whether a trace with given `id` and `operation`
 	// should be sampled. This function will also return the tags that
 	// can be used to identify the type of sampling that was applied to
 	// the root span. Most simple samplers would return two tags,

@@ -36,7 +36,7 @@ import (
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/core/vm"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/metrics"
@@ -71,7 +71,7 @@ const (
 // CacheConfig contains the configuration values for the trie caching/pruning
 // that's resident in a blockchain.
 type CacheConfig struct {
-	Disabled       bool          // Whsever to disable trie write caching (archive node)
+	Disabled       bool          // Whether to disable trie write caching (archive node)
 	TrieCleanLimit int           // Memory allowance (MB) to use for caching trie nodes in memory
 	TrieDirtyLimit int           // Memory limit (MB) at which to start flushing dirty trie nodes to disk
 	TrieTimeLimit  time.Duration // Time limit after which to flush the current in-memory trie to disk
@@ -95,7 +95,7 @@ type BlockChain struct {
 	chainConfig *params.ChainConfig // Chain & network configuration
 	cacheConfig *CacheConfig        // Cache configuration for pruning
 
-	db     sevdb.Database // Low level persistent database to store final content in
+	db     ethdb.Database // Low level persistent database to store final content in
 	triegc *prque.Prque   // Priority queue mapping block numbers to tries to gc
 	gcproc time.Duration  // Accumulates canonical block processing for trie dumping
 
@@ -134,13 +134,13 @@ type BlockChain struct {
 	vmConfig  vm.Config
 
 	badBlocks      *lru.Cache              // Bad block cache
-	shouldPreserve func(*types.Block) bool // Function used to determine whsever should preserve the given block.
+	shouldPreserve func(*types.Block) bool // Function used to determine whether should preserve the given block.
 }
 
 // NewBlockChain returns a fully initialised block chain using information
 // available in the database. It initialises the default Severeum Validator and
 // Processor.
-func NewBlockChain(db sevdb.Database, cacheConfig *CacheConfig, chainConfig *params.ChainConfig, engine consensus.Engine, vmConfig vm.Config, shouldPreserve func(block *types.Block) bool) (*BlockChain, error) {
+func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, chainConfig *params.ChainConfig, engine consensus.Engine, vmConfig vm.Config, shouldPreserve func(block *types.Block) bool) (*BlockChain, error) {
 	if cacheConfig == nil {
 		cacheConfig = &CacheConfig{
 			TrieCleanLimit: 256,
@@ -214,7 +214,7 @@ func (bc *BlockChain) GetVMConfig() *vm.Config {
 	return &bc.vmConfig
 }
 
-// loadLastState loads the last known chain state from the database. This msevod
+// loadLastState loads the last known chain state from the database. This method
 // assumes that the chain manager mutex is held.
 func (bc *BlockChain) loadLastState() error {
 	// Restore the last known head block
@@ -442,7 +442,7 @@ func (bc *BlockChain) ResetWithGenesisBlock(genesis *types.Block) error {
 // until one with associated state is found. This is needed to fix incomplete db
 // writes caused either by crashes/power outages, or simply non-committed tries.
 //
-// This msevod only rolls back the current block. The current header and current
+// This method only rolls back the current block. The current header and current
 // fast block are left intact.
 func (bc *BlockChain) repair(head **types.Block) error {
 	for {
@@ -492,7 +492,7 @@ func (bc *BlockChain) ExportN(w io.Writer, first uint64, last uint64) error {
 	return nil
 }
 
-// insert injects a new head block into the current block chain. This msevod
+// insert injects a new head block into the current block chain. This method
 // assumes that the block is indeed a true head. It will also reset the head
 // header and the head fast sync block to this very same block if they are older
 // or if they are on a different side chain.
@@ -652,7 +652,7 @@ func (bc *BlockChain) GetReceiptsByHash(hash common.Hash) types.Receipts {
 }
 
 // GetBlocksFromHash returns the block corresponding to hash and up to n-1 ancestors.
-// [deprecated by sev/62]
+// [deprecated by eth/62]
 func (bc *BlockChain) GetBlocksFromHash(hash common.Hash, n int) (blocks []*types.Block) {
 	number := bc.hc.GetBlockNumber(hash)
 	if number == nil {
@@ -866,7 +866,7 @@ func (bc *BlockChain) InsertReceiptChain(blockChain types.Blocks, receiptChain [
 
 		stats.processed++
 
-		if batch.ValueSize() >= sevdb.IdealBatchSize {
+		if batch.ValueSize() >= ethdb.IdealBatchSize {
 			if err := batch.Write(); err != nil {
 				return 0, err
 			}
@@ -976,7 +976,7 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 				limit       = common.StorageSize(bc.cacheConfig.TrieDirtyLimit) * 1024 * 1024
 			)
 			if nodes > limit || imgs > 4*1024*1024 {
-				triedb.Cap(limit - sevdb.IdealBatchSize)
+				triedb.Cap(limit - ethdb.IdealBatchSize)
 			}
 			// Find the next state trie we need to commit
 			header := bc.GetHeaderByNumber(current - triesInMemory)
@@ -1074,7 +1074,7 @@ func (bc *BlockChain) addFutureBlock(block *types.Block) error {
 //
 // After insertion is done, all accumulated events will be fired.
 func (bc *BlockChain) InsertChain(chain types.Blocks) (int, error) {
-	// Sanity check that we have somseving meaningful to import
+	// Sanity check that we have something meaningful to import
 	if len(chain) == 0 {
 		return 0, nil
 	}
@@ -1103,7 +1103,7 @@ func (bc *BlockChain) InsertChain(chain types.Blocks) (int, error) {
 // insertChain is the internal implementation of insertChain, which assumes that
 // 1) chains are contiguous, and 2) The chain mutex is held.
 //
-// This msevod is split out so that import batches that require re-injecting
+// This method is split out so that import batches that require re-injecting
 // historical blocks can do so without releasing the lock, which could lead to
 // racey behaviour. If a sidechain import is in progress, and the historic state
 // is imported, but then new canon-head is added before the actual sidechain
@@ -1283,7 +1283,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, []
 // error, which happens when a sidechain with a sufficiently old fork-block is
 // found.
 //
-// The msevod writes all (header-and-body-valid) blocks to disk, then tries to
+// The method writes all (header-and-body-valid) blocks to disk, then tries to
 // switch over to the new chain if the TD exceeded the current chain.
 func (bc *BlockChain) insertSidechain(it *insertIterator) (int, []interface{}, []*types.Log, error) {
 	var (
@@ -1586,7 +1586,7 @@ Error: %v
 // chain, possibly creating a reorg. If an error is returned, it will return the
 // index number of the failing header as well an error describing what went wrong.
 //
-// The verify parameter can be used to fine tune whsever nonce verification
+// The verify parameter can be used to fine tune whether nonce verification
 // should be done or not. The reason behind the optional check is because some
 // of the header retrieval mechanisms already need to verify nonces, as well as
 // because nonces can be verified sparsely, not needing to check each.

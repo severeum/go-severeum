@@ -11,8 +11,8 @@ Vcs-Browser: https://github.com/severeum/go-severeum
 Package: {{.Name}}
 Architecture: any
 Depends: ${misc:Depends}, {{.ExeList}}
-Description: Meta-package to install ssev, swarm, and other tools
- Meta-package to install ssev, swarm and other tools
+Description: Meta-package to install seth, swarm, and other tools
+ Meta-package to install seth, swarm and other tools
 
 {{range .Executables}}
 Package: {{$.ExeName .}}

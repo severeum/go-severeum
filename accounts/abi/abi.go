@@ -24,11 +24,11 @@ import (
 )
 
 // The ABI holds information about a contract's context and available
-// invokable msevods. It will allow you to type check function calls and
+// invokable methods. It will allow you to type check function calls and
 // packs data accordingly.
 type ABI struct {
-	Constructor Msevod
-	Msevods     map[string]Msevod
+	Constructor Method
+	Methods     map[string]Method
 	Events      map[string]Event
 }
 
@@ -44,13 +44,13 @@ func JSON(reader io.Reader) (ABI, error) {
 	return abi, nil
 }
 
-// Pack the given msevod name to conform the ABI. Msevod call's data
-// will consist of msevod_id, args0, arg1, ... argN. Msevod id consists
+// Pack the given method name to conform the ABI. Method call's data
+// will consist of method_id, args0, arg1, ... argN. Method id consists
 // of 4 bytes and arguments are all 32 bytes.
-// Msevod ids are created from the first 4 bytes of the hash of the
-// msevods string signature. (signature = baz(uint32,string32))
+// Method ids are created from the first 4 bytes of the hash of the
+// methods string signature. (signature = baz(uint32,string32))
 func (abi ABI) Pack(name string, args ...interface{}) ([]byte, error) {
-	// Fetch the ABI of the requested msevod
+	// Fetch the ABI of the requested method
 	if name == "" {
 		// constructor
 		arguments, err := abi.Constructor.Inputs.Pack(args...)
@@ -59,16 +59,16 @@ func (abi ABI) Pack(name string, args ...interface{}) ([]byte, error) {
 		}
 		return arguments, nil
 	}
-	msevod, exist := abi.Msevods[name]
+	method, exist := abi.Methods[name]
 	if !exist {
-		return nil, fmt.Errorf("msevod '%s' not found", name)
+		return nil, fmt.Errorf("method '%s' not found", name)
 	}
-	arguments, err := msevod.Inputs.Pack(args...)
+	arguments, err := method.Inputs.Pack(args...)
 	if err != nil {
 		return nil, err
 	}
-	// Pack up the msevod ID too if not a constructor and return
-	return append(msevod.Id(), arguments...), nil
+	// Pack up the method ID too if not a constructor and return
+	return append(method.Id(), arguments...), nil
 }
 
 // Unpack output in v according to the abi specification
@@ -77,16 +77,16 @@ func (abi ABI) Unpack(v interface{}, name string, output []byte) (err error) {
 		return fmt.Errorf("abi: unmarshalling empty output")
 	}
 	// since there can't be naming collisions with contracts and events,
-	// we need to decide whsever we're calling a msevod or an event
-	if msevod, ok := abi.Msevods[name]; ok {
+	// we need to decide whether we're calling a method or an event
+	if method, ok := abi.Methods[name]; ok {
 		if len(output)%32 != 0 {
 			return fmt.Errorf("abi: improperly formatted output: %s - Bytes: [%+v]", string(output), output)
 		}
-		return msevod.Outputs.Unpack(v, output)
+		return method.Outputs.Unpack(v, output)
 	} else if event, ok := abi.Events[name]; ok {
 		return event.Inputs.Unpack(v, output)
 	}
-	return fmt.Errorf("abi: could not locate named msevod or event")
+	return fmt.Errorf("abi: could not locate named method or event")
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface
@@ -104,17 +104,17 @@ func (abi *ABI) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	abi.Msevods = make(map[string]Msevod)
+	abi.Methods = make(map[string]Method)
 	abi.Events = make(map[string]Event)
 	for _, field := range fields {
 		switch field.Type {
 		case "constructor":
-			abi.Constructor = Msevod{
+			abi.Constructor = Method{
 				Inputs: field.Inputs,
 			}
 		// empty defaults to function according to the abi spec
 		case "function", "":
-			abi.Msevods[field.Name] = Msevod{
+			abi.Methods[field.Name] = Method{
 				Name:    field.Name,
 				Const:   field.Constant,
 				Inputs:  field.Inputs,
@@ -132,16 +132,16 @@ func (abi *ABI) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MsevodById looks up a msevod by the 4-byte id
+// MethodById looks up a method by the 4-byte id
 // returns nil if none found
-func (abi *ABI) MsevodById(sigdata []byte) (*Msevod, error) {
+func (abi *ABI) MethodById(sigdata []byte) (*Method, error) {
 	if len(sigdata) < 4 {
-		return nil, fmt.Errorf("data too short (% bytes) for abi msevod lookup", len(sigdata))
+		return nil, fmt.Errorf("data too short (% bytes) for abi method lookup", len(sigdata))
 	}
-	for _, msevod := range abi.Msevods {
-		if bytes.Equal(msevod.Id(), sigdata[:4]) {
-			return &msevod, nil
+	for _, method := range abi.Methods {
+		if bytes.Equal(method.Id(), sigdata[:4]) {
+			return &method, nil
 		}
 	}
-	return nil, fmt.Errorf("no msevod with id: %#x", sigdata[:4])
+	return nil, fmt.Errorf("no method with id: %#x", sigdata[:4])
 }

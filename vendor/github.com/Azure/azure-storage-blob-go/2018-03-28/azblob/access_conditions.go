@@ -60,7 +60,7 @@ func (ac LeaseAccessConditions) pointers() (leaseID *string) {
 // getInt32 is for internal infrastructure. It is used with access condition values where
 // 0 (the default setting) is meaningful. The library interprets 0 as do not send the header
 // and the privately-storage field in the access condition object is stored as +1 higher than desired.
-// THis msevod returns true, if the value is > 0 (explicitly set) and the stored value - 1 (the set desired value).
+// THis method returns true, if the value is > 0 (explicitly set) and the stored value - 1 (the set desired value).
 func getInt32(value int32) (bool, int32) {
 	return value > 0, value - 1
 }

@@ -50,7 +50,7 @@ const (
 // all registered services.
 type Config struct {
 	// Name sets the instance name of the node. It must not contain the / character and is
-	// used in the devp2p node identifier. The instance name of ssev is "ssev". If no
+	// used in the devp2p node identifier. The instance name of seth is "seth". If no
 	// value is specified, the basename of the current executable is used.
 	Name string `toml:"-"`
 
@@ -63,7 +63,7 @@ type Config struct {
 
 	// DataDir is the file system folder the node should use for any data storage
 	// requirements. The configured data directory will not be directly shared with
-	// registered services, instead those can use utility msevods to create/access
+	// registered services, instead those can use utility methods to create/access
 	// databases or flat files. This enables ephemeral nodes which can fully reside
 	// in memory.
 	DataDir string
@@ -156,7 +156,7 @@ type Config struct {
 
 	staticNodesWarning     bool
 	trustedNodesWarning    bool
-	oldSsevResourceWarning bool
+	oldSethResourceWarning bool
 }
 
 // IPCEndpoint resolves an IPC endpoint based on a configured value, taking into
@@ -237,9 +237,9 @@ func DefaultWSEndpoint() string {
 // NodeName returns the devp2p node identifier.
 func (c *Config) NodeName() string {
 	name := c.name()
-	// Backwards compatibility: previous versions used title-cased "Ssev", keep that.
-	if name == "ssev" || name == "ssev-testnet" {
-		name = "Ssev"
+	// Backwards compatibility: previous versions used title-cased "Seth", keep that.
+	if name == "seth" || name == "seth-testnet" {
+		name = "Seth"
 	}
 	if c.UserIdent != "" {
 		name += "/" + c.UserIdent
@@ -263,8 +263,8 @@ func (c *Config) name() string {
 	return c.Name
 }
 
-// These resources are resolved differently for "ssev" instances.
-var isOldSsevResource = map[string]bool{
+// These resources are resolved differently for "seth" instances.
+var isOldSethResource = map[string]bool{
 	"chaindata":          true,
 	"nodes":              true,
 	"nodekey":            true,
@@ -281,15 +281,15 @@ func (c *Config) ResolvePath(path string) string {
 		return ""
 	}
 	// Backwards-compatibility: ensure that data directory files created
-	// by ssev 1.4 are used if they exist.
-	if warn, isOld := isOldSsevResource[path]; isOld {
+	// by seth 1.4 are used if they exist.
+	if warn, isOld := isOldSethResource[path]; isOld {
 		oldpath := ""
-		if c.name() == "ssev" {
+		if c.name() == "seth" {
 			oldpath = filepath.Join(c.DataDir, path)
 		}
 		if oldpath != "" && common.FileExist(oldpath) {
 			if warn {
-				c.warnOnce(&c.oldSsevResourceWarning, "Using deprecated resource file %s, please move this file to the 'ssev' subdirectory of datadir.", oldpath)
+				c.warnOnce(&c.oldSethResourceWarning, "Using deprecated resource file %s, please move this file to the 'seth' subdirectory of datadir.", oldpath)
 			}
 			return oldpath
 		}

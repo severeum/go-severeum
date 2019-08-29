@@ -19,7 +19,7 @@
 // explicitly to each function that needs it. The Context should be the first
 // parameter, typically named ctx:
 //
-// 	func DoSomseving(ctx context.Context, arg Arg) error {
+// 	func DoSomething(ctx context.Context, arg Arg) error {
 // 		// ... use ctx ...
 // 	}
 //
@@ -41,7 +41,7 @@ import "time"
 // A Context carries a deadline, a cancelation signal, and other values across
 // API boundaries.
 //
-// Context's msevods may be called by multiple goroutines simultaneously.
+// Context's methods may be called by multiple goroutines simultaneously.
 type Context interface {
 	// Deadline returns the time when work done on behalf of this context
 	// should be canceled. Deadline returns ok==false when no deadline is
@@ -59,11 +59,11 @@ type Context interface {
 	//
 	// Done is provided for use in select statements:
 	//
-	//  // Stream generates values with DoSomseving and sends them to out
-	//  // until DoSomseving returns an error or ctx.Done is closed.
+	//  // Stream generates values with DoSomething and sends them to out
+	//  // until DoSomething returns an error or ctx.Done is closed.
 	//  func Stream(ctx context.Context, out chan<- Value) error {
 	//  	for {
-	//  		v, err := DoSomseving(ctx)
+	//  		v, err := DoSomething(ctx)
 	//  		if err != nil {
 	//  			return err
 	//  		}
@@ -145,7 +145,7 @@ func Background() Context {
 // it's unclear which Context to use or it is not yet available (because the
 // surrounding function has not yet been extended to accept a Context
 // parameter).  TODO is recognized by static analysis tools that determine
-// whsever Contexts are propagated correctly in a program.
+// whether Contexts are propagated correctly in a program.
 func TODO() Context {
 	return todo
 }

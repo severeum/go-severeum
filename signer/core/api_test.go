@@ -33,7 +33,7 @@ import (
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/common/hexutil"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/internal/sevapi"
+	"github.com/severeum/go-severeum/internal/ethapi"
 	"github.com/severeum/go-severeum/rlp"
 )
 
@@ -49,7 +49,7 @@ func (ui *HeadlessUI) OnInputRequired(info UserInputRequest) (UserInputResponse,
 func (ui *HeadlessUI) OnSignerStartup(info StartupInfo) {
 }
 
-func (ui *HeadlessUI) OnApprovedTx(tx sevapi.SignTransactionResult) {
+func (ui *HeadlessUI) OnApprovedTx(tx ethapi.SignTransactionResult) {
 	fmt.Printf("OnApproved()\n")
 }
 
@@ -118,7 +118,7 @@ func (ui *HeadlessUI) ShowInfo(message string) {
 }
 
 func tmpDirName(t *testing.T) string {
-	d, err := ioutil.TempDir("", "sev-keystore-test")
+	d, err := ioutil.TempDir("", "eth-keystore-test")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -305,7 +305,7 @@ func mkTestTx(from common.MixedcaseAddress) SendTxArgs {
 func TestSignTx(t *testing.T) {
 	var (
 		list      []common.Address
-		res, res2 *sevapi.SignTransactionResult
+		res, res2 *ethapi.SignTransactionResult
 		err       error
 	)
 
@@ -318,12 +318,12 @@ func TestSignTx(t *testing.T) {
 	}
 	a := common.NewMixedcaseAddress(list[0])
 
-	msevodSig := "test(uint)"
+	methodSig := "test(uint)"
 	tx := mkTestTx(a)
 
 	control <- "Y"
 	control <- "wrongpassword"
-	res, err = api.SignTransaction(context.Background(), tx, &msevodSig)
+	res, err = api.SignTransaction(context.Background(), tx, &methodSig)
 	if res != nil {
 		t.Errorf("Expected nil-response, got %v", res)
 	}
@@ -331,7 +331,7 @@ func TestSignTx(t *testing.T) {
 		t.Errorf("Expected ErrLocked! %v", err)
 	}
 	control <- "No way"
-	res, err = api.SignTransaction(context.Background(), tx, &msevodSig)
+	res, err = api.SignTransaction(context.Background(), tx, &methodSig)
 	if res != nil {
 		t.Errorf("Expected nil-response, got %v", res)
 	}
@@ -340,7 +340,7 @@ func TestSignTx(t *testing.T) {
 	}
 	control <- "Y"
 	control <- "a_long_password"
-	res, err = api.SignTransaction(context.Background(), tx, &msevodSig)
+	res, err = api.SignTransaction(context.Background(), tx, &methodSig)
 
 	if err != nil {
 		t.Fatal(err)
@@ -355,7 +355,7 @@ func TestSignTx(t *testing.T) {
 	control <- "Y"
 	control <- "a_long_password"
 
-	res2, err = api.SignTransaction(context.Background(), tx, &msevodSig)
+	res2, err = api.SignTransaction(context.Background(), tx, &methodSig)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -367,7 +367,7 @@ func TestSignTx(t *testing.T) {
 	control <- "M"
 	control <- "a_long_password"
 
-	res2, err = api.SignTransaction(context.Background(), tx, &msevodSig)
+	res2, err = api.SignTransaction(context.Background(), tx, &methodSig)
 	if err != nil {
 		t.Fatal(err)
 	}

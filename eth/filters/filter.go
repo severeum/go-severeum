@@ -25,13 +25,13 @@ import (
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/bloombits"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/rpc"
 )
 
 type Backend interface {
-	ChainDb() sevdb.Database
+	ChainDb() ethdb.Database
 	EventMux() *event.TypeMux
 	HeaderByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*types.Header, error)
 	HeaderByHash(ctx context.Context, blockHash common.Hash) (*types.Header, error)
@@ -51,7 +51,7 @@ type Backend interface {
 type Filter struct {
 	backend Backend
 
-	db        sevdb.Database
+	db        ethdb.Database
 	addresses []common.Address
 	topics    [][]common.Hash
 
@@ -62,7 +62,7 @@ type Filter struct {
 }
 
 // NewRangeFilter creates a new filter which uses a bloom filter on blocks to
-// figure out whsever a particular block is interesting or not.
+// figure out whether a particular block is interesting or not.
 func NewRangeFilter(backend Backend, begin, end int64, addresses []common.Address, topics [][]common.Hash) *Filter {
 	// Flatten the address and topic filter clauses into a single bloombits filter
 	// system. Since the bloombits are not positional, nil topics are permitted,
@@ -95,7 +95,7 @@ func NewRangeFilter(backend Backend, begin, end int64, addresses []common.Addres
 }
 
 // NewBlockFilter creates a new filter which directly inspects the contents of
-// a block to figure out whsever it is interesting or not.
+// a block to figure out whether it is interesting or not.
 func NewBlockFilter(backend Backend, block common.Hash, addresses []common.Address, topics [][]common.Hash) *Filter {
 	// Create a generic filter and convert it into a block filter
 	filter := newFilter(backend, addresses, topics)

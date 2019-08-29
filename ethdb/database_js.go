@@ -16,13 +16,13 @@
 
 // +build js
 
-package sevdb
+package ethdb
 
 import (
 	"errors"
 )
 
-var errNotSupported = errors.New("sevdb: not supported")
+var errNotSupported = errors.New("ethdb: not supported")
 
 type LDBDatabase struct {
 }

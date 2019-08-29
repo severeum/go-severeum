@@ -53,7 +53,7 @@ var (
 // Decoder is implemented by types that require custom RLP
 // decoding rules or need to decode into private fields.
 //
-// The DecodeRLP msevod should read one value from the given
+// The DecodeRLP method should read one value from the given
 // Stream. It is not forbidden to read less or more, but it might
 // be confusing.
 type Decoder interface {
@@ -509,7 +509,7 @@ func makeOptionalPtrDecoder(typ reflect.Type) (decoder, error) {
 var ifsliceType = reflect.TypeOf([]interface{}{})
 
 func decodeInterface(s *Stream, val reflect.Value) error {
-	if val.Type().NumMsevod() != 0 {
+	if val.Type().NumMethod() != 0 {
 		return fmt.Errorf("rlp: type %v is not RLP-serializable", val.Type())
 	}
 	kind, _, err := s.Kind()
@@ -816,7 +816,7 @@ func (s *Stream) Decode(val interface{}) error {
 }
 
 // Reset discards any information about the current decoding context
-// and starts reading from r. This msevod is meant to facilitate reuse
+// and starts reading from r. This method is meant to facilitate reuse
 // of a preallocated Stream across many decoding operations.
 //
 // If r does not also implement ByteReader, Stream will do its own

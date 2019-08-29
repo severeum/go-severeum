@@ -115,7 +115,7 @@ func (r *reporter) run() {
 			if err := r.save(); err != nil {
 				log.Error("unable to send metrics to LevelDB", "err", err)
 				//If there is an error in writing, exit the routine; we assume here that the error is
-				//severe and don't attempt to write again.
+				//ethere and don't attempt to write again.
 				//Also, this should prevent leaking when the node is stopped
 				return
 			}

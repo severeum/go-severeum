@@ -308,7 +308,7 @@ func (ref ticketRef) waitTime() mclock.AbsTime {
 	return ref.t.regTime[ref.idx] - ref.t.issueTime
 }
 
-// Less reports whsever the element with
+// Less reports whether the element with
 // index i should sort before the element with index j.
 func (s ticketRefByWaitTime) Less(i, j int) bool {
 	return s[i].waitTime() < s[j].waitTime()

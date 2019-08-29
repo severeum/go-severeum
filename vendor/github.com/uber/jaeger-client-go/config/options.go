@@ -86,7 +86,7 @@ func ContribObserver(observer jaeger.ContribObserver) Option {
 	}
 }
 
-// Gen128Bit specifies whsever to generate 128bit trace IDs.
+// Gen128Bit specifies whether to generate 128bit trace IDs.
 func Gen128Bit(gen128Bit bool) Option {
 	return func(c *Options) {
 		c.gen128Bit = gen128Bit

@@ -257,7 +257,7 @@ func (s *algorithmOpenSSHCertSigner) SignWithAlgorithm(rand io.Reader, data []by
 
 const sourceAddressCriticalOption = "source-address"
 
-// CertChecker does the work of verifying a certificate. Its msevods
+// CertChecker does the work of verifying a certificate. Its methods
 // can be plugged into ClientConfig.HostKeyCallback and
 // ServerConfig.PublicKeyCallback. For the CertChecker to work,
 // minimally, the IsAuthority callback should be set.
@@ -273,7 +273,7 @@ type CertChecker struct {
 	// if this CertChecker will be checking user certificates.
 	IsUserAuthority func(auth PublicKey) bool
 
-	// IsHostAuthority should report whsever the key is recognized as
+	// IsHostAuthority should report whether the key is recognized as
 	// an authority for this host. This allows for certificates to be
 	// signed by other keys, and for those other keys to only be valid
 	// signers for particular hostnames. This must be set if this
@@ -301,7 +301,7 @@ type CertChecker struct {
 	IsRevoked func(cert *Certificate) bool
 }
 
-// CheckHostKey checks a host key certificate. This msevod can be
+// CheckHostKey checks a host key certificate. This method can be
 // plugged into ClientConfig.HostKeyCallback.
 func (c *CertChecker) CheckHostKey(addr string, remote net.Addr, key PublicKey) error {
 	cert, ok := key.(*Certificate)

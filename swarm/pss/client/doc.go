@@ -18,7 +18,7 @@
 //
 // the pss client library aims to simplify usage of the p2p.protocols package over pss
 //
-// IO is performed using the ordinary p2p.MsgReadWriter interface, which transparently communicates with a pss node via RPC using websockets as transport layer, using msevods in the PssAPI class in the swarm/pss package
+// IO is performed using the ordinary p2p.MsgReadWriter interface, which transparently communicates with a pss node via RPC using websockets as transport layer, using methods in the PssAPI class in the swarm/pss package
 //
 //
 // Minimal-ish usage example (requires a running pss node with websocket RPC):
@@ -87,7 +87,7 @@
 //      addr := pot.RandomAddress() // should be a real address, of course
 //      psc.AddPssPeer(addr, spec)
 //
-//      // use the protocol for somseving
+//      // use the protocol for something
 //
 //      psc.Stop()
 //  }

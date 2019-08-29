@@ -126,7 +126,7 @@ func TestNonExistingHashesWithServer(t *testing.T) {
 		if _, err := reader.Size(ctx, nil); err != nil {
 			log.Debug("expected error for non-existing chunk")
 		}
-		//sleep so that the frontend can have somseving to display
+		//sleep so that the frontend can have something to display
 		time.Sleep(testDuration)
 
 		return nil

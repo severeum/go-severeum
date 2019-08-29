@@ -83,12 +83,12 @@ func (p *SamplingManagerClient) recvGetSamplingStrategy() (value *SamplingStrate
 		iprot = p.ProtocolFactory.GetProtocol(p.Transport)
 		p.InputProtocol = iprot
 	}
-	msevod, mTypeId, seqId, err := iprot.ReadMessageBegin()
+	method, mTypeId, seqId, err := iprot.ReadMessageBegin()
 	if err != nil {
 		return
 	}
-	if msevod != "getSamplingStrategy" {
-		err = thrift.NewTApplicationException(thrift.WRONG_MSEVOD_NAME, "getSamplingStrategy failed: wrong msevod name")
+	if method != "getSamplingStrategy" {
+		err = thrift.NewTApplicationException(thrift.WRONG_MSEVOD_NAME, "getSamplingStrategy failed: wrong method name")
 		return
 	}
 	if p.SeqId != seqId {

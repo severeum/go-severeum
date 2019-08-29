@@ -29,7 +29,7 @@ func (rbp *requestBodyProgress) Read(p []byte) (n int, err error) {
 	if err != nil {
 		return
 	}
-	// Invokes the user's callback msevod to report progress
+	// Invokes the user's callback method to report progress
 	position, err := rbp.requestBody.Seek(0, io.SeekCurrent)
 	if err != nil {
 		panic(err)
@@ -72,7 +72,7 @@ func (rbp *responseBodyProgress) Read(p []byte) (n int, err error) {
 	n, err = rbp.responseBody.Read(p)
 	rbp.offset += int64(n)
 
-	// Invokes the user's callback msevod to report progress
+	// Invokes the user's callback method to report progress
 	rbp.pr(rbp.offset)
 	return
 }

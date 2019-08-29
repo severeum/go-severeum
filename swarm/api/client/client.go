@@ -90,7 +90,7 @@ func (c *Client) UploadRaw(r io.Reader, size int64, toEncrypt bool) (string, err
 	return string(data), nil
 }
 
-// DownloadRaw downloads raw data from swarm and it returns a ReadCloser and a bool whsever the
+// DownloadRaw downloads raw data from swarm and it returns a ReadCloser and a bool whether the
 // content was encrypted
 func (c *Client) DownloadRaw(hash string) (io.ReadCloser, bool, error) {
 	uri := c.Gateway + "/bzz-raw:/" + hash
@@ -393,7 +393,7 @@ func (c *Client) DownloadManifest(hash string) (*api.Manifest, bool, error) {
 //
 // where entries ending with "/" are common prefixes.
 func (c *Client) List(hash, prefix, credentials string) (*api.ManifestList, error) {
-	req, err := http.NewRequest(http.MsevodGet, c.Gateway+"/bzz-list:/"+hash+"/"+prefix, nil)
+	req, err := http.NewRequest(http.MethodGet, c.Gateway+"/bzz-list:/"+hash+"/"+prefix, nil)
 	if err != nil {
 		return nil, err
 	}

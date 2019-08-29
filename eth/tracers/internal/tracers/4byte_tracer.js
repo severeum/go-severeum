@@ -15,7 +15,7 @@
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
 // 4byteTracer searches for 4byte-identifiers, and collects them for post-processing.
-// It collects the msevods identifiers along with the size of the supplied data, so
+// It collects the methods identifiers along with the size of the supplied data, so
 // a reversed signature can be matched against the size of the data.
 //
 // Example:

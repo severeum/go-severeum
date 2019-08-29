@@ -118,7 +118,7 @@ reference.
             opentracing.HTTPHeaders,
             opentracing.HTTPHeadersCarrier(req.Header))
         if err != nil {
-            // Optionally record somseving about err here
+            // Optionally record something about err here
         }
 
         // Create the span referring to the RPC client if available.
@@ -136,7 +136,7 @@ reference.
 
 #### Conditionally capture a field using `log.Noop`
 
-In some situations, you may want to dynamically decide whsever or not
+In some situations, you may want to dynamically decide whether or not
 to log a field.  For example, you may want to capture additional data,
 such as a customer ID, in non-production environments:
 

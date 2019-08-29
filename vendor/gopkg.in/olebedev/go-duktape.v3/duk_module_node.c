@@ -97,7 +97,7 @@ static duk_ret_t duk__handle_require(duk_context *ctx) {
 	/*
 	 *  From here on out, we have to be careful not to throw.  If it can't be
 	 *  avoided, the error must be caught and the module removed from the
-	 *  require cache before rsevrowing.  This allows the application to
+	 *  require cache before rethrowing.  This allows the application to
 	 *  reattempt loading the module.
 	 */
 
@@ -112,7 +112,7 @@ static duk_ret_t duk__handle_require(duk_context *ctx) {
 	ret = duk_pcall(ctx, 3);
 	if (ret != DUK_EXEC_SUCCESS) {
 		duk__del_cached_module(ctx, id);
-		(void) duk_throw(ctx);  /* rsevrow */
+		(void) duk_throw(ctx);  /* rethrow */
 	}
 
 	if (duk_is_string(ctx, -1)) {
@@ -127,7 +127,7 @@ static duk_ret_t duk__handle_require(duk_context *ctx) {
 #endif
 		if (ret != DUK_EXEC_SUCCESS) {
 			duk__del_cached_module(ctx, id);
-			(void) duk_throw(ctx);  /* rsevrow */
+			(void) duk_throw(ctx);  /* rethrow */
 		}
 	} else if (duk_is_undefined(ctx, -1)) {
 		duk_pop(ctx);

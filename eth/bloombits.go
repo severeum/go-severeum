@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sev
+package eth
 
 import (
 	"context"
@@ -26,7 +26,7 @@ import (
 	"github.com/severeum/go-severeum/core/bloombits"
 	"github.com/severeum/go-severeum/core/rawdb"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 )
 
 const (
@@ -49,20 +49,20 @@ const (
 
 // startBloomHandlers starts a batch of goroutines to accept bloom bit database
 // retrievals from possibly a range of filters and serving the data to satisfy.
-func (sev *Severeum) startBloomHandlers(sectionSize uint64) {
+func (eth *Severeum) startBloomHandlers(sectionSize uint64) {
 	for i := 0; i < bloomServiceThreads; i++ {
 		go func() {
 			for {
 				select {
-				case <-sev.shutdownChan:
+				case <-eth.shutdownChan:
 					return
 
-				case request := <-sev.bloomRequests:
+				case request := <-eth.bloomRequests:
 					task := <-request
 					task.Bitsets = make([][]byte, len(task.Sections))
 					for i, section := range task.Sections {
-						head := rawdb.ReadCanonicalHash(sev.chainDb, (section+1)*sectionSize-1)
-						if compVector, err := rawdb.ReadBloomBits(sev.chainDb, task.Bit, section, head); err == nil {
+						head := rawdb.ReadCanonicalHash(eth.chainDb, (section+1)*sectionSize-1)
+						if compVector, err := rawdb.ReadBloomBits(eth.chainDb, task.Bit, section, head); err == nil {
 							if blob, err := bitutil.DecompressBytes(compVector, int(sectionSize/8)); err == nil {
 								task.Bitsets[i] = blob
 							} else {
@@ -89,7 +89,7 @@ const (
 // for the Severeum header bloom filters, permitting blazing fast filtering.
 type BloomIndexer struct {
 	size    uint64               // section size to generate bloombits for
-	db      sevdb.Database       // database instance to write index data and metadata into
+	db      ethdb.Database       // database instance to write index data and metadata into
 	gen     *bloombits.Generator // generator to rotate the bloom bits crating the bloom index
 	section uint64               // Section is the section number being processed currently
 	head    common.Hash          // Head is the hash of the last header processed
@@ -97,12 +97,12 @@ type BloomIndexer struct {
 
 // NewBloomIndexer returns a chain indexer that generates bloom bits data for the
 // canonical chain for fast logs filtering.
-func NewBloomIndexer(db sevdb.Database, size, confirms uint64) *core.ChainIndexer {
+func NewBloomIndexer(db ethdb.Database, size, confirms uint64) *core.ChainIndexer {
 	backend := &BloomIndexer{
 		db:   db,
 		size: size,
 	}
-	table := sevdb.NewTable(db, string(rawdb.BloomBitsIndexPrefix))
+	table := ethdb.NewTable(db, string(rawdb.BloomBitsIndexPrefix))
 
 	return core.NewChainIndexer(db, table, backend, size, confirms, bloomThrottling, "bloombits")
 }

@@ -27,14 +27,14 @@ import (
 )
 
 func tmpdir(t *testing.T) string {
-	dir, err := ioutil.TempDir("", "ssev-test")
+	dir, err := ioutil.TempDir("", "seth-test")
 	if err != nil {
 		t.Fatal(err)
 	}
 	return dir
 }
 
-type testssev struct {
+type testseth struct {
 	*cmdtest.TestCmd
 
 	// template variables for expect
@@ -43,8 +43,8 @@ type testssev struct {
 }
 
 func init() {
-	// Run the app if we've been exec'd as "ssev-test" in runSsev.
-	reexec.Register("ssev-test", func() {
+	// Run the app if we've been exec'd as "seth-test" in runSeth.
+	reexec.Register("seth-test", func() {
 		if err := app.Run(os.Args); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -61,10 +61,10 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-// spawns ssev with the given command line args. If the args don't set --datadir, the
+// spawns seth with the given command line args. If the args don't set --datadir, the
 // child g gets a temporary data directory.
-func runSsev(t *testing.T, args ...string) *testssev {
-	tt := &testssev{}
+func runSeth(t *testing.T, args ...string) *testseth {
+	tt := &testseth{}
 	tt.TestCmd = cmdtest.NewTestCmd(t, tt)
 	for i, arg := range args {
 		switch {
@@ -72,7 +72,7 @@ func runSsev(t *testing.T, args ...string) *testssev {
 			if i < len(args)-1 {
 				tt.Datadir = args[i+1]
 			}
-		case arg == "-severbase" || arg == "--severbase":
+		case arg == "-etherbase" || arg == "--etherbase":
 			if i < len(args)-1 {
 				tt.Severbase = args[i+1]
 			}
@@ -82,7 +82,7 @@ func runSsev(t *testing.T, args ...string) *testssev {
 		tt.Datadir = tmpdir(t)
 		tt.Cleanup = func() { os.RemoveAll(tt.Datadir) }
 		args = append([]string{"-datadir", tt.Datadir}, args...)
-		// Remove the temporary datadir if somseving fails below.
+		// Remove the temporary datadir if something fails below.
 		defer func() {
 			if t.Failed() {
 				tt.Cleanup()
@@ -90,9 +90,9 @@ func runSsev(t *testing.T, args ...string) *testssev {
 		}()
 	}
 
-	// Boot "ssev". This actually runs the test binary but the TestMain
+	// Boot "seth". This actually runs the test binary but the TestMain
 	// function will prevent any tests from running.
-	tt.Run("ssev-test", args...)
+	tt.Run("seth-test", args...)
 
 	return tt
 }

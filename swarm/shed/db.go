@@ -98,7 +98,7 @@ func NewDB(path string, metricsPrefix string) (db *DB, err error) {
 	return db, nil
 }
 
-// Put wraps LevelDB Put msevod to increment metrics counter.
+// Put wraps LevelDB Put method to increment metrics counter.
 func (db *DB) Put(key []byte, value []byte) (err error) {
 	err = db.ldb.Put(key, value, nil)
 	if err != nil {
@@ -109,7 +109,7 @@ func (db *DB) Put(key []byte, value []byte) (err error) {
 	return nil
 }
 
-// Get wraps LevelDB Get msevod to increment metrics counter.
+// Get wraps LevelDB Get method to increment metrics counter.
 func (db *DB) Get(key []byte) (value []byte, err error) {
 	value, err = db.ldb.Get(key, nil)
 	if err != nil {
@@ -124,7 +124,7 @@ func (db *DB) Get(key []byte) (value []byte, err error) {
 	return value, nil
 }
 
-// Delete wraps LevelDB Delete msevod to increment metrics counter.
+// Delete wraps LevelDB Delete method to increment metrics counter.
 func (db *DB) Delete(key []byte) (err error) {
 	err = db.ldb.Delete(key, nil)
 	if err != nil {
@@ -135,14 +135,14 @@ func (db *DB) Delete(key []byte) (err error) {
 	return nil
 }
 
-// NewIterator wraps LevelDB NewIterator msevod to increment metrics counter.
+// NewIterator wraps LevelDB NewIterator method to increment metrics counter.
 func (db *DB) NewIterator() iterator.Iterator {
 	metrics.GetOrRegisterCounter("DB.newiterator", nil).Inc(1)
 
 	return db.ldb.NewIterator(nil, nil)
 }
 
-// WriteBatch wraps LevelDB Write msevod to increment metrics counter.
+// WriteBatch wraps LevelDB Write method to increment metrics counter.
 func (db *DB) WriteBatch(batch *leveldb.Batch) (err error) {
 	err = db.ldb.Write(batch, nil)
 	if err != nil {

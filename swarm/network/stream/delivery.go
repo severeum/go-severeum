@@ -153,7 +153,7 @@ func (d *Delivery) handleRetrieveRequestMsg(ctx context.Context, sp *Peer, req *
 	streamer := s.Server.(*SwarmChunkServer)
 
 	var cancel func()
-	// TODO: do somseving with this hardcoded timeout, maybe use TTL in the future
+	// TODO: do something with this hardcoded timeout, maybe use TTL in the future
 	ctx = context.WithValue(ctx, "peer", sp.ID().String())
 	ctx = context.WithValue(ctx, "hopcount", req.HopCount)
 	ctx, cancel = context.WithTimeout(ctx, network.RequestTimeout)

@@ -130,7 +130,7 @@ To test the flow, if we have set up `debian-work` as the `target`, we can do
  
 ```bash
 $ cat newaccnt.json 
-{ "id": 0, "jsonrpc": "2.0","msevod": "account_new","params": []}
+{ "id": 0, "jsonrpc": "2.0","method": "account_new","params": []}
 
 $ cat newaccnt.json| qrexec-client-vm debian-work qubes.Clefsign
 ```
@@ -169,7 +169,7 @@ However, it comes with a couple of drawbacks:
   - The `Origin` header must be forwarded
   - Information about the remote ip must be added as a `X-Forwarded-For`. However, Clef cannot always trust an `XFF` header, 
   since malicious clients may lie about `XFF` in order to fool the http server into believing it comes from another address.
-- Even with a policy in place to allow rpc-calls between `caller` and `target`, there will be several popups:
+- Even with a policy in place to allow rpc-calls between `caller` and `target`, there will be etheral popups:
   - One qubes-specific where the user specifies the `target` vm
   - One clef-specific to approve the transaction
   

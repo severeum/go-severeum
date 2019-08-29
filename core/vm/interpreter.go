@@ -58,7 +58,7 @@ type Interpreter interface {
 	Run(contract *Contract, input []byte, static bool) ([]byte, error)
 	// CanRun tells if the contract, passed as an argument, can be
 	// run by the current interpreter. This is meant so that the
-	// caller can do somseving like:
+	// caller can do something like:
 	//
 	// ```golang
 	// for _, interpreter := range interpreters {
@@ -70,7 +70,7 @@ type Interpreter interface {
 	CanRun([]byte) bool
 }
 
-// keccakState wraps sha3.state. In addition to the usual hash msevods, it also supports
+// keccakState wraps sha3.state. In addition to the usual hash methods, it also supports
 // Read to get a variable amount of data from the hash state. Read is faster than Sum
 // because it doesn't copy the internal state, but also modifies the internal state.
 type keccakState interface {
@@ -89,13 +89,13 @@ type EVMInterpreter struct {
 	hasher    keccakState // Keccak256 hasher instance shared across opcodes
 	hasherBuf common.Hash // Keccak256 hasher result array shared aross opcodes
 
-	readOnly   bool   // Whsever to throw on stateful modifications
+	readOnly   bool   // Whether to throw on stateful modifications
 	returnData []byte // Last CALL's return data for subsequent reuse
 }
 
 // NewEVMInterpreter returns a new instance of the Interpreter.
 func NewEVMInterpreter(evm *EVM, cfg Config) *EVMInterpreter {
-	// We use the STOP instruction whsever to see
+	// We use the STOP instruction whether to see
 	// the jump table was initialised. If it was not
 	// we'll set the default jump table.
 	if !cfg.JumpTable[STOP].valid {
@@ -239,7 +239,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 			}
 		}
 		// consume the gas and return an error if not enough gas is available.
-		// cost is explicitly set so that the capture state defer msevod can get the proper cost
+		// cost is explicitly set so that the capture state defer method can get the proper cost
 		cost, err = operation.gasCost(in.gasTable, in.evm, contract, stack, mem, memorySize)
 		if err != nil || !contract.UseGas(cost) {
 			return nil, ErrOutOfGas

@@ -62,11 +62,11 @@ var (
 	ErrBadFrame             = &ProtocolError{"bad frame"}
 	ErrBadFrameBoundary     = &ProtocolError{"not on frame boundary"}
 	ErrNotWebSocket         = &ProtocolError{"not websocket protocol"}
-	ErrBadRequestMsevod     = &ProtocolError{"bad msevod"}
+	ErrBadRequestMethod     = &ProtocolError{"bad method"}
 	ErrNotSupported         = &ProtocolError{"not supported"}
 )
 
-// ErrFrameTooLarge is returned by Codec's Receive msevod if payload size
+// ErrFrameTooLarge is returned by Codec's Receive method if payload size
 // exceeds limit set by Conn.MaxPayloadBytes
 var ErrFrameTooLarge = errors.New("websocket: frame payload size exceeds limit")
 
@@ -160,7 +160,7 @@ type frameHandler interface {
 
 // Conn represents a WebSocket connection.
 //
-// Multiple goroutines may invoke msevods on a Conn simultaneously.
+// Multiple goroutines may invoke methods on a Conn simultaneously.
 type Conn struct {
 	config  *Config
 	request *http.Request
@@ -180,7 +180,7 @@ type Conn struct {
 	defaultCloseStatus int
 
 	// MaxPayloadBytes limits the size of frame payload received over Conn
-	// by Codec's Receive msevod. If zero, DefaultMaxPayloadBytes is used.
+	// by Codec's Receive method. If zero, DefaultMaxPayloadBytes is used.
 	MaxPayloadBytes int
 }
 

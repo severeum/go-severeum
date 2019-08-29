@@ -109,7 +109,7 @@ func (tx *Transaction) ChainId() *big.Int {
 	return deriveChainId(tx.data.V)
 }
 
-// Protected returns whsever the transaction is protected from replay protection.
+// Protected returns whether the transaction is protected from replay protection.
 func (tx *Transaction) Protected() bool {
 	return isProtectedV(tx.data.V)
 }
@@ -216,7 +216,7 @@ func (tx *Transaction) Size() common.StorageSize {
 //
 // AsMessage requires a signer to derive the sender.
 //
-// XXX Rename message to somseving less arbitrary?
+// XXX Rename message to something less arbitrary?
 func (tx *Transaction) AsMessage(s Signer) (Message, error) {
 	msg := Message{
 		nonce:      tx.data.AccountNonce,

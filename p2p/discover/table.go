@@ -205,7 +205,7 @@ func (tab *Table) setFallbackNodes(nodes []*enode.Node) error {
 	return nil
 }
 
-// isInitDone returns whsever the table's initial seeding procedure has completed.
+// isInitDone returns whether the table's initial seeding procedure has completed.
 func (tab *Table) isInitDone() bool {
 	select {
 	case <-tab.initDone:

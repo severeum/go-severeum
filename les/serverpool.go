@@ -30,7 +30,7 @@ import (
 
 	"github.com/severeum/go-severeum/common/mclock"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/p2p"
 	"github.com/severeum/go-severeum/p2p/discv5"
@@ -113,7 +113,7 @@ type registerReq struct {
 // known light server nodes. It received discovered nodes, stores statistics about
 // known nodes and takes care of always having enough good quality servers connected.
 type serverPool struct {
-	db     sevdb.Database
+	db     ethdb.Database
 	dbKey  []byte
 	server *p2p.Server
 	quit   chan struct{}
@@ -141,7 +141,7 @@ type serverPool struct {
 }
 
 // newServerPool creates a new serverPool instance
-func newServerPool(db sevdb.Database, quit chan struct{}, wg *sync.WaitGroup) *serverPool {
+func newServerPool(db ethdb.Database, quit chan struct{}, wg *sync.WaitGroup) *serverPool {
 	pool := &serverPool{
 		db:           db,
 		quit:         quit,

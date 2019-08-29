@@ -62,7 +62,7 @@ func Transitional(transitional bool) Option {
 	return func(o *options) { o.transitional = true }
 }
 
-// VerifyDNSLength sets whsever a Profile should fail if any of the IDN parts
+// VerifyDNSLength sets whether a Profile should fail if any of the IDN parts
 // are longer than allowed by the RFC.
 func VerifyDNSLength(verify bool) Option {
 	return func(o *options) { o.verifyDNSLength = verify }
@@ -77,7 +77,7 @@ func RemoveLeadingDots(remove bool) Option {
 	return func(o *options) { o.removeLeadingDots = remove }
 }
 
-// ValidateLabels sets whsever to check the mandatory label validation criteria
+// ValidateLabels sets whether to check the mandatory label validation criteria
 // as defined in Section 5.4 of RFC 5891. This includes testing for correct use
 // of hyphens ('-'), normalization, validity of runes, and the context rules.
 func ValidateLabels(enable bool) Option {
@@ -162,7 +162,7 @@ type options struct {
 	// or UTS 46, tailored to, for example, domain registration or lookup.
 	mapping func(p *Profile, s string) (mapped string, isBidi bool, err error)
 
-	// bidirule, if specified, checks whsever s conforms to the Bidi Rule
+	// bidirule, if specified, checks whether s conforms to the Bidi Rule
 	// defined in RFC 5893.
 	bidirule func(s string) bool
 }
@@ -245,7 +245,7 @@ var (
 	// The configuration of this profile may change over time.
 	Display *Profile = display
 
-	// Registration is the recommended profile for checking whsever a given
+	// Registration is the recommended profile for checking whether a given
 	// IDN is valid for registration, according to Section 4 of RFC 5891.
 	Registration *Profile = registration
 
@@ -592,7 +592,7 @@ func validateFromPunycode(p *Profile, s string) error {
 	if !norm.NFC.IsNormalString(s) {
 		return &labelError{s, "V1"}
 	}
-	// TODO: detect whsever string may have to be normalized in the following
+	// TODO: detect whether string may have to be normalized in the following
 	// loop.
 	for i := 0; i < len(s); {
 		v, sz := trie.lookupString(s[i:])

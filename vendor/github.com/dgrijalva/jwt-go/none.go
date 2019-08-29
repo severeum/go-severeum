@@ -1,50 +1,50 @@
 package jwt
 
-// Implements the none signing msevod.  This is required by the spec
+// Implements the none signing method.  This is required by the spec
 // but you probably should never use it.
-var SigningMsevodNone *signingMsevodNone
+var SigningMethodNone *signingMethodNone
 
-const UnsafeAllowNoneSignatureType unsafeNoneMagicConstant = "none signing msevod allowed"
+const UnsafeAllowNoneSignatureType unsafeNoneMagicConstant = "none signing method allowed"
 
 var NoneSignatureTypeDisallowedError error
 
-type signingMsevodNone struct{}
+type signingMethodNone struct{}
 type unsafeNoneMagicConstant string
 
 func init() {
-	SigningMsevodNone = &signingMsevodNone{}
+	SigningMethodNone = &signingMethodNone{}
 	NoneSignatureTypeDisallowedError = NewValidationError("'none' signature type is not allowed", ValidationErrorSignatureInvalid)
 
-	RegisterSigningMsevod(SigningMsevodNone.Alg(), func() SigningMsevod {
-		return SigningMsevodNone
+	RegisterSigningMethod(SigningMethodNone.Alg(), func() SigningMethod {
+		return SigningMethodNone
 	})
 }
 
-func (m *signingMsevodNone) Alg() string {
+func (m *signingMethodNone) Alg() string {
 	return "none"
 }
 
 // Only allow 'none' alg type if UnsafeAllowNoneSignatureType is specified as the key
-func (m *signingMsevodNone) Verify(signingString, signature string, key interface{}) (err error) {
+func (m *signingMethodNone) Verify(signingString, signature string, key interface{}) (err error) {
 	// Key must be UnsafeAllowNoneSignatureType to prevent accidentally
-	// accepting 'none' signing msevod
+	// accepting 'none' signing method
 	if _, ok := key.(unsafeNoneMagicConstant); !ok {
 		return NoneSignatureTypeDisallowedError
 	}
-	// If signing msevod is none, signature must be an empty string
+	// If signing method is none, signature must be an empty string
 	if signature != "" {
 		return NewValidationError(
-			"'none' signing msevod with non-empty signature",
+			"'none' signing method with non-empty signature",
 			ValidationErrorSignatureInvalid,
 		)
 	}
 
-	// Accept 'none' signing msevod.
+	// Accept 'none' signing method.
 	return nil
 }
 
 // Only allow 'none' signing if UnsafeAllowNoneSignatureType is specified as the key
-func (m *signingMsevodNone) Sign(signingString string, key interface{}) (string, error) {
+func (m *signingMethodNone) Sign(signingString string, key interface{}) (string, error) {
 	if _, ok := key.(unsafeNoneMagicConstant); ok {
 		return "", nil
 	}

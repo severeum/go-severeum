@@ -70,9 +70,9 @@ func decryptPreSaleKey(fileContent []byte, password string) (key *Key, err error
 	iv := encSeedBytes[:16]
 	cipherText := encSeedBytes[16:]
 	/*
-		See https://github.com/severeum/pysevsaletool
+		See https://github.com/severeum/pyethsaletool
 
-		pysevsaletool generates the encryption key from password by
+		pyethsaletool generates the encryption key from password by
 		2000 rounds of PBKDF2 with HMAC-SHA-256 using password as salt (:().
 		16 byte key length within PBKDF2 and resulting key is used as AES key
 	*/
@@ -82,8 +82,8 @@ func decryptPreSaleKey(fileContent []byte, password string) (key *Key, err error
 	if err != nil {
 		return nil, err
 	}
-	sevPriv := crypto.Keccak256(plainText)
-	ecKey := crypto.ToECDSAUnsafe(sevPriv)
+	ethPriv := crypto.Keccak256(plainText)
+	ecKey := crypto.ToECDSAUnsafe(ethPriv)
 
 	key = &Key{
 		Id:         nil,

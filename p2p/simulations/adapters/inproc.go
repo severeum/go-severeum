@@ -200,12 +200,12 @@ func (sn *SimNode) ServeRPC(conn net.Conn) error {
 	if err != nil {
 		return err
 	}
-	handler.ServeCodec(rpc.NewJSONCodec(conn), rpc.OptionMsevodInvocation|rpc.OptionSubscriptions)
+	handler.ServeCodec(rpc.NewJSONCodec(conn), rpc.OptionMethodInvocation|rpc.OptionSubscriptions)
 	return nil
 }
 
 // Snapshots creates snapshots of the services by calling the
-// simulation_snapshot RPC msevod
+// simulation_snapshot RPC method
 func (sn *SimNode) Snapshots() (map[string][]byte, error) {
 	sn.lock.RLock()
 	services := make(map[string]node.Service, len(sn.running))

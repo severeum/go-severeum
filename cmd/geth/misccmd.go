@@ -24,8 +24,8 @@ import (
 	"strings"
 
 	"github.com/severeum/go-severeum/cmd/utils"
-	"github.com/severeum/go-severeum/consensus/sevash"
-	"github.com/severeum/go-severeum/sev"
+	"github.com/severeum/go-severeum/consensus/ethash"
+	"github.com/severeum/go-severeum/eth"
 	"github.com/severeum/go-severeum/params"
 	"gopkg.in/urfave/cli.v1"
 )
@@ -34,11 +34,11 @@ var (
 	makecacheCommand = cli.Command{
 		Action:    utils.MigrateFlags(makecache),
 		Name:      "makecache",
-		Usage:     "Generate sevash verification cache (for testing)",
+		Usage:     "Generate ethash verification cache (for testing)",
 		ArgsUsage: "<blockNum> <outputDir>",
 		Category:  "MISCELLANEOUS COMMANDS",
 		Description: `
-The makecache command generates an sevash cache in <outputDir>.
+The makecache command generates an ethash cache in <outputDir>.
 
 This command exists to support the system testing project.
 Regular users do not need to execute it.
@@ -47,11 +47,11 @@ Regular users do not need to execute it.
 	makedagCommand = cli.Command{
 		Action:    utils.MigrateFlags(makedag),
 		Name:      "makedag",
-		Usage:     "Generate sevash mining DAG (for testing)",
+		Usage:     "Generate ethash mining DAG (for testing)",
 		ArgsUsage: "<blockNum> <outputDir>",
 		Category:  "MISCELLANEOUS COMMANDS",
 		Description: `
-The makedag command generates an sevash DAG in <outputDir>.
+The makedag command generates an ethash DAG in <outputDir>.
 
 This command exists to support the system testing project.
 Regular users do not need to execute it.
@@ -76,32 +76,32 @@ The output of this command is supposed to be machine-readable.
 	}
 )
 
-// makecache generates an sevash verification cache into the provided folder.
+// makecache generates an ethash verification cache into the provided folder.
 func makecache(ctx *cli.Context) error {
 	args := ctx.Args()
 	if len(args) != 2 {
-		utils.Fatalf(`Usage: ssev makecache <block number> <outputdir>`)
+		utils.Fatalf(`Usage: seth makecache <block number> <outputdir>`)
 	}
 	block, err := strconv.ParseUint(args[0], 0, 64)
 	if err != nil {
 		utils.Fatalf("Invalid block number: %v", err)
 	}
-	sevash.MakeCache(block, args[1])
+	ethash.MakeCache(block, args[1])
 
 	return nil
 }
 
-// makedag generates an sevash mining DAG into the provided folder.
+// makedag generates an ethash mining DAG into the provided folder.
 func makedag(ctx *cli.Context) error {
 	args := ctx.Args()
 	if len(args) != 2 {
-		utils.Fatalf(`Usage: ssev makedag <block number> <outputdir>`)
+		utils.Fatalf(`Usage: seth makedag <block number> <outputdir>`)
 	}
 	block, err := strconv.ParseUint(args[0], 0, 64)
 	if err != nil {
 		utils.Fatalf("Invalid block number: %v", err)
 	}
-	sevash.MakeDataset(block, args[1])
+	ethash.MakeDataset(block, args[1])
 
 	return nil
 }
@@ -113,8 +113,8 @@ func version(ctx *cli.Context) error {
 		fmt.Println("Git Commit:", gitCommit)
 	}
 	fmt.Println("Architecture:", runtime.GOARCH)
-	fmt.Println("Protocol Versions:", sev.ProtocolVersions)
-	fmt.Println("Network Id:", sev.DefaultConfig.NetworkId)
+	fmt.Println("Protocol Versions:", eth.ProtocolVersions)
+	fmt.Println("Network Id:", eth.DefaultConfig.NetworkId)
 	fmt.Println("Go Version:", runtime.Version())
 	fmt.Println("Operating System:", runtime.GOOS)
 	fmt.Printf("GOPATH=%s\n", os.Getenv("GOPATH"))
@@ -123,17 +123,17 @@ func version(ctx *cli.Context) error {
 }
 
 func license(_ *cli.Context) error {
-	fmt.Println(`Ssev is free software: you can redistribute it and/or modify
+	fmt.Println(`Seth is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Ssev is distributed in the hope that it will be useful,
+Seth is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with ssev. If not, see <http://www.gnu.org/licenses/>.`)
+along with seth. If not, see <http://www.gnu.org/licenses/>.`)
 	return nil
 }

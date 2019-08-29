@@ -24,7 +24,7 @@ import (
 )
 
 // Intervals store a list of intervals. Its purpose is to provide
-// msevods to add new intervals and retrieve missing intervals that
+// methods to add new intervals and retrieve missing intervals that
 // need to be added.
 // It may be used in synchronization of streaming data to persist
 // retrieved data ranges between sessions.
@@ -36,8 +36,8 @@ type Intervals struct {
 
 // New creates a new instance of Intervals.
 // Start argument limits the lower bound of intervals.
-// No range bellow start bound will be added by Add msevod or
-// returned by Next msevod. This limit may be used for
+// No range bellow start bound will be added by Add method or
+// returned by Next method. This limit may be used for
 // tracking "live" synchronization, where the sync session
 // starts from a specific value, and if "live" sync intervals
 // need to be merged with historical ones, it can be safely done.

@@ -15,7 +15,7 @@ import (
 	"strconv"
 )
 
-// serviceClient is the client for the Service msevods of the Azblob service.
+// serviceClient is the client for the Service methods of the Azblob service.
 type serviceClient struct {
 	managementClient
 }

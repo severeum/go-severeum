@@ -30,7 +30,7 @@ import (
 
 var (
 	abiFlag = flag.String("abi", "", "Path to the Severeum contract ABI json to bind, - for STDIN")
-	binFlag = flag.String("bin", "", "Path to the Severeum contract bytecode (generate deploy msevod)")
+	binFlag = flag.String("bin", "", "Path to the Severeum contract bytecode (generate deploy method)")
 	typFlag = flag.String("type", "", "Struct name for the binding (default = package name)")
 
 	solFlag  = flag.String("sol", "", "Path to the Severeum contract Solidity source to build and bind")

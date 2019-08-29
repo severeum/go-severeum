@@ -18,5 +18,5 @@ testImport:
   - assert
   - require
   - suite
-- package: github.com/promseveus/client_golang
+- package: github.com/prometheus/client_golang
   version: v0.8.0

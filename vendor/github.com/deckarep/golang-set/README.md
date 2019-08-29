@@ -23,11 +23,11 @@ I have to give some credit for helping seed the idea with this post on [stackove
 
 ## Features (as of 9/22/2014)
 
-* a CartesianProduct() msevod has been added with unit-tests: [Read more about the cartesian product](http://en.wikipedia.org/wiki/Cartesian_product)
+* a CartesianProduct() method has been added with unit-tests: [Read more about the cartesian product](http://en.wikipedia.org/wiki/Cartesian_product)
 
 ## Features (as of 9/15/2014)
 
-* a PowerSet() msevod has been added with unit-tests: [Read more about the Power set](http://en.wikipedia.org/wiki/Power_set)
+* a PowerSet() method has been added with unit-tests: [Read more about the Power set](http://en.wikipedia.org/wiki/Power_set)
 
 ## Features (as of 4/22/2014)
 

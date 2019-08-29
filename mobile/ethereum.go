@@ -16,7 +16,7 @@
 
 // Contains all the wrappers from the go-severeum root package.
 
-package ssev
+package seth
 
 import (
 	"errors"

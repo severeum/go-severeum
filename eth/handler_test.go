@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sev
+package eth
 
 import (
 	"fmt"
@@ -25,14 +25,14 @@ import (
 	"time"
 
 	"github.com/severeum/go-severeum/common"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/state"
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/core/vm"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sev/downloader"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/eth/downloader"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/p2p"
 	"github.com/severeum/go-severeum/params"
@@ -313,11 +313,11 @@ func testGetNodeData(t *testing.T, protocol int) {
 	generator := func(i int, block *core.BlockGen) {
 		switch i {
 		case 0:
-			// In block 1, the test bank sends account #1 some sever.
+			// In block 1, the test bank sends account #1 some ether.
 			tx, _ := types.SignTx(types.NewTransaction(block.TxNonce(testBank), acc1Addr, big.NewInt(10000), params.TxGas, nil, nil), signer, testBankKey)
 			block.AddTx(tx)
 		case 1:
-			// In block 2, the test bank sends some more sever to account #1.
+			// In block 2, the test bank sends some more ether to account #1.
 			// acc1Addr passes it on to account #2.
 			tx1, _ := types.SignTx(types.NewTransaction(block.TxNonce(testBank), acc1Addr, big.NewInt(1000), params.TxGas, nil, nil), signer, testBankKey)
 			tx2, _ := types.SignTx(types.NewTransaction(block.TxNonce(acc1Addr), acc2Addr, big.NewInt(1000), params.TxGas, nil, nil), signer, acc1Key)
@@ -367,7 +367,7 @@ func testGetNodeData(t *testing.T, protocol int) {
 			t.Errorf("data hash mismatch: have %x, want %x", hash, want)
 		}
 	}
-	statedb := sevdb.NewMemDatabase()
+	statedb := ethdb.NewMemDatabase()
 	for i := 0; i < len(data); i++ {
 		statedb.Put(hashes[i].Bytes(), data[i])
 	}
@@ -405,11 +405,11 @@ func testGetReceipt(t *testing.T, protocol int) {
 	generator := func(i int, block *core.BlockGen) {
 		switch i {
 		case 0:
-			// In block 1, the test bank sends account #1 some sever.
+			// In block 1, the test bank sends account #1 some ether.
 			tx, _ := types.SignTx(types.NewTransaction(block.TxNonce(testBank), acc1Addr, big.NewInt(10000), params.TxGas, nil, nil), signer, testBankKey)
 			block.AddTx(tx)
 		case 1:
-			// In block 2, the test bank sends some more sever to account #1.
+			// In block 2, the test bank sends some more ether to account #1.
 			// acc1Addr passes it on to account #2.
 			tx1, _ := types.SignTx(types.NewTransaction(block.TxNonce(testBank), acc1Addr, big.NewInt(1000), params.TxGas, nil, nil), signer, testBankKey)
 			tx2, _ := types.SignTx(types.NewTransaction(block.TxNonce(acc1Addr), acc2Addr, big.NewInt(1000), params.TxGas, nil, nil), signer, acc1Key)
@@ -449,7 +449,7 @@ func testGetReceipt(t *testing.T, protocol int) {
 	}
 }
 
-// Tests that post sev protocol handshake, DAO fork-enabled clients also execute
+// Tests that post eth protocol handshake, DAO fork-enabled clients also execute
 // a DAO "challenge" verifying each others' DAO fork headers to ensure they're on
 // compatible chains.
 func TestDAOChallengeNoVsNo(t *testing.T)       { testDAOChallenge(t, false, false, false) }
@@ -468,8 +468,8 @@ func testDAOChallenge(t *testing.T, localForked, remoteForked bool, timeout bool
 	// Create a DAO aware protocol manager
 	var (
 		evmux   = new(event.TypeMux)
-		pow     = sevash.NewFaker()
-		db      = sevdb.NewMemDatabase()
+		pow     = ethash.NewFaker()
+		db      = ethdb.NewMemDatabase()
 		config  = &params.ChainConfig{DAOForkBlock: big.NewInt(1), DAOForkSupport: localForked}
 		gspec   = &core.Genesis{Config: config}
 		genesis = gspec.MustCommit(db)
@@ -486,7 +486,7 @@ func testDAOChallenge(t *testing.T, localForked, remoteForked bool, timeout bool
 	defer pm.Stop()
 
 	// Connect a new peer and check that we receive the DAO challenge
-	peer, _ := newTestPeer("peer", sev63, pm, true)
+	peer, _ := newTestPeer("peer", eth63, pm, true)
 	defer peer.close()
 
 	challenge := &getBlockHeadersData{
@@ -500,7 +500,7 @@ func testDAOChallenge(t *testing.T, localForked, remoteForked bool, timeout bool
 	}
 	// Create a block to reply to the challenge if no timeout is simulated
 	if !timeout {
-		blocks, _ := core.GenerateChain(&params.ChainConfig{}, genesis, sevash.NewFaker(), db, 1, func(i int, block *core.BlockGen) {
+		blocks, _ := core.GenerateChain(&params.ChainConfig{}, genesis, ethash.NewFaker(), db, 1, func(i int, block *core.BlockGen) {
 			if remoteForked {
 				block.SetExtra(params.DAOForkBlockExtra)
 			}
@@ -549,8 +549,8 @@ func TestBroadcastBlock(t *testing.T) {
 func testBroadcastBlock(t *testing.T, totalPeers, broadcastExpected int) {
 	var (
 		evmux   = new(event.TypeMux)
-		pow     = sevash.NewFaker()
-		db      = sevdb.NewMemDatabase()
+		pow     = ethash.NewFaker()
+		db      = ethdb.NewMemDatabase()
 		config  = &params.ChainConfig{}
 		gspec   = &core.Genesis{Config: config}
 		genesis = gspec.MustCommit(db)
@@ -567,11 +567,11 @@ func testBroadcastBlock(t *testing.T, totalPeers, broadcastExpected int) {
 	defer pm.Stop()
 	var peers []*testPeer
 	for i := 0; i < totalPeers; i++ {
-		peer, _ := newTestPeer(fmt.Sprintf("peer %d", i), sev63, pm, true)
+		peer, _ := newTestPeer(fmt.Sprintf("peer %d", i), eth63, pm, true)
 		defer peer.close()
 		peers = append(peers, peer)
 	}
-	chain, _ := core.GenerateChain(gspec.Config, genesis, sevash.NewFaker(), db, 1, func(i int, gen *core.BlockGen) {})
+	chain, _ := core.GenerateChain(gspec.Config, genesis, ethash.NewFaker(), db, 1, func(i int, gen *core.BlockGen) {})
 	pm.BroadcastBlock(chain[0], true /*propagate*/)
 
 	errCh := make(chan error, totalPeers)

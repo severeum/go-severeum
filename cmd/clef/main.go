@@ -59,7 +59,7 @@ const legalWarning = `
 WARNING! 
 
 Clef is alpha software, and not yet publically released. This software has _not_ been audited, and there
-are no guarantees about the workings of this software. It may contain severe flaws. You should not use this software
+are no guarantees about the workings of this software. It may contain ethere flaws. You should not use this software
 unless you agree to take full responsibility for doing so, and know what you are doing. 
 
 TLDR; THIS IS NOT PRODUCTION-READY SOFTWARE! 
@@ -622,9 +622,9 @@ func testExternalUI(api *core.SignerAPI) {
 	api.UI.ShowInfo("Testing 'ShowInfo'")
 	api.UI.ShowError("Testing 'ShowError'")
 
-	checkErr := func(msevod string, err error) {
+	checkErr := func(method string, err error) {
 		if err != nil && err != core.ErrRequestDenied {
-			errs = append(errs, fmt.Sprintf("%v: %v", msevod, err.Error()))
+			errs = append(errs, fmt.Sprintf("%v: %v", method, err.Error()))
 		}
 	}
 	var err error
@@ -711,25 +711,25 @@ func decryptSeed(keyjson []byte, auth string) ([]byte, error) {
 /**
 //Create Account
 
-curl -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","msevod":"account_new","params":["test"],"id":67}' localhost:8550
+curl -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_new","params":["test"],"id":67}' localhost:8550
 
 // List accounts
 
-curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","msevod":"account_list","params":[""],"id":67}' http://localhost:8550/
+curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_list","params":[""],"id":67}' http://localhost:8550/
 
 // Make Transaction
 // safeSend(0x12)
 // 4401a6e40000000000000000000000000000000000000000000000000000000000000012
 
 // supplied abi
-curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","msevod":"account_signTransaction","params":[{"from":"0x82A2A876D39022B3019932D30Cd9c97ad5616813","gas":"0x333","gasPrice":"0x123","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x10", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"},"test"],"id":67}' http://localhost:8550/
+curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_signTransaction","params":[{"from":"0x82A2A876D39022B3019932D30Cd9c97ad5616813","gas":"0x333","gasPrice":"0x123","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x10", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"},"test"],"id":67}' http://localhost:8550/
 
 // Not supplied
-curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","msevod":"account_signTransaction","params":[{"from":"0x82A2A876D39022B3019932D30Cd9c97ad5616813","gas":"0x333","gasPrice":"0x123","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x10", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"}],"id":67}' http://localhost:8550/
+curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_signTransaction","params":[{"from":"0x82A2A876D39022B3019932D30Cd9c97ad5616813","gas":"0x333","gasPrice":"0x123","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x10", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"}],"id":67}' http://localhost:8550/
 
 // Sign data
 
-curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","msevod":"account_sign","params":["0x694267f14675d7e1b9494fd8d72fefe1755710fa","bazonk gaz baz"],"id":67}' http://localhost:8550/
+curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_sign","params":["0x694267f14675d7e1b9494fd8d72fefe1755710fa","bazonk gaz baz"],"id":67}' http://localhost:8550/
 
 
 **/

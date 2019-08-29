@@ -74,8 +74,8 @@ func (v *IDispatch) InvokeWithOptionalArgs(name string, dispatch int16, params [
 	return
 }
 
-// CallMsevod invokes named function with arguments on object.
-func (v *IDispatch) CallMsevod(name string, params ...interface{}) (*VARIANT, error) {
+// CallMethod invokes named function with arguments on object.
+func (v *IDispatch) CallMethod(name string, params ...interface{}) (*VARIANT, error) {
 	return v.InvokeWithOptionalArgs(name, DISPATCH_MSEVOD, params)
 }
 

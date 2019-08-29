@@ -16,7 +16,7 @@
 
 package storage
 
-// this is a clone of an earlier state of the severeum sevdb/database
+// this is a clone of an earlier state of the severeum ethdb/database
 // no need for queueing/caching
 
 import (

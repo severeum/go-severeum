@@ -105,7 +105,7 @@ func (n *Node) Record() *enr.Record {
 	return &cpy
 }
 
-// checks whsever n is a valid complete node.
+// checks whether n is a valid complete node.
 func (n *Node) ValidateComplete() error {
 	if n.Incomplete() {
 		return errors.New("incomplete node")

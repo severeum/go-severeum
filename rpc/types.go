@@ -27,21 +27,21 @@ import (
 	"github.com/severeum/go-severeum/common/hexutil"
 )
 
-// API describes the set of msevods offered over the RPC interface
+// API describes the set of methods offered over the RPC interface
 type API struct {
-	Namespace string      // namespace under which the rpc msevods of Service are exposed
+	Namespace string      // namespace under which the rpc methods of Service are exposed
 	Version   string      // api version for DApp's
-	Service   interface{} // receiver instance which holds the msevods
-	Public    bool        // indication if the msevods must be considered safe for public use
+	Service   interface{} // receiver instance which holds the methods
+	Public    bool        // indication if the methods must be considered safe for public use
 }
 
-// callback is a msevod callback which was registered in the server
+// callback is a method callback which was registered in the server
 type callback struct {
-	rcvr        reflect.Value  // receiver of msevod
-	msevod      reflect.Msevod // callback
+	rcvr        reflect.Value  // receiver of method
+	method      reflect.Method // callback
 	argTypes    []reflect.Type // input argument types
-	hasCtx      bool           // msevod's first argument is a context (not included in argTypes)
-	errPos      int            // err return idx, of -1 when msevod cannot return error
+	hasCtx      bool           // method's first argument is a context (not included in argTypes)
+	errPos      int            // err return idx, of -1 when method cannot return error
 	isSubscribe bool           // indication if the callback is a subscription
 }
 
@@ -79,7 +79,7 @@ type Server struct {
 // rpcRequest represents a raw incoming RPC request
 type rpcRequest struct {
 	service  string
-	msevod   string
+	method   string
 	id       interface{}
 	isPubSub bool
 	params   interface{}

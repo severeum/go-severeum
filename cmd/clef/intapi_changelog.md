@@ -6,7 +6,7 @@
 
 ### 2.1.0
 
-* Add `OnInputRequired(info UserInputRequest)` to internal API. This msevod is used when Clef needs user input, e.g. passwords.
+* Add `OnInputRequired(info UserInputRequest)` to internal API. This method is used when Clef needs user input, e.g. passwords.
 
 The following structures are used:
 ```golang
@@ -27,7 +27,7 @@ The following structures are used:
 {
   "jsonrpc": "2.0",
   "id": 2,
-  "msevod": "ApproveTx",
+  "method": "ApproveTx",
   "params": [
     {
       "transaction": {
@@ -62,7 +62,7 @@ The following structures are used:
 
 #### 1.2.0
 
-* Add `OnStartup` msevod, to provide the UI with information about what API version
+* Add `OnStartup` method, to provide the UI with information about what API version
 the signer uses (both internal and external) aswell as build-info and external api.
 
 Example call:
@@ -70,7 +70,7 @@ Example call:
 {
   "jsonrpc": "2.0",
   "id": 1,
-  "msevod": "OnSignerStartup",
+  "method": "OnSignerStartup",
   "params": [
     {
       "info": {
@@ -86,7 +86,7 @@ Example call:
 
 #### 1.1.0
 
-* Add `OnApproved` msevod
+* Add `OnApproved` method
 
 #### 1.0.0
 

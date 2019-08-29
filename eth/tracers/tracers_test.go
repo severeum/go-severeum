@@ -34,22 +34,22 @@ import (
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/core/vm"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/params"
 	"github.com/severeum/go-severeum/rlp"
 	"github.com/severeum/go-severeum/tests"
 )
 
-// To generate a new callTracer test, copy paste the makeTest msevod below into
-// a Ssev console and call it with a transaction hash you which to export.
+// To generate a new callTracer test, copy paste the makeTest method below into
+// a Seth console and call it with a transaction hash you which to export.
 
 /*
 // makeTest generates a callTracer test by running a prestate reassembled and a
 // call trace run, assembling all the gathered information into a test case.
 var makeTest = function(tx, rewind) {
   // Generate the genesis block from the block, transaction and prestate data
-  var block   = sev.getBlock(sev.getTransaction(tx).blockHash);
-  var genesis = sev.getBlock(block.parentHash);
+  var block   = eth.getBlock(eth.getTransaction(tx).blockHash);
+  var genesis = eth.getBlock(block.parentHash);
 
   delete genesis.gasUsed;
   delete genesis.logsBloom;
@@ -69,7 +69,7 @@ var makeTest = function(tx, rewind) {
   for (var key in genesis.alloc) {
     genesis.alloc[key].nonce = genesis.alloc[key].nonce.toString();
   }
-  genesis.config = admin.nodeInfo.protocols.sev.config;
+  genesis.config = admin.nodeInfo.protocols.eth.config;
 
   // Generate the call trace and produce the test input
   var result = debug.traceTransaction(tx, {tracer: "callTracer", rewind: rewind});
@@ -84,7 +84,7 @@ var makeTest = function(tx, rewind) {
       gasLimit:   block.gasLimit.toString(),
       miner:      block.miner,
     },
-    input:  sev.getRawTransaction(tx),
+    input:  eth.getRawTransaction(tx),
     result: result,
   }, null, 2));
 }
@@ -167,7 +167,7 @@ func TestPrestateTracerCreate2(t *testing.T) {
 		Code:    []byte{},
 		Balance: big.NewInt(500000000000000),
 	}
-	statedb := tests.MakePreState(sevdb.NewMemDatabase(), alloc)
+	statedb := tests.MakePreState(ethdb.NewMemDatabase(), alloc)
 	// Create the tracer, the EVM environment and run it
 	tracer, err := New("prestateTracer")
 	if err != nil {
@@ -240,7 +240,7 @@ func TestCallTracer(t *testing.T) {
 				GasLimit:    uint64(test.Context.GasLimit),
 				GasPrice:    tx.GasPrice(),
 			}
-			statedb := tests.MakePreState(sevdb.NewMemDatabase(), test.Genesis.Alloc)
+			statedb := tests.MakePreState(ethdb.NewMemDatabase(), test.Genesis.Alloc)
 
 			// Create the tracer, the EVM environment and run it
 			tracer, err := New("callTracer")

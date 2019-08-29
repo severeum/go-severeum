@@ -30,21 +30,21 @@ import (
 
 // walletDockerfile is the Dockerfile required to run a web wallet.
 var walletDockerfile = `
-FROM puppsev/wallet:latest
+FROM puppeth/wallet:latest
 
 ADD genesis.json /genesis.json
 
 RUN \
   echo 'node server.js &'                     > wallet.sh && \
-	echo 'ssev --cache 512 init /genesis.json' >> wallet.sh && \
-	echo $'exec ssev --networkid {{.NetworkID}} --port {{.NodePort}} --bootnodes {{.Bootnodes}} --sevstats \'{{.Sevstats}}\' --cache=512 --rpc --rpcaddr=0.0.0.0 --rpccorsdomain "*" --rpcvhosts "*"' >> wallet.sh
+	echo 'seth --cache 512 init /genesis.json' >> wallet.sh && \
+	echo $'exec seth --networkid {{.NetworkID}} --port {{.NodePort}} --bootnodes {{.Bootnodes}} --ethstats \'{{.Sevstats}}\' --cache=512 --rpc --rpcaddr=0.0.0.0 --rpccorsdomain "*" --rpcvhosts "*"' >> wallet.sh
 
 RUN \
-	sed -i 's/PuppsevNetworkID/{{.NetworkID}}/g' dist/js/severwallet-master.js && \
-	sed -i 's/PuppsevNetwork/{{.Network}}/g'     dist/js/severwallet-master.js && \
-	sed -i 's/PuppsevDenom/{{.Denom}}/g'         dist/js/severwallet-master.js && \
-	sed -i 's/PuppsevHost/{{.Host}}/g'           dist/js/severwallet-master.js && \
-	sed -i 's/PuppsevRPCPort/{{.RPCPort}}/g'     dist/js/severwallet-master.js
+	sed -i 's/PuppethNetworkID/{{.NetworkID}}/g' dist/js/etherwallet-master.js && \
+	sed -i 's/PuppethNetwork/{{.Network}}/g'     dist/js/etherwallet-master.js && \
+	sed -i 's/PuppethDenom/{{.Denom}}/g'         dist/js/etherwallet-master.js && \
+	sed -i 's/PuppethHost/{{.Host}}/g'           dist/js/etherwallet-master.js && \
+	sed -i 's/PuppethRPCPort/{{.RPCPort}}/g'     dist/js/etherwallet-master.js
 
 ENTRYPOINT ["/bin/sh", "wallet.sh"]
 `
@@ -94,7 +94,7 @@ func deployWallet(client *sshClient, network string, bootnodes []string, config 
 		"NodePort":  config.nodePort,
 		"RPCPort":   config.rpcPort,
 		"Bootnodes": strings.Join(bootnodes, ","),
-		"Sevstats":  config.sevstats,
+		"Sevstats":  config.ethstats,
 		"Host":      client.address,
 	})
 	files[filepath.Join(workdir, "Dockerfile")] = dockerfile.Bytes()
@@ -107,7 +107,7 @@ func deployWallet(client *sshClient, network string, bootnodes []string, config 
 		"RPCPort":  config.rpcPort,
 		"VHost":    config.webHost,
 		"WebPort":  config.webPort,
-		"Sevstats": config.sevstats[:strings.Index(config.sevstats, ":")],
+		"Sevstats": config.ethstats[:strings.Index(config.ethstats, ":")],
 	})
 	files[filepath.Join(workdir, "docker-compose.yaml")] = composefile.Bytes()
 
@@ -132,7 +132,7 @@ type walletInfos struct {
 	genesis  []byte
 	network  int64
 	datadir  string
-	sevstats string
+	ethstats string
 	nodePort int
 	rpcPort  int
 	webHost  string
@@ -144,7 +144,7 @@ type walletInfos struct {
 func (info *walletInfos) Report() map[string]string {
 	report := map[string]string{
 		"Data directory":         info.datadir,
-		"Sevstats username":      info.sevstats,
+		"Sevstats username":      info.ethstats,
 		"Node listener port ":    strconv.Itoa(info.nodePort),
 		"RPC listener port ":     strconv.Itoa(info.rpcPort),
 		"Website address ":       info.webHost,
@@ -153,8 +153,8 @@ func (info *walletInfos) Report() map[string]string {
 	return report
 }
 
-// checkWallet does a health-check against web wallet server to verify whsever
-// it's running, and if yes, whsever it's responsive.
+// checkWallet does a health-check against web wallet server to verify whether
+// it's running, and if yes, whether it's responsive.
 func checkWallet(client *sshClient, network string) (*walletInfos, error) {
 	// Inspect a possible web wallet container on the host
 	infos, err := inspectContainer(client, fmt.Sprintf("%s_wallet_1", network))
@@ -195,7 +195,7 @@ func checkWallet(client *sshClient, network string) (*walletInfos, error) {
 		rpcPort:  rpcPort,
 		webHost:  host,
 		webPort:  webPort,
-		sevstats: infos.envvars["STATS"],
+		ethstats: infos.envvars["STATS"],
 	}
 	return stats, nil
 }

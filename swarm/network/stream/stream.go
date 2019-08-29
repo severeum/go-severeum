@@ -615,7 +615,7 @@ type server struct {
 	sessionIndex uint64
 }
 
-// setNextBatch adjusts passed interval based on session index and whsever
+// setNextBatch adjusts passed interval based on session index and whether
 // stream is live or history. It calls Server SetNextBatch with adjusted
 // interval and returns batch hashes and their interval.
 func (s *server) setNextBatch(from, to uint64) ([]byte, uint64, uint64, *HandoverProof, error) {
@@ -830,7 +830,7 @@ func (sp *StreamerPrices) getChunkDeliveryMsgRetrievalPrice() uint64 {
 }
 
 // createPriceOracle sets up a matrix which can be queried to get
-// the price for a message via the Price msevod
+// the price for a message via the Price method
 func (r *Registry) createPriceOracle() {
 	sp := &StreamerPrices{
 		registry: r,

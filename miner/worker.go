@@ -124,7 +124,7 @@ type intervalAdjust struct {
 type worker struct {
 	config *params.ChainConfig
 	engine consensus.Engine
-	sev    Backend
+	eth    Backend
 	chain  *core.BlockChain
 
 	gasFloor uint64
@@ -165,32 +165,32 @@ type worker struct {
 	snapshotState *state.StateDB
 
 	// atomic status counters
-	running int32 // The indicator whsever the consensus engine is running or not.
+	running int32 // The indicator whether the consensus engine is running or not.
 	newTxs  int32 // New arrival transaction count since last sealing work submitting.
 
 	// External functions
-	isLocalBlock func(block *types.Block) bool // Function used to determine whsever the specified block is mined by local miner.
+	isLocalBlock func(block *types.Block) bool // Function used to determine whether the specified block is mined by local miner.
 
 	// Test hooks
-	newTaskHook  func(*task)                        // Msevod to call upon receiving a new sealing task.
-	skipSealHook func(*task) bool                   // Msevod to decide whsever skipping the sealing.
-	fullTaskHook func()                             // Msevod to call before pushing the full sealing task.
-	resubmitHook func(time.Duration, time.Duration) // Msevod to call upon updating resubmitting interval.
+	newTaskHook  func(*task)                        // Method to call upon receiving a new sealing task.
+	skipSealHook func(*task) bool                   // Method to decide whether skipping the sealing.
+	fullTaskHook func()                             // Method to call before pushing the full sealing task.
+	resubmitHook func(time.Duration, time.Duration) // Method to call upon updating resubmitting interval.
 }
 
-func newWorker(config *params.ChainConfig, engine consensus.Engine, sev Backend, mux *event.TypeMux, recommit time.Duration, gasFloor, gasCeil uint64, isLocalBlock func(*types.Block) bool) *worker {
+func newWorker(config *params.ChainConfig, engine consensus.Engine, eth Backend, mux *event.TypeMux, recommit time.Duration, gasFloor, gasCeil uint64, isLocalBlock func(*types.Block) bool) *worker {
 	worker := &worker{
 		config:             config,
 		engine:             engine,
-		sev:                sev,
+		eth:                eth,
 		mux:                mux,
-		chain:              sev.BlockChain(),
+		chain:              eth.BlockChain(),
 		gasFloor:           gasFloor,
 		gasCeil:            gasCeil,
 		isLocalBlock:       isLocalBlock,
 		localUncles:        make(map[common.Hash]*types.Block),
 		remoteUncles:       make(map[common.Hash]*types.Block),
-		unconfirmed:        newUnconfirmedBlocks(sev.BlockChain(), miningLogAtDepth),
+		unconfirmed:        newUnconfirmedBlocks(eth.BlockChain(), miningLogAtDepth),
 		pendingTasks:       make(map[common.Hash]*task),
 		txsCh:              make(chan core.NewTxsEvent, txChanSize),
 		chainHeadCh:        make(chan core.ChainHeadEvent, chainHeadChanSize),
@@ -204,10 +204,10 @@ func newWorker(config *params.ChainConfig, engine consensus.Engine, sev Backend,
 		resubmitAdjustCh:   make(chan *intervalAdjust, resubmitAdjustChanSize),
 	}
 	// Subscribe NewTxsEvent for tx pool
-	worker.txsSub = sev.TxPool().SubscribeNewTxsEvent(worker.txsCh)
+	worker.txsSub = eth.TxPool().SubscribeNewTxsEvent(worker.txsCh)
 	// Subscribe events for blockchain
-	worker.chainHeadSub = sev.BlockChain().SubscribeChainHeadEvent(worker.chainHeadCh)
-	worker.chainSideSub = sev.BlockChain().SubscribeChainSideEvent(worker.chainSideCh)
+	worker.chainHeadSub = eth.BlockChain().SubscribeChainHeadEvent(worker.chainHeadCh)
+	worker.chainSideSub = eth.BlockChain().SubscribeChainSideEvent(worker.chainSideCh)
 
 	// Sanitize recommit interval if the user-specified one is too short.
 	if recommit < minRecommitInterval {
@@ -226,7 +226,7 @@ func newWorker(config *params.ChainConfig, engine consensus.Engine, sev Backend,
 	return worker
 }
 
-// setSeverbase sets the severbase used to initialize the block coinbase field.
+// setSeverbase sets the etherbase used to initialize the block coinbase field.
 func (w *worker) setSeverbase(addr common.Address) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
@@ -275,7 +275,7 @@ func (w *worker) stop() {
 	atomic.StoreInt32(&w.running, 0)
 }
 
-// isRunning returns an indicator whsever worker is running or not.
+// isRunning returns an indicator whether worker is running or not.
 func (w *worker) isRunning() bool {
 	return atomic.LoadInt32(&w.running) == 1
 }
@@ -750,7 +750,7 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 		//
 		// We use the eip155 signer regardless of the current hf.
 		from, _ := types.Sender(w.current.signer, tx)
-		// Check whsever the tx is replay protected. If we're not in the EIP155 hf
+		// Check whether the tx is replay protected. If we're not in the EIP155 hf
 		// phase, start ignoring the sender until we do.
 		if tx.Protected() && !w.config.IsEIP155(w.current.header.Number) {
 			log.Trace("Ignoring reply protected transaction", "hash", tx.Hash(), "eip155", w.config.EIP155Block)
@@ -815,7 +815,7 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 	return false
 }
 
-// commitNewWork generates several new sealing tasks based on the parent block.
+// commitNewWork generates etheral new sealing tasks based on the parent block.
 func (w *worker) commitNewWork(interrupt *int32, noempty bool, timestamp int64) {
 	w.mu.RLock()
 	defer w.mu.RUnlock()
@@ -844,7 +844,7 @@ func (w *worker) commitNewWork(interrupt *int32, noempty bool, timestamp int64) 
 	// Only set the coinbase if our consensus engine is running (avoid spurious block rewards)
 	if w.isRunning() {
 		if w.coinbase == (common.Address{}) {
-			log.Error("Refusing to mine without severbase")
+			log.Error("Refusing to mine without etherbase")
 			return
 		}
 		header.Coinbase = w.coinbase
@@ -853,12 +853,12 @@ func (w *worker) commitNewWork(interrupt *int32, noempty bool, timestamp int64) 
 		log.Error("Failed to prepare header for mining", "err", err)
 		return
 	}
-	// If we are care about TheDAO hard-fork check whsever to override the extra-data or not
+	// If we are care about TheDAO hard-fork check whether to override the extra-data or not
 	if daoBlock := w.config.DAOForkBlock; daoBlock != nil {
-		// Check whsever the block is among the fork extra-override range
+		// Check whether the block is among the fork extra-override range
 		limit := new(big.Int).Add(daoBlock, params.DAOForkExtraRange)
 		if header.Number.Cmp(daoBlock) >= 0 && header.Number.Cmp(limit) < 0 {
-			// Depending whsever we support or oppose the fork, override differently
+			// Depending whether we support or oppose the fork, override differently
 			if w.config.DAOForkSupport {
 				header.Extra = common.CopyBytes(params.DAOForkBlockExtra)
 			} else if bytes.Equal(header.Extra, params.DAOForkBlockExtra) {
@@ -909,7 +909,7 @@ func (w *worker) commitNewWork(interrupt *int32, noempty bool, timestamp int64) 
 	}
 
 	// Fill the block with all available pending transactions.
-	pending, err := w.sev.TxPool().Pending()
+	pending, err := w.eth.TxPool().Pending()
 	if err != nil {
 		log.Error("Failed to fetch pending transactions", "err", err)
 		return
@@ -921,7 +921,7 @@ func (w *worker) commitNewWork(interrupt *int32, noempty bool, timestamp int64) 
 	}
 	// Split the pending transactions into locals and remotes
 	localTxs, remoteTxs := make(map[common.Address]types.Transactions), pending
-	for _, account := range w.sev.TxPool().Locals() {
+	for _, account := range w.eth.TxPool().Locals() {
 		if txs := remoteTxs[account]; len(txs) > 0 {
 			delete(remoteTxs, account)
 			localTxs[account] = txs

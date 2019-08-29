@@ -83,7 +83,7 @@ type Matcher struct {
 	retrievals chan chan *Retrieval // Retriever processes waiting for task allocations
 	deliveries chan *Retrieval      // Retriever processes waiting for task response deliveries
 
-	running uint32 // Atomic flag whsever a session is live or not
+	running uint32 // Atomic flag whether a session is live or not
 }
 
 // NewMatcher creates a new pipeline for retrieving bloom bit streams and doing
@@ -220,7 +220,7 @@ func (m *Matcher) Start(ctx context.Context, begin, end uint64, results chan uin
 // ones have all found a potential match in one of the blocks of the section,
 // then binary AND-ing its own matches and forwarding the result to the next one.
 //
-// The msevod starts feeding the section indexes into the first sub-matcher on a
+// The method starts feeding the section indexes into the first sub-matcher on a
 // new goroutine and returns a sink channel receiving the results.
 func (m *Matcher) run(begin, end uint64, buffer int, session *MatcherSession) chan *partialMatches {
 	// Create the source channel and feed section indexes into
@@ -256,7 +256,7 @@ func (m *Matcher) run(begin, end uint64, buffer int, session *MatcherSession) ch
 // subMatch creates a sub-matcher that filters for a set of addresses or topics, binary OR-s those matches, then
 // binary AND-s the result to the daisy-chain input (source) and forwards it to the daisy-chain output.
 // The matches of each address/topic are calculated by fetching the given sections of the three bloom bit indexes belonging to
-// that address/topic, and binary AND-ing those vectors tossever.
+// that address/topic, and binary AND-ing those vectors tosether.
 func (m *Matcher) subMatch(source chan *partialMatches, dist chan *request, bloom []bloomIndexes, session *MatcherSession) chan *partialMatches {
 	// Start the concurrent schedulers for each bit required by the bloom filter
 	sectionSources := make([][3]chan uint64, len(bloom))
@@ -333,7 +333,7 @@ func (m *Matcher) subMatch(source chan *partialMatches, dist chan *request, bloo
 				if !ok {
 					return
 				}
-				// Gather all the sub-results and merge them tossever
+				// Gather all the sub-results and merge them tosether
 				var orVector []byte
 				for _, bloomSinks := range sectionSinks {
 					var andVector []byte
@@ -392,7 +392,7 @@ func (m *Matcher) distributor(dist chan *request, session *MatcherSession) {
 		shutdown = session.quit // Shutdown request channel, will gracefully wait for pending requests
 	)
 
-	// assign is a helper msevod fo try to assign a pending bit an actively
+	// assign is a helper method fo try to assign a pending bit an actively
 	// listening servicer, or schedule it up for later when one arrives.
 	assign := func(bit uint) {
 		select {
@@ -600,9 +600,9 @@ func (s *MatcherSession) DeliverSections(bit uint, sections []uint64, bitsets []
 }
 
 // Multiplex polls the matcher session for retrieval tasks and multiplexes it into
-// the requested retrieval queue to be serviced tossever with other sessions.
+// the requested retrieval queue to be serviced tosether with other sessions.
 //
-// This msevod will block for the lifetime of the session. Even after termination
+// This method will block for the lifetime of the session. Even after termination
 // of the session, any request in-flight need to be responded to! Empty responses
 // are fine though in that case.
 func (s *MatcherSession) Multiplex(batch int, wait time.Duration, mux chan chan *Retrieval) {
@@ -636,7 +636,7 @@ func (s *MatcherSession) Multiplex(batch int, wait time.Duration, mux chan chan 
 			return
 
 		case mux <- request:
-			// Retrieval accepted, somseving must arrive before we're aborting
+			// Retrieval accepted, something must arrive before we're aborting
 			request <- &Retrieval{Bit: bit, Sections: sections, Context: s.ctx}
 
 			result := <-request

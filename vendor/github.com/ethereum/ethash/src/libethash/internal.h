@@ -1,7 +1,7 @@
 #pragma once
 #include "compiler.h"
 #include "endian.h"
-#include "sevash.h"
+#include "ethash.h"
 #include <stdio.h>
 
 #define ENABLE_SSE 0
@@ -31,33 +31,33 @@ typedef union node {
 
 } node;
 
-static inline uint8_t sevash_h256_get(sevash_h256_t const* hash, unsigned int i)
+static inline uint8_t ethash_h256_get(ethash_h256_t const* hash, unsigned int i)
 {
 	return hash->b[i];
 }
 
-static inline void sevash_h256_set(sevash_h256_t* hash, unsigned int i, uint8_t v)
+static inline void ethash_h256_set(ethash_h256_t* hash, unsigned int i, uint8_t v)
 {
 	hash->b[i] = v;
 }
 
-static inline void sevash_h256_reset(sevash_h256_t* hash)
+static inline void ethash_h256_reset(ethash_h256_t* hash)
 {
 	memset(hash, 0, 32);
 }
 
 // Returns if hash is less than or equal to boundary (2^256/difficulty)
-static inline bool sevash_check_difficulty(
-	sevash_h256_t const* hash,
-	sevash_h256_t const* boundary
+static inline bool ethash_check_difficulty(
+	ethash_h256_t const* hash,
+	ethash_h256_t const* boundary
 )
 {
 	// Boundary is big endian
 	for (int i = 0; i < 32; i++) {
-		if (sevash_h256_get(hash, i) == sevash_h256_get(boundary, i)) {
+		if (ethash_h256_get(hash, i) == ethash_h256_get(boundary, i)) {
 			continue;
 		}
-		return sevash_h256_get(hash, i) < sevash_h256_get(boundary, i);
+		return ethash_h256_get(hash, i) < ethash_h256_get(boundary, i);
 	}
 	return true;
 }
@@ -71,29 +71,29 @@ static inline bool sevash_check_difficulty(
  * @param boundary         The boundary is defined as (2^256 / difficulty)
  * @return                 true for succesful pre-verification and false otherwise
  */
-bool sevash_quick_check_difficulty(
-	sevash_h256_t const* header_hash,
+bool ethash_quick_check_difficulty(
+	ethash_h256_t const* header_hash,
 	uint64_t const nonce,
-	sevash_h256_t const* mix_hash,
-	sevash_h256_t const* boundary
+	ethash_h256_t const* mix_hash,
+	ethash_h256_t const* boundary
 );
 
-struct sevash_light {
+struct ethash_light {
 	void* cache;
 	uint64_t cache_size;
 	uint64_t block_number;
 };
 
 /**
- * Allocate and initialize a new sevash_light handler. Internal version
+ * Allocate and initialize a new ethash_light handler. Internal version
  *
  * @param cache_size    The size of the cache in bytes
  * @param seed          Block seedhash to be used during the computation of the
  *                      cache nodes
- * @return              Newly allocated sevash_light handler or NULL in case of
- *                      ERRNOMEM or invalid parameters used for @ref sevash_compute_cache_nodes()
+ * @return              Newly allocated ethash_light handler or NULL in case of
+ *                      ERRNOMEM or invalid parameters used for @ref ethash_compute_cache_nodes()
  */
-sevash_light_t sevash_light_new_internal(uint64_t cache_size, sevash_h256_t const* seed);
+ethash_light_t ethash_light_new_internal(uint64_t cache_size, ethash_h256_t const* seed);
 
 /**
  * Calculate the light client data. Internal version.
@@ -104,74 +104,74 @@ sevash_light_t sevash_light_new_internal(uint64_t cache_size, sevash_h256_t cons
  * @param nonce          The nonce to pack into the mix
  * @return               The resulting hash.
  */
-sevash_return_value_t sevash_light_compute_internal(
-	sevash_light_t light,
+ethash_return_value_t ethash_light_compute_internal(
+	ethash_light_t light,
 	uint64_t full_size,
-	sevash_h256_t const header_hash,
+	ethash_h256_t const header_hash,
 	uint64_t nonce
 );
 
-struct sevash_full {
+struct ethash_full {
 	FILE* file;
 	uint64_t file_size;
 	node* data;
 };
 
 /**
- * Allocate and initialize a new sevash_full handler. Internal version.
+ * Allocate and initialize a new ethash_full handler. Internal version.
  *
  * @param dirname        The directory in which to put the DAG file.
  * @param seedhash       The seed hash of the block. Used in the DAG file naming.
  * @param full_size      The size of the full data in bytes.
- * @param cache          A cache object to use that was allocated with @ref sevash_cache_new().
- *                       Iff this function succeeds the sevash_full_t will take memory
+ * @param cache          A cache object to use that was allocated with @ref ethash_cache_new().
+ *                       Iff this function succeeds the ethash_full_t will take memory
  *                       memory ownership of the cache and free it at deletion. If
  *                       not then the user still has to handle freeing of the cache himself.
- * @param callback       A callback function with signature of @ref sevash_callback_t
+ * @param callback       A callback function with signature of @ref ethash_callback_t
  *                       It accepts an unsigned with which a progress of DAG calculation
  *                       can be displayed. If all goes well the callback should return 0.
  *                       If a non-zero value is returned then DAG generation will stop.
- * @return               Newly allocated sevash_full handler or NULL in case of
- *                       ERRNOMEM or invalid parameters used for @ref sevash_compute_full_data()
+ * @return               Newly allocated ethash_full handler or NULL in case of
+ *                       ERRNOMEM or invalid parameters used for @ref ethash_compute_full_data()
  */
-sevash_full_t sevash_full_new_internal(
+ethash_full_t ethash_full_new_internal(
 	char const* dirname,
-	sevash_h256_t const seed_hash,
+	ethash_h256_t const seed_hash,
 	uint64_t full_size,
-	sevash_light_t const light,
-	sevash_callback_t callback
+	ethash_light_t const light,
+	ethash_callback_t callback
 );
 
-void sevash_calculate_dag_item(
+void ethash_calculate_dag_item(
 	node* const ret,
 	uint32_t node_index,
-	sevash_light_t const cache
+	ethash_light_t const cache
 );
 
-void sevash_quick_hash(
-	sevash_h256_t* return_hash,
-	sevash_h256_t const* header_hash,
+void ethash_quick_hash(
+	ethash_h256_t* return_hash,
+	ethash_h256_t const* header_hash,
 	const uint64_t nonce,
-	sevash_h256_t const* mix_hash
+	ethash_h256_t const* mix_hash
 );
 
-uint64_t sevash_get_datasize(uint64_t const block_number);
-uint64_t sevash_get_cachesize(uint64_t const block_number);
+uint64_t ethash_get_datasize(uint64_t const block_number);
+uint64_t ethash_get_cachesize(uint64_t const block_number);
 
 /**
  * Compute the memory data for a full node's memory
  *
- * @param mem         A pointer to an sevash full's memory
+ * @param mem         A pointer to an ethash full's memory
  * @param full_size   The size of the full data in bytes
  * @param cache       A cache object to use in the calculation
- * @param callback    The callback function. Check @ref sevash_full_new() for details.
+ * @param callback    The callback function. Check @ref ethash_full_new() for details.
  * @return            true if all went fine and false for invalid parameters
  */
-bool sevash_compute_full_data(
+bool ethash_compute_full_data(
 	void* mem,
 	uint64_t full_size,
-	sevash_light_t const light,
-	sevash_callback_t callback
+	ethash_light_t const light,
+	ethash_callback_t callback
 );
 
 #ifdef __cplusplus

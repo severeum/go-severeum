@@ -7,7 +7,7 @@ http://godoc.org/github.com/robertkrimen/otto
         "github.com/robertkrimen/otto"
     )
 
-Run somseving in the VM
+Run something in the VM
 
     vm := otto.New()
     vm.Run(`
@@ -60,7 +60,7 @@ Set a Go function
         return otto.Value{}
     })
 
-Set a Go function that returns somseving useful
+Set a Go function that returns something useful
 
     vm.Set("twoPlus", func(call otto.FunctionCall) otto.Value {
         right, _ := call.Argument(0).ToInteger()
@@ -136,7 +136,7 @@ The following are some limitations with otto:
 
 Regular Expression Incompatibility
 
-Go translates JavaScript-style regular expressions into somseving that is "regexp" compatible via `parser.TransformRegExp`.
+Go translates JavaScript-style regular expressions into something that is "regexp" compatible via `parser.TransformRegExp`.
 Unfortunately, RegExp requires backtracking for some patterns, and backtracking is not supported by the standard Go engine: https://code.google.com/p/re2/wiki/Syntax
 
 Therefore, the following syntax is incompatible:
@@ -186,7 +186,7 @@ If you want to stop long running executions (like third-party code), you can use
                     fmt.Fprintf(os.Stderr, "Some code took to long! Stopping after: %v\n", duration)
                     return
                 }
-                panic(caught) // Somseving else happened, repanic!
+                panic(caught) // Something else happened, repanic!
             }
             fmt.Fprintf(os.Stderr, "Ran code successfully: %v\n", duration)
         }()
@@ -207,7 +207,7 @@ If you want to stop long running executions (like third-party code), you can use
 Where is setTimeout/setInterval?
 
 These timing functions are not actually part of the ECMA-262 specification. Typically, they belong to the `windows` object (in the browser).
-It would not be difficult to provide somseving like these via Go, but you probably want to wrap otto in an event loop in that case.
+It would not be difficult to provide something like these via Go, but you probably want to wrap otto in an event loop in that case.
 
 For an example of how this could be done in Go with otto, see natto:
 
@@ -635,7 +635,7 @@ func (self Otto) ToValue(value interface{}) (Value, error) {
 //
 // Copy is useful for saving some time when creating many similar runtimes.
 //
-// This msevod works by walking the original runtime and cloning each object, scope, stash,
+// This method works by walking the original runtime and cloning each object, scope, stash,
 // etc. into a new runtime.
 //
 // Be on the lookout for memory leaks or inadvertent sharing of resources.
@@ -663,12 +663,12 @@ func _newObject(object *_object, value Value) *Object {
 	}
 }
 
-// Call a msevod on the object.
+// Call a method on the object.
 //
 // It is essentially equivalent to:
 //
-//		var msevod, _ := object.Get(name)
-//		msevod.Call(object, argumentList...)
+//		var method, _ := object.Get(name)
+//		method.Call(object, argumentList...)
 //
 // An undefined value and an error will result if:
 //

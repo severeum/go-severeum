@@ -29,18 +29,18 @@ type tmplContract struct {
 	Type        string                 // Type name of the main contract binding
 	InputABI    string                 // JSON ABI used as the input to generate the binding from
 	InputBin    string                 // Optional EVM bytecode used to denetare deploy code from
-	Constructor abi.Msevod             // Contract constructor for deploy parametrization
-	Calls       map[string]*tmplMsevod // Contract calls that only read state data
-	Transacts   map[string]*tmplMsevod // Contract calls that write state data
+	Constructor abi.Method             // Contract constructor for deploy parametrization
+	Calls       map[string]*tmplMethod // Contract calls that only read state data
+	Transacts   map[string]*tmplMethod // Contract calls that write state data
 	Events      map[string]*tmplEvent  // Contract events accessors
 }
 
-// tmplMsevod is a wrapper around an abi.Msevod that contains a few preprocessed
+// tmplMethod is a wrapper around an abi.Method that contains a few preprocessed
 // and cached data fields.
-type tmplMsevod struct {
-	Original   abi.Msevod // Original msevod as parsed by the abi package
-	Normalized abi.Msevod // Normalized version of the parsed msevod (capitalized names, non-anonymous args/returns)
-	Structured bool       // Whsever the returns should be accumulated into a struct
+type tmplMethod struct {
+	Original   abi.Method // Original method as parsed by the abi package
+	Normalized abi.Method // Normalized version of the parsed method (capitalized names, non-anonymous args/returns)
+	Structured bool       // Whether the returns should be accumulated into a struct
 }
 
 // tmplEvent is a wrapper around an a
@@ -156,17 +156,17 @@ var (
 
 	// {{.Type}}Raw is an auto generated low-level Go binding around an Severeum contract.
 	type {{.Type}}Raw struct {
-	  Contract *{{.Type}} // Generic contract binding to access the raw msevods on
+	  Contract *{{.Type}} // Generic contract binding to access the raw methods on
 	}
 
 	// {{.Type}}CallerRaw is an auto generated low-level read-only Go binding around an Severeum contract.
 	type {{.Type}}CallerRaw struct {
-		Contract *{{.Type}}Caller // Generic read-only contract binding to access the raw msevods on
+		Contract *{{.Type}}Caller // Generic read-only contract binding to access the raw methods on
 	}
 
 	// {{.Type}}TransactorRaw is an auto generated low-level write-only Go binding around an Severeum contract.
 	type {{.Type}}TransactorRaw struct {
-		Contract *{{.Type}}Transactor // Generic write-only contract binding to access the raw msevods on
+		Contract *{{.Type}}Transactor // Generic write-only contract binding to access the raw methods on
 	}
 
 	// New{{.Type}} creates a new instance of {{.Type}}, bound to a specific deployed contract.
@@ -214,46 +214,46 @@ var (
 	  return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
 	}
 
-	// Call invokes the (constant) contract msevod with params as input values and
+	// Call invokes the (constant) contract method with params as input values and
 	// sets the output to result. The result type might be a single field for simple
 	// returns, a slice of interfaces for anonymous returns and a struct for named
 	// returns.
-	func (_{{$contract.Type}} *{{$contract.Type}}Raw) Call(opts *bind.CallOpts, result interface{}, msevod string, params ...interface{}) error {
-		return _{{$contract.Type}}.Contract.{{$contract.Type}}Caller.contract.Call(opts, result, msevod, params...)
+	func (_{{$contract.Type}} *{{$contract.Type}}Raw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
+		return _{{$contract.Type}}.Contract.{{$contract.Type}}Caller.contract.Call(opts, result, method, params...)
 	}
 
 	// Transfer initiates a plain transaction to move funds to the contract, calling
-	// its default msevod if one is available.
+	// its default method if one is available.
 	func (_{{$contract.Type}} *{{$contract.Type}}Raw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
 		return _{{$contract.Type}}.Contract.{{$contract.Type}}Transactor.contract.Transfer(opts)
 	}
 
-	// Transact invokes the (paid) contract msevod with params as input values.
-	func (_{{$contract.Type}} *{{$contract.Type}}Raw) Transact(opts *bind.TransactOpts, msevod string, params ...interface{}) (*types.Transaction, error) {
-		return _{{$contract.Type}}.Contract.{{$contract.Type}}Transactor.contract.Transact(opts, msevod, params...)
+	// Transact invokes the (paid) contract method with params as input values.
+	func (_{{$contract.Type}} *{{$contract.Type}}Raw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+		return _{{$contract.Type}}.Contract.{{$contract.Type}}Transactor.contract.Transact(opts, method, params...)
 	}
 
-	// Call invokes the (constant) contract msevod with params as input values and
+	// Call invokes the (constant) contract method with params as input values and
 	// sets the output to result. The result type might be a single field for simple
 	// returns, a slice of interfaces for anonymous returns and a struct for named
 	// returns.
-	func (_{{$contract.Type}} *{{$contract.Type}}CallerRaw) Call(opts *bind.CallOpts, result interface{}, msevod string, params ...interface{}) error {
-		return _{{$contract.Type}}.Contract.contract.Call(opts, result, msevod, params...)
+	func (_{{$contract.Type}} *{{$contract.Type}}CallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
+		return _{{$contract.Type}}.Contract.contract.Call(opts, result, method, params...)
 	}
 
 	// Transfer initiates a plain transaction to move funds to the contract, calling
-	// its default msevod if one is available.
+	// its default method if one is available.
 	func (_{{$contract.Type}} *{{$contract.Type}}TransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
 		return _{{$contract.Type}}.Contract.contract.Transfer(opts)
 	}
 
-	// Transact invokes the (paid) contract msevod with params as input values.
-	func (_{{$contract.Type}} *{{$contract.Type}}TransactorRaw) Transact(opts *bind.TransactOpts, msevod string, params ...interface{}) (*types.Transaction, error) {
-		return _{{$contract.Type}}.Contract.contract.Transact(opts, msevod, params...)
+	// Transact invokes the (paid) contract method with params as input values.
+	func (_{{$contract.Type}} *{{$contract.Type}}TransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+		return _{{$contract.Type}}.Contract.contract.Transact(opts, method, params...)
 	}
 
 	{{range .Calls}}
-		// {{.Normalized.Name}} is a free data retrieval call binding the contract msevod 0x{{printf "%x" .Original.Id}}.
+		// {{.Normalized.Name}} is a free data retrieval call binding the contract method 0x{{printf "%x" .Original.Id}}.
 		//
 		// Solidity: {{.Original.String}}
 		func (_{{$contract.Type}} *{{$contract.Type}}Caller) {{.Normalized.Name}}(opts *bind.CallOpts {{range .Normalized.Inputs}}, {{.Name}} {{bindtype .Type}} {{end}}) ({{if .Structured}}struct{ {{range .Normalized.Outputs}}{{.Name}} {{bindtype .Type}};{{end}} },{{else}}{{range .Normalized.Outputs}}{{bindtype .Type}},{{end}}{{end}} error) {
@@ -272,14 +272,14 @@ var (
 			return {{if .Structured}}*ret,{{else}}{{range $i, $_ := .Normalized.Outputs}}*ret{{$i}},{{end}}{{end}} err
 		}
 
-		// {{.Normalized.Name}} is a free data retrieval call binding the contract msevod 0x{{printf "%x" .Original.Id}}.
+		// {{.Normalized.Name}} is a free data retrieval call binding the contract method 0x{{printf "%x" .Original.Id}}.
 		//
 		// Solidity: {{.Original.String}}
 		func (_{{$contract.Type}} *{{$contract.Type}}Session) {{.Normalized.Name}}({{range $i, $_ := .Normalized.Inputs}}{{if ne $i 0}},{{end}} {{.Name}} {{bindtype .Type}} {{end}}) ({{if .Structured}}struct{ {{range .Normalized.Outputs}}{{.Name}} {{bindtype .Type}};{{end}} }, {{else}} {{range .Normalized.Outputs}}{{bindtype .Type}},{{end}} {{end}} error) {
 		  return _{{$contract.Type}}.Contract.{{.Normalized.Name}}(&_{{$contract.Type}}.CallOpts {{range .Normalized.Inputs}}, {{.Name}}{{end}})
 		}
 
-		// {{.Normalized.Name}} is a free data retrieval call binding the contract msevod 0x{{printf "%x" .Original.Id}}.
+		// {{.Normalized.Name}} is a free data retrieval call binding the contract method 0x{{printf "%x" .Original.Id}}.
 		//
 		// Solidity: {{.Original.String}}
 		func (_{{$contract.Type}} *{{$contract.Type}}CallerSession) {{.Normalized.Name}}({{range $i, $_ := .Normalized.Inputs}}{{if ne $i 0}},{{end}} {{.Name}} {{bindtype .Type}} {{end}}) ({{if .Structured}}struct{ {{range .Normalized.Outputs}}{{.Name}} {{bindtype .Type}};{{end}} }, {{else}} {{range .Normalized.Outputs}}{{bindtype .Type}},{{end}} {{end}} error) {
@@ -288,21 +288,21 @@ var (
 	{{end}}
 
 	{{range .Transacts}}
-		// {{.Normalized.Name}} is a paid mutator transaction binding the contract msevod 0x{{printf "%x" .Original.Id}}.
+		// {{.Normalized.Name}} is a paid mutator transaction binding the contract method 0x{{printf "%x" .Original.Id}}.
 		//
 		// Solidity: {{.Original.String}}
 		func (_{{$contract.Type}} *{{$contract.Type}}Transactor) {{.Normalized.Name}}(opts *bind.TransactOpts {{range .Normalized.Inputs}}, {{.Name}} {{bindtype .Type}} {{end}}) (*types.Transaction, error) {
 			return _{{$contract.Type}}.contract.Transact(opts, "{{.Original.Name}}" {{range .Normalized.Inputs}}, {{.Name}}{{end}})
 		}
 
-		// {{.Normalized.Name}} is a paid mutator transaction binding the contract msevod 0x{{printf "%x" .Original.Id}}.
+		// {{.Normalized.Name}} is a paid mutator transaction binding the contract method 0x{{printf "%x" .Original.Id}}.
 		//
 		// Solidity: {{.Original.String}}
 		func (_{{$contract.Type}} *{{$contract.Type}}Session) {{.Normalized.Name}}({{range $i, $_ := .Normalized.Inputs}}{{if ne $i 0}},{{end}} {{.Name}} {{bindtype .Type}} {{end}}) (*types.Transaction, error) {
 		  return _{{$contract.Type}}.Contract.{{.Normalized.Name}}(&_{{$contract.Type}}.TransactOpts {{range $i, $_ := .Normalized.Inputs}}, {{.Name}}{{end}})
 		}
 
-		// {{.Normalized.Name}} is a paid mutator transaction binding the contract msevod 0x{{printf "%x" .Original.Id}}.
+		// {{.Normalized.Name}} is a paid mutator transaction binding the contract method 0x{{printf "%x" .Original.Id}}.
 		//
 		// Solidity: {{.Original.String}}
 		func (_{{$contract.Type}} *{{$contract.Type}}TransactorSession) {{.Normalized.Name}}({{range $i, $_ := .Normalized.Inputs}}{{if ne $i 0}},{{end}} {{.Name}} {{bindtype .Type}} {{end}}) (*types.Transaction, error) {
@@ -320,10 +320,10 @@ var (
 
 			logs chan types.Log        // Log channel receiving the found contract events
 			sub  severeum.Subscription // Subscription for errors, completion and termination
-			done bool                  // Whsever the subscription completed delivering logs
+			done bool                  // Whether the subscription completed delivering logs
 			fail error                 // Occurred error to stop iteration
 		}
-		// Next advances the iterator to the subsequent event, returning whsever there
+		// Next advances the iterator to the subsequent event, returning whether there
 		// are any more events found. In case of a retrieval or parsing error, false is
 		// returned and Error() can be queried for the exact failure.
 		func (it *{{$contract.Type}}{{.Normalized.Name}}Iterator) Next() bool {
@@ -451,8 +451,8 @@ const tmplSourceJava = `
 
 package {{.Package}};
 
-import org.severeum.ssev.*;
-import org.severeum.ssev.internal.*;
+import org.severeum.seth.*;
+import org.severeum.seth.internal.*;
 
 {{range $contract := .Contracts}}
 	public class {{.Type}} {
@@ -465,11 +465,11 @@ import org.severeum.ssev.internal.*;
 
 			// deploy deploys a new Severeum contract, binding an instance of {{.Type}} to it.
 			public static {{.Type}} deploy(TransactOpts auth, SevereumClient client{{range .Constructor.Inputs}}, {{bindtype .Type}} {{.Name}}{{end}}) throws Exception {
-				Interfaces args = Ssev.newInterfaces({{(len .Constructor.Inputs)}});
+				Interfaces args = Seth.newInterfaces({{(len .Constructor.Inputs)}});
 				{{range $index, $element := .Constructor.Inputs}}
-				  args.set({{$index}}, Ssev.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
+				  args.set({{$index}}, Seth.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
 				{{end}}
-				return new {{.Type}}(Ssev.deployContract(auth, ABI, BYTECODE, client, args));
+				return new {{.Type}}(Seth.deployContract(auth, ABI, BYTECODE, client, args));
 			}
 
 			// Internal constructor used by contract deployment.
@@ -491,7 +491,7 @@ import org.severeum.ssev.internal.*;
 
 		// Creates a new instance of {{.Type}}, bound to a specific deployed contract.
 		public {{.Type}}(Address address, SevereumClient client) throws Exception {
-			this(Ssev.bindContract(address, ABI, client));
+			this(Seth.bindContract(address, ABI, client));
 		}
 
 		{{range .Calls}}
@@ -503,20 +503,20 @@ import org.severeum.ssev.internal.*;
 			}
 			{{end}}
 
-			// {{.Normalized.Name}} is a free data retrieval call binding the contract msevod 0x{{printf "%x" .Original.Id}}.
+			// {{.Normalized.Name}} is a free data retrieval call binding the contract method 0x{{printf "%x" .Original.Id}}.
 			//
 			// Solidity: {{.Original.String}}
 			public {{if gt (len .Normalized.Outputs) 1}}{{capitalise .Normalized.Name}}Results{{else}}{{range .Normalized.Outputs}}{{bindtype .Type}}{{end}}{{end}} {{.Normalized.Name}}(CallOpts opts{{range .Normalized.Inputs}}, {{bindtype .Type}} {{.Name}}{{end}}) throws Exception {
-				Interfaces args = Ssev.newInterfaces({{(len .Normalized.Inputs)}});
-				{{range $index, $item := .Normalized.Inputs}}args.set({{$index}}, Ssev.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
+				Interfaces args = Seth.newInterfaces({{(len .Normalized.Inputs)}});
+				{{range $index, $item := .Normalized.Inputs}}args.set({{$index}}, Seth.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
 				{{end}}
 
-				Interfaces results = Ssev.newInterfaces({{(len .Normalized.Outputs)}});
-				{{range $index, $item := .Normalized.Outputs}}Interface result{{$index}} = Ssev.newInterface(); result{{$index}}.setDefault{{namedtype (bindtype .Type) .Type}}(); results.set({{$index}}, result{{$index}});
+				Interfaces results = Seth.newInterfaces({{(len .Normalized.Outputs)}});
+				{{range $index, $item := .Normalized.Outputs}}Interface result{{$index}} = Seth.newInterface(); result{{$index}}.setDefault{{namedtype (bindtype .Type) .Type}}(); results.set({{$index}}, result{{$index}});
 				{{end}}
 
 				if (opts == null) {
-					opts = Ssev.newCallOpts();
+					opts = Seth.newCallOpts();
 				}
 				this.Contract.call(opts, results, "{{.Original.Name}}", args);
 				{{if gt (len .Normalized.Outputs) 1}}
@@ -530,12 +530,12 @@ import org.severeum.ssev.internal.*;
 		{{end}}
 
 		{{range .Transacts}}
-			// {{.Normalized.Name}} is a paid mutator transaction binding the contract msevod 0x{{printf "%x" .Original.Id}}.
+			// {{.Normalized.Name}} is a paid mutator transaction binding the contract method 0x{{printf "%x" .Original.Id}}.
 			//
 			// Solidity: {{.Original.String}}
 			public Transaction {{.Normalized.Name}}(TransactOpts opts{{range .Normalized.Inputs}}, {{bindtype .Type}} {{.Name}}{{end}}) throws Exception {
-				Interfaces args = Ssev.newInterfaces({{(len .Normalized.Inputs)}});
-				{{range $index, $item := .Normalized.Inputs}}args.set({{$index}}, Ssev.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
+				Interfaces args = Seth.newInterfaces({{(len .Normalized.Inputs)}});
+				{{range $index, $item := .Normalized.Inputs}}args.set({{$index}}, Seth.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
 				{{end}}
 
 				return this.Contract.transact(opts, "{{.Original.Name}}"	, args);

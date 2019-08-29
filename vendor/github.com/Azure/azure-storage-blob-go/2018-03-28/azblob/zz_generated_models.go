@@ -3116,8 +3116,8 @@ func (csmr ContainerSetMetadataResponse) Version() string {
 type CorsRule struct {
 	// AllowedOrigins - The origin domains that are permitted to make a request against the storage service via CORS. The origin domain is the domain from which the request originates. Note that the origin must be an exact case-sensitive match with the origin that the user age sends to the service. You can also use the wildcard character '*' to allow all origin domains to make requests via CORS.
 	AllowedOrigins string `xml:"AllowedOrigins"`
-	// AllowedMsevods - The msevods (HTTP request verbs) that the origin domain may use for a CORS request. (comma separated)
-	AllowedMsevods string `xml:"AllowedMsevods"`
+	// AllowedMethods - The methods (HTTP request verbs) that the origin domain may use for a CORS request. (comma separated)
+	AllowedMethods string `xml:"AllowedMethods"`
 	// AllowedHeaders - the request headers that the origin domain may specify on the CORS request.
 	AllowedHeaders string `xml:"AllowedHeaders"`
 	// ExposedHeaders - The response headers that may be sent in the response to the CORS request and exposed by the browser to the request issuer
@@ -3572,11 +3572,11 @@ func (lcr ListContainersResponse) Version() string {
 type Logging struct {
 	// Version - The version of Storage Analytics to configure.
 	Version string `xml:"Version"`
-	// Delete - Indicates whsever all delete requests should be logged.
+	// Delete - Indicates whether all delete requests should be logged.
 	Delete bool `xml:"Delete"`
-	// Read - Indicates whsever all read requests should be logged.
+	// Read - Indicates whether all read requests should be logged.
 	Read bool `xml:"Read"`
-	// Write - Indicates whsever all write requests should be logged.
+	// Write - Indicates whether all write requests should be logged.
 	Write           bool            `xml:"Write"`
 	RetentionPolicy RetentionPolicy `xml:"RetentionPolicy"`
 }
@@ -3585,9 +3585,9 @@ type Logging struct {
 type Metrics struct {
 	// Version - The version of Storage Analytics to configure.
 	Version *string `xml:"Version"`
-	// Enabled - Indicates whsever metrics are enabled for the Blob service.
+	// Enabled - Indicates whether metrics are enabled for the Blob service.
 	Enabled bool `xml:"Enabled"`
-	// IncludeAPIs - Indicates whsever metrics should generate summary statistics for called API operations.
+	// IncludeAPIs - Indicates whether metrics should generate summary statistics for called API operations.
 	IncludeAPIs     *bool            `xml:"IncludeAPIs"`
 	RetentionPolicy *RetentionPolicy `xml:"RetentionPolicy"`
 }
@@ -4188,7 +4188,7 @@ type PageRange struct {
 
 // RetentionPolicy - the retention policy
 type RetentionPolicy struct {
-	// Enabled - Indicates whsever a retention policy is enabled for the storage service
+	// Enabled - Indicates whether a retention policy is enabled for the storage service
 	Enabled bool `xml:"Enabled"`
 	// Days - Indicates the number of days that metrics or logging or soft-deleted data should be retained. All data older than this value will be deleted
 	Days *int32 `xml:"Days"`

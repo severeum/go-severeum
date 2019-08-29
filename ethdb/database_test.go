@@ -16,7 +16,7 @@
 
 // +build !js
 
-package sevdb_test
+package ethdb_test
 
 import (
 	"bytes"
@@ -27,15 +27,15 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 )
 
-func newTestLDB() (*sevdb.LDBDatabase, func()) {
-	dirname, err := ioutil.TempDir(os.TempDir(), "sevdb_test_")
+func newTestLDB() (*ethdb.LDBDatabase, func()) {
+	dirname, err := ioutil.TempDir(os.TempDir(), "ethdb_test_")
 	if err != nil {
 		panic("failed to create test file: " + err.Error())
 	}
-	db, err := sevdb.NewLDBDatabase(dirname, 0, 0)
+	db, err := ethdb.NewLDBDatabase(dirname, 0, 0)
 	if err != nil {
 		panic("failed to create test database: " + err.Error())
 	}
@@ -55,10 +55,10 @@ func TestLDB_PutGet(t *testing.T) {
 }
 
 func TestMemoryDB_PutGet(t *testing.T) {
-	testPutGet(sevdb.NewMemDatabase(), t)
+	testPutGet(ethdb.NewMemDatabase(), t)
 }
 
-func testPutGet(db sevdb.Database, t *testing.T) {
+func testPutGet(db ethdb.Database, t *testing.T) {
 	t.Parallel()
 
 	for _, k := range test_values {
@@ -154,10 +154,10 @@ func TestLDB_ParallelPutGet(t *testing.T) {
 }
 
 func TestMemoryDB_ParallelPutGet(t *testing.T) {
-	testParallelPutGet(sevdb.NewMemDatabase(), t)
+	testParallelPutGet(ethdb.NewMemDatabase(), t)
 }
 
-func testParallelPutGet(db sevdb.Database, t *testing.T) {
+func testParallelPutGet(db ethdb.Database, t *testing.T) {
 	const n = 8
 	var pending sync.WaitGroup
 

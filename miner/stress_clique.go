@@ -34,8 +34,8 @@ import (
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sev"
-	"github.com/severeum/go-severeum/sev/downloader"
+	"github.com/severeum/go-severeum/eth"
+	"github.com/severeum/go-severeum/eth/downloader"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/node"
 	"github.com/severeum/go-severeum/p2p"
@@ -96,7 +96,7 @@ func main() {
 	time.Sleep(3 * time.Second)
 
 	for _, node := range nodes {
-		var severeum *sev.Severeum
+		var severeum *eth.Severeum
 		if err := node.Service(&severeum); err != nil {
 			panic(err)
 		}
@@ -112,7 +112,7 @@ func main() {
 		index := rand.Intn(len(faucets))
 
 		// Fetch the accessor for the relevant signer
-		var severeum *sev.Severeum
+		var severeum *eth.Severeum
 		if err := nodes[index%len(nodes)].Service(&severeum); err != nil {
 			panic(err)
 		}
@@ -175,7 +175,7 @@ func makeSealer(genesis *core.Genesis) (*node.Node, error) {
 	datadir, _ := ioutil.TempDir("", "")
 
 	config := &node.Config{
-		Name:    "ssev",
+		Name:    "seth",
 		Version: params.Version,
 		DataDir: datadir,
 		P2P: p2p.Config{
@@ -191,14 +191,14 @@ func makeSealer(genesis *core.Genesis) (*node.Node, error) {
 		return nil, err
 	}
 	if err := stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
-		return sev.New(ctx, &sev.Config{
+		return eth.New(ctx, &eth.Config{
 			Genesis:         genesis,
 			NetworkId:       genesis.Config.ChainID.Uint64(),
 			SyncMode:        downloader.FullSync,
 			DatabaseCache:   256,
 			DatabaseHandles: 256,
 			TxPool:          core.DefaultTxPoolConfig,
-			GPO:             sev.DefaultConfig.GPO,
+			GPO:             eth.DefaultConfig.GPO,
 			MinerGasFloor:   genesis.GasLimit * 9 / 10,
 			MinerGasCeil:    genesis.GasLimit * 11 / 10,
 			MinerGasPrice:   big.NewInt(1),

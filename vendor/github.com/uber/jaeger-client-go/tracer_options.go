@@ -75,7 +75,7 @@ func (tracerOptions) RandomNumber(randomNumber func() uint64) TracerOption {
 	}
 }
 
-// PoolSpans creates a TracerOption that tells the tracer whsever it should use
+// PoolSpans creates a TracerOption that tells the tracer whether it should use
 // an object pool to minimize span allocations.
 // This should be used with care, only if the service is not running any async tasks
 // that can access parent spans after those spans have been finished.
@@ -86,7 +86,7 @@ func (tracerOptions) PoolSpans(poolSpans bool) TracerOption {
 }
 
 // Deprecated: HostIPv4 creates a TracerOption that identifies the current service/process.
-// If not set, the factory msevod will obtain the current IP address.
+// If not set, the factory method will obtain the current IP address.
 // The TracerOption is deprecated; the tracer will attempt to automatically detect the IP.
 func (tracerOptions) HostIPv4(hostIPv4 uint32) TracerOption {
 	return func(tracer *Tracer) {

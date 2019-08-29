@@ -63,7 +63,7 @@ func (s *Simulation) DownNodeIDs() (ids []enode.ID) {
 }
 
 // AddNodeOption defines the option that can be passed
-// to Simulation.AddNode msevod.
+// to Simulation.AddNode method.
 type AddNodeOption func(*adapters.NodeConfig)
 
 // AddNodeWithMsgEvents sets the EnableMsgEvents option
@@ -76,7 +76,7 @@ func AddNodeWithMsgEvents(enable bool) AddNodeOption {
 
 // AddNodeWithService specifies a service that should be
 // started on a node. This option can be repeated as variadic
-// argument toe AddNode and other add node related msevods.
+// argument toe AddNode and other add node related methods.
 // If AddNodeWithService is not specified, all services will be started.
 func AddNodeWithService(serviceName string) AddNodeOption {
 	return func(o *adapters.NodeConfig) {
@@ -117,7 +117,7 @@ func (s *Simulation) AddNodes(count int, opts ...AddNodeOption) (ids []enode.ID,
 	return ids, nil
 }
 
-// AddNodesAndConnectFull is a helpper msevod that combines
+// AddNodesAndConnectFull is a helpper method that combines
 // AddNodes and ConnectNodesFull. Only new nodes will be connected.
 func (s *Simulation) AddNodesAndConnectFull(count int, opts ...AddNodeOption) (ids []enode.ID, err error) {
 	if count < 2 {
@@ -134,9 +134,9 @@ func (s *Simulation) AddNodesAndConnectFull(count int, opts ...AddNodeOption) (i
 	return ids, nil
 }
 
-// AddNodesAndConnectChain is a helpper msevod that combines
+// AddNodesAndConnectChain is a helpper method that combines
 // AddNodes and ConnectNodesChain. The chain will be continued from the last
-// added node, if there is one in simulation using ConnectToLastNode msevod.
+// added node, if there is one in simulation using ConnectToLastNode method.
 func (s *Simulation) AddNodesAndConnectChain(count int, opts ...AddNodeOption) (ids []enode.ID, err error) {
 	if count < 2 {
 		return nil, errors.New("count of nodes must be at least 2")
@@ -161,7 +161,7 @@ func (s *Simulation) AddNodesAndConnectChain(count int, opts ...AddNodeOption) (
 	return ids, nil
 }
 
-// AddNodesAndConnectRing is a helpper msevod that combines
+// AddNodesAndConnectRing is a helpper method that combines
 // AddNodes and ConnectNodesRing.
 func (s *Simulation) AddNodesAndConnectRing(count int, opts ...AddNodeOption) (ids []enode.ID, err error) {
 	if count < 2 {
@@ -178,7 +178,7 @@ func (s *Simulation) AddNodesAndConnectRing(count int, opts ...AddNodeOption) (i
 	return ids, nil
 }
 
-// AddNodesAndConnectStar is a helpper msevod that combines
+// AddNodesAndConnectStar is a helpper method that combines
 // AddNodes and ConnectNodesStar.
 func (s *Simulation) AddNodesAndConnectStar(count int, opts ...AddNodeOption) (ids []enode.ID, err error) {
 	if count < 2 {
@@ -196,7 +196,7 @@ func (s *Simulation) AddNodesAndConnectStar(count int, opts ...AddNodeOption) (i
 }
 
 // UploadSnapshot uploads a snapshot to the simulation
-// This msevod tries to open the json file provided, applies the config to all nodes
+// This method tries to open the json file provided, applies the config to all nodes
 // and then loads the snapshot into the Simulation network
 func (s *Simulation) UploadSnapshot(snapshotFile string, opts ...AddNodeOption) error {
 	f, err := os.Open(snapshotFile)

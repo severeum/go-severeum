@@ -33,7 +33,7 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-// sshClient is a small wrapper around Go's SSH client with a few utility msevods
+// sshClient is a small wrapper around Go's SSH client with a few utility methods
 // implemented on top.
 type sshClient struct {
 	server  string // Server name or IP without port number
@@ -79,8 +79,8 @@ func dial(server string, pubkey []byte) (*sshClient, error) {
 	if username == "" {
 		username = user.Username
 	}
-	// Configure the supported authentication msevods (private key and password)
-	var auths []ssh.AuthMsevod
+	// Configure the supported authentication methods (private key and password)
+	var auths []ssh.AuthMethod
 
 	path := filepath.Join(user.HomeDir, ".ssh", identity)
 	if buf, err := ioutil.ReadFile(path); err != nil {
@@ -167,7 +167,7 @@ func dial(server string, pubkey []byte) (*sshClient, error) {
 }
 
 // init runs some initialization commands on the remote server to ensure it's
-// capable of acting as puppsev target.
+// capable of acting as puppeth target.
 func (client *sshClient) init() error {
 	client.logger.Debug("Verifying if docker is available")
 	if out, err := client.Run("docker version"); err != nil {

@@ -30,20 +30,20 @@ import (
 
 // explorerDockerfile is the Dockerfile required to run a block explorer.
 var explorerDockerfile = `
-FROM puppsev/explorer:latest
+FROM puppeth/explorer:latest
 
-ADD sevstats.json /sevstats.json
+ADD ethstats.json /ethstats.json
 ADD chain.json /chain.json
 
 RUN \
-  echo '(cd ../sev-net-intelligence-api && pm2 start /sevstats.json)' >  explorer.sh && \
-	echo '(cd ../severchain-light && npm start &)'                      >> explorer.sh && \
+  echo '(cd ../eth-net-intelligence-api && pm2 start /ethstats.json)' >  explorer.sh && \
+	echo '(cd ../etherchain-light && npm start &)'                      >> explorer.sh && \
 	echo 'exec /parity/parity --chain=/chain.json --port={{.NodePort}} --tracing=on --fat-db=on --pruning=archive' >> explorer.sh
 
 ENTRYPOINT ["/bin/sh", "explorer.sh"]
 `
 
-// explorerSevstats is the configuration file for the sevstats javascript client.
+// explorerSevstats is the configuration file for the ethstats javascript client.
 var explorerSevstats = `[
   {
     "name"              : "node-app",
@@ -111,14 +111,14 @@ func deployExplorer(client *sshClient, network string, chainspec []byte, config 
 	})
 	files[filepath.Join(workdir, "Dockerfile")] = dockerfile.Bytes()
 
-	sevstats := new(bytes.Buffer)
-	template.Must(template.New("").Parse(explorerSevstats)).Execute(sevstats, map[string]interface{}{
+	ethstats := new(bytes.Buffer)
+	template.Must(template.New("").Parse(explorerSevstats)).Execute(ethstats, map[string]interface{}{
 		"Port":   config.nodePort,
-		"Name":   config.sevstats[:strings.Index(config.sevstats, ":")],
-		"Secret": config.sevstats[strings.Index(config.sevstats, ":")+1 : strings.Index(config.sevstats, "@")],
-		"Host":   config.sevstats[strings.Index(config.sevstats, "@")+1:],
+		"Name":   config.ethstats[:strings.Index(config.ethstats, ":")],
+		"Secret": config.ethstats[strings.Index(config.ethstats, ":")+1 : strings.Index(config.ethstats, "@")],
+		"Host":   config.ethstats[strings.Index(config.ethstats, "@")+1:],
 	})
-	files[filepath.Join(workdir, "sevstats.json")] = sevstats.Bytes()
+	files[filepath.Join(workdir, "ethstats.json")] = ethstats.Bytes()
 
 	composefile := new(bytes.Buffer)
 	template.Must(template.New("").Parse(explorerComposefile)).Execute(composefile, map[string]interface{}{
@@ -127,7 +127,7 @@ func deployExplorer(client *sshClient, network string, chainspec []byte, config 
 		"NodePort": config.nodePort,
 		"VHost":    config.webHost,
 		"WebPort":  config.webPort,
-		"Sevstats": config.sevstats[:strings.Index(config.sevstats, ":")],
+		"Sevstats": config.ethstats[:strings.Index(config.ethstats, ":")],
 	})
 	files[filepath.Join(workdir, "docker-compose.yaml")] = composefile.Bytes()
 
@@ -150,7 +150,7 @@ func deployExplorer(client *sshClient, network string, chainspec []byte, config 
 // various configuration parameters.
 type explorerInfos struct {
 	datadir  string
-	sevstats string
+	ethstats string
 	nodePort int
 	webHost  string
 	webPort  int
@@ -162,7 +162,7 @@ func (info *explorerInfos) Report() map[string]string {
 	report := map[string]string{
 		"Data directory":         info.datadir,
 		"Node listener port ":    strconv.Itoa(info.nodePort),
-		"Sevstats username":      info.sevstats,
+		"Sevstats username":      info.ethstats,
 		"Website address ":       info.webHost,
 		"Website listener port ": strconv.Itoa(info.webPort),
 	}
@@ -170,7 +170,7 @@ func (info *explorerInfos) Report() map[string]string {
 }
 
 // checkExplorer does a health-check against a block explorer server to verify
-// whsever it's running, and if yes, whsever it's responsive.
+// whether it's running, and if yes, whether it's responsive.
 func checkExplorer(client *sshClient, network string) (*explorerInfos, error) {
 	// Inspect a possible block explorer container on the host
 	infos, err := inspectContainer(client, fmt.Sprintf("%s_explorer_1", network))
@@ -206,7 +206,7 @@ func checkExplorer(client *sshClient, network string) (*explorerInfos, error) {
 		nodePort: nodePort,
 		webHost:  host,
 		webPort:  webPort,
-		sevstats: infos.envvars["STATS"],
+		ethstats: infos.envvars["STATS"],
 	}
 	return stats, nil
 }

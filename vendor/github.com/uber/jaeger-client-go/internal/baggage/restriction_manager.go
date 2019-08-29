@@ -18,7 +18,7 @@ const (
 	defaultMaxValueLength = 2048
 )
 
-// Restriction determines whsever a baggage key is allowed and contains any restrictions on the baggage value.
+// Restriction determines whether a baggage key is allowed and contains any restrictions on the baggage value.
 type Restriction struct {
 	keyAllowed     bool
 	maxValueLength int
@@ -32,7 +32,7 @@ func NewRestriction(keyAllowed bool, maxValueLength int) *Restriction {
 	}
 }
 
-// KeyAllowed returns whsever the baggage key for this restriction is allowed.
+// KeyAllowed returns whether the baggage key for this restriction is allowed.
 func (r *Restriction) KeyAllowed() bool {
 	return r.keyAllowed
 }
@@ -43,7 +43,7 @@ func (r *Restriction) MaxValueLength() int {
 }
 
 // RestrictionManager keeps track of valid baggage keys and their restrictions. The manager
-// will return a Restriction for a specific baggage key which will determine whsever the baggage
+// will return a Restriction for a specific baggage key which will determine whether the baggage
 // key is allowed for the current service and any other applicable restrictions on the baggage
 // value.
 type RestrictionManager interface {

@@ -37,7 +37,7 @@ type Stream struct {
 	Name string
 	// Key is the name of specific stream data.
 	Key string
-	// Live defines whsever the stream delivers only new data
+	// Live defines whether the stream delivers only new data
 	// for the specific stream.
 	Live bool
 }
@@ -193,7 +193,7 @@ func (m OfferedHashesMsg) String() string {
 }
 
 // handleOfferedHashesMsg protocol msg handler calls the incoming streamer interface
-// Filter msevod
+// Filter method
 func (p *Peer) handleOfferedHashesMsg(ctx context.Context, req *OfferedHashesMsg) error {
 	metrics.GetOrRegisterCounter("peer.handleofferedhashes", nil).Inc(1)
 

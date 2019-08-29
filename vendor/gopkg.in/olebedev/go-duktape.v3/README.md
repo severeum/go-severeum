@@ -61,7 +61,7 @@ $
 
 ### Timers
 
-There is a msevod to inject timers to the global scope:
+There is a method to inject timers to the global scope:
 ```go
 package main
 
@@ -120,5 +120,5 @@ The package is not fully tested, so be careful.
 
 ### Contribution
 
-Pull requests are welcome! Also, if you want to discuss somseving send a pull request with proposal and changes.
+Pull requests are welcome! Also, if you want to discuss something send a pull request with proposal and changes.
 __Convention:__ fork the repository and make changes on your fork in a feature branch.

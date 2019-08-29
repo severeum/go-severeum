@@ -61,7 +61,7 @@ data_{i} := size(subtree_{i}) || key_{j} || key_{j+1} .... || key_{j+n-1}
 Tree chunker is a concrete implementation of data chunking.
 This chunker works in a simple way, it builds a tree out of the document so that each node either represents a chunk of real data or a chunk of data representing an branching non-leaf node of the tree. In particular each such non-leaf chunk will represent is a concatenation of the hash of its respective children. This scheme simultaneously guarantees data integrity as well as self addressing. Abstract nodes are transparent since their represented size component is strictly greater than their maximum data size, since they encode a subtree.
 
-If all is well it is possible to implement this by simply composing readers so that no extra allocation or buffering is necessary for the data splitting and joining. This means that in principle there can be direct IO between : memory, file system, network socket (bzz peers storage request is read from the socket). In practice there may be need for several stages of internal buffering.
+If all is well it is possible to implement this by simply composing readers so that no extra allocation or buffering is necessary for the data splitting and joining. This means that in principle there can be direct IO between : memory, file system, network socket (bzz peers storage request is read from the socket). In practice there may be need for etheral stages of internal buffering.
 The hashing itself does use extra copies and allocation though, since it does need it.
 */
 
@@ -86,7 +86,7 @@ type JoinerParams struct {
 	ChunkerParams
 	addr   Address
 	getter Getter
-	// TODO: there is a bug, so depth can only be 0 today, see: https://github.com/seversphere/go-severeum/issues/344
+	// TODO: there is a bug, so depth can only be 0 today, see: https://github.com/ethersphere/go-severeum/issues/344
 	depth int
 	ctx   context.Context
 }

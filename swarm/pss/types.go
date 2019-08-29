@@ -159,7 +159,7 @@ func (msg *PssMsg) String() string {
 }
 
 // Signature for a message handler function for a PssMsg
-// Implementations of this type are passed to Pss.Register tossever with a topic,
+// Implementations of this type are passed to Pss.Register tosether with a topic,
 type HandlerFunc func(msg []byte, p *p2p.Peer, asymmetric bool, keyid string) error
 
 type handlerCaps struct {
@@ -181,13 +181,13 @@ func NewHandler(f HandlerFunc) *handler {
 	}
 }
 
-// WithRaw is a chainable msevod that allows raw messages to be handled.
+// WithRaw is a chainable method that allows raw messages to be handled.
 func (h *handler) WithRaw() *handler {
 	h.caps.raw = true
 	return h
 }
 
-// WithProxBin is a chainable msevod that allows sending messages with full addresses to neighbourhoods using the kademlia depth as reference
+// WithProxBin is a chainable method that allows sending messages with full addresses to neighbourhoods using the kademlia depth as reference
 func (h *handler) WithProxBin() *handler {
 	h.caps.prox = true
 	return h

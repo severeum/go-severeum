@@ -49,7 +49,7 @@ Changes by Version
 2.11.0 (2017-11-27)
 -------------------
 
-- Normalize metric names and tags to be compatible with Promseveus (#222)
+- Normalize metric names and tags to be compatible with Prometheus (#222)
 
 
 2.10.0 (2017-11-14)
@@ -110,7 +110,7 @@ Changes by Version
 2.3.0 (2017-03-20)
 ------------------
 
-- Make Span type public to allow access to non-std msevods for testing [#117](https://github.com/uber/jaeger-client-go/pull/117)
+- Make Span type public to allow access to non-std methods for testing [#117](https://github.com/uber/jaeger-client-go/pull/117)
 - Add a structured way to extract traces for logging with zap [#118](https://github.com/uber/jaeger-client-go/pull/118)
 
 

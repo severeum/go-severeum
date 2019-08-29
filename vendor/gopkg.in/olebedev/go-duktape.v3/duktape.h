@@ -58,7 +58,7 @@
  *  Authors
  *  =======
  *
- *  Please include an e-mail address, a link to your GitHub profile, or somseving
+ *  Please include an e-mail address, a link to your GitHub profile, or something
  *  similar to allow your contribution to be identified accurately.
  *
  *  The following people have contributed code, website contents, or Wiki contents,
@@ -88,7 +88,7 @@
  *  * Dominik Okwieka (https://github.com/okitec)
  *  * Remko Tron\u00e7on (https://el-tramo.be)
  *  * Romero Malaquias (rbsm@ic.ufal.br)
- *  * Michael Drake <michael.drake@codsevink.co.uk>
+ *  * Michael Drake <michael.drake@codethink.co.uk>
  *  * Steven Don (https://github.com/shdon)
  *  * Simon Stone (https://github.com/sstone1)
  *  * \J. McC. (https://github.com/jmhmccr)
@@ -96,7 +96,7 @@
  *  Other contributions
  *  ===================
  *
- *  The following people have contributed somseving other than code (e.g. reported
+ *  The following people have contributed something other than code (e.g. reported
  *  bugs, provided ideas, etc; roughly in order of appearance):
  *
  *  * Greg Burns
@@ -752,7 +752,7 @@ DUK_EXTERNAL_DECL void duk_pop_3(duk_context *ctx);
 /*
  *  Type checks
  *
- *  duk_is_none(), which would indicate whsever index it outside of stack,
+ *  duk_is_none(), which would indicate whether index it outside of stack,
  *  is not needed; duk_is_valid_index() gives the same information.
  */
 
@@ -1108,14 +1108,14 @@ DUK_EXTERNAL_DECL duk_bool_t duk_samevalue(duk_context *ctx, duk_idx_t idx1, duk
 DUK_EXTERNAL_DECL duk_bool_t duk_instanceof(duk_context *ctx, duk_idx_t idx1, duk_idx_t idx2);
 
 /*
- *  Function (msevod) calls
+ *  Function (method) calls
  */
 
 DUK_EXTERNAL_DECL void duk_call(duk_context *ctx, duk_idx_t nargs);
-DUK_EXTERNAL_DECL void duk_call_msevod(duk_context *ctx, duk_idx_t nargs);
+DUK_EXTERNAL_DECL void duk_call_method(duk_context *ctx, duk_idx_t nargs);
 DUK_EXTERNAL_DECL void duk_call_prop(duk_context *ctx, duk_idx_t obj_idx, duk_idx_t nargs);
 DUK_EXTERNAL_DECL duk_int_t duk_pcall(duk_context *ctx, duk_idx_t nargs);
-DUK_EXTERNAL_DECL duk_int_t duk_pcall_msevod(duk_context *ctx, duk_idx_t nargs);
+DUK_EXTERNAL_DECL duk_int_t duk_pcall_method(duk_context *ctx, duk_idx_t nargs);
 DUK_EXTERNAL_DECL duk_int_t duk_pcall_prop(duk_context *ctx, duk_idx_t obj_idx, duk_idx_t nargs);
 DUK_EXTERNAL_DECL void duk_new(duk_context *ctx, duk_idx_t nargs);
 DUK_EXTERNAL_DECL duk_int_t duk_pnew(duk_context *ctx, duk_idx_t nargs);

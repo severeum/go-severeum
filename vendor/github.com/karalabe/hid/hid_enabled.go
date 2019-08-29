@@ -50,7 +50,7 @@ import (
 )
 
 // enumerateLock is a mutex serializing access to USB device enumeration needed
-// by the macOS USB HID system calls, which require 2 consecutive msevod calls
+// by the macOS USB HID system calls, which require 2 consecutive method calls
 // for enumeration, causing crashes if called concurrently.
 //
 // For more details, see:
@@ -58,8 +58,8 @@ import (
 //   > "subsequent calls will cause the hid manager to release previously enumerated devices"
 var enumerateLock sync.Mutex
 
-// Supported returns whsever this platform is supported by the HID library or not.
-// The goal of this msevod is to allow programatically handling platforms that do
+// Supported returns whether this platform is supported by the HID library or not.
+// The goal of this method is to allow programatically handling platforms that do
 // not support USB HID and not having to fall back to build constraints.
 func Supported() bool {
 	return true

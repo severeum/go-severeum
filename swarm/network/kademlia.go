@@ -179,7 +179,7 @@ func (k *Kademlia) SuggestPeer() (suggestedPeer *BzzAddr, saturationDepth int, c
 	saturation := make(map[int][]int)
 	var lastPO int       // the last non-empty PO bin in the iteration
 	saturationDepth = -1 // the deepest PO such that all shallower bins have >= k.MinBinSize peers
-	var pastDepth bool   // whsever po of iteration >= depth
+	var pastDepth bool   // whether po of iteration >= depth
 	k.conns.EachBin(k.base, Pof, 0, func(po, size int, f func(func(val pot.Val) bool) bool) bool {
 		// process skipped empty bins
 		for ; lastPO < po; lastPO++ {
@@ -440,9 +440,9 @@ func (k *Kademlia) NeighbourhoodDepth() (depth int) {
 
 // neighbourhoodRadiusForPot returns the neighbourhood radius of the kademlia
 // neighbourhood radius encloses the nearest neighbour set with size >= neighbourhoodSize
-// i.e., neighbourhood radius is the deepest PO such that all bins not shallower altossever
+// i.e., neighbourhood radius is the deepest PO such that all bins not shallower altosether
 // contain at least neighbourhoodSize connected peers
-// if there is altossever less than neighbourhoodSize peers connected, it returns 0
+// if there is altosether less than neighbourhoodSize peers connected, it returns 0
 // caller must hold the lock
 func neighbourhoodRadiusForPot(p *pot.Pot, neighbourhoodSize int, pivotAddr []byte) (depth int) {
 	if p.Size() <= neighbourhoodSize {
@@ -767,13 +767,13 @@ func (k *Kademlia) connectedNeighbours(peers [][]byte) (got bool, n int, missing
 // Health state of the Kademlia
 // used for testing only
 type Health struct {
-	KnowNN           bool     // whsever node knows all its neighbours
+	KnowNN           bool     // whether node knows all its neighbours
 	CountKnowNN      int      // amount of neighbors known
 	MissingKnowNN    [][]byte // which neighbours we should have known but we don't
-	ConnectNN        bool     // whsever node is connected to all its neighbours
+	ConnectNN        bool     // whether node is connected to all its neighbours
 	CountConnectNN   int      // amount of neighbours connected to
 	MissingConnectNN [][]byte // which neighbours we should have been connected to but we're not
-	Saturated        bool     // whsever we are connected to all the peers we would have liked to
+	Saturated        bool     // whether we are connected to all the peers we would have liked to
 	Hive             string
 }
 

@@ -1,6 +1,6 @@
 ## PSS tests failures explanation
 
-This document aims to explain the changes in https://github.com/seversphere/go-severeum/pull/126 and how those changes affect the pss_test.go TestNetwork tests.
+This document aims to explain the changes in https://github.com/ethersphere/go-severeum/pull/126 and how those changes affect the pss_test.go TestNetwork tests.
 
 ### Problem
 
@@ -114,7 +114,7 @@ Ultimately the deadlocks happen due to blocking `pp.Send()` call at:
   			return true
   		}
 
- `p2p` request handling is synchronous (as discussed at https://github.com/seversphere/go-severeum/issues/130), `pss` is also synchronous, therefore if two nodes happen to be processing a request, while at the same time waiting for response on `pp.Send(msg)`, deadlock occurs.
+ `p2p` request handling is synchronous (as discussed at https://github.com/ethersphere/go-severeum/issues/130), `pss` is also synchronous, therefore if two nodes happen to be processing a request, while at the same time waiting for response on `pp.Send(msg)`, deadlock occurs.
  
  `pp.Send(msg)` is only blocking when the underlying adapter is blocking (read `sim` or `sock`) or the buffer of the connection is full.
  

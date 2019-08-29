@@ -189,7 +189,7 @@ func (b BlobURL) ChangeLease(ctx context.Context, leaseID string, proposedID str
 		nil, ifModifiedSince, ifUnmodifiedSince, ifMatchETag, ifNoneMatchETag, nil)
 }
 
-// LeaseBreakNaturally tells ContainerURL's or BlobURL's BreakLease msevod to break the lease using service semantics.
+// LeaseBreakNaturally tells ContainerURL's or BlobURL's BreakLease method to break the lease using service semantics.
 const LeaseBreakNaturally = -1
 
 func leasePeriodPointer(period int32) (p *int32) {

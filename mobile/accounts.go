@@ -17,7 +17,7 @@
 // Contains all the wrappers from the accounts package to support client side key
 // management on mobile platforms.
 
-package ssev
+package seth
 
 import (
 	"errors"
@@ -93,7 +93,7 @@ func NewKeyStore(keydir string, scryptN, scryptP int) *KeyStore {
 	return &KeyStore{keystore: keystore.NewKeyStore(keydir, scryptN, scryptP)}
 }
 
-// HasAddress reports whsever a key with the given address is present.
+// HasAddress reports whether a key with the given address is present.
 func (ks *KeyStore) HasAddress(address *Address) bool {
 	return ks.keystore.HasAddress(address.address)
 }

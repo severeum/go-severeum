@@ -23,7 +23,7 @@ import (
 
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/params"
 	lru "github.com/hashicorp/golang-lru"
 )
@@ -34,13 +34,13 @@ type Vote struct {
 	Signer    common.Address `json:"signer"`    // Authorized signer that cast this vote
 	Block     uint64         `json:"block"`     // Block number the vote was cast in (expire old votes)
 	Address   common.Address `json:"address"`   // Account being voted on to change its authorization
-	Authorize bool           `json:"authorize"` // Whsever to authorize or deauthorize the voted account
+	Authorize bool           `json:"authorize"` // Whether to authorize or deauthorize the voted account
 }
 
 // Tally is a simple vote tally to keep the current score of votes. Votes that
 // go against the proposal aren't counted since it's equivalent to not voting.
 type Tally struct {
-	Authorize bool `json:"authorize"` // Whsever the vote is about authorizing or kicking someone
+	Authorize bool `json:"authorize"` // Whether the vote is about authorizing or kicking someone
 	Votes     int  `json:"votes"`     // Number of votes until now wanting to pass the proposal
 }
 
@@ -65,7 +65,7 @@ func (s signersAscending) Less(i, j int) bool { return bytes.Compare(s[i][:], s[
 func (s signersAscending) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 
 // newSnapshot creates a new snapshot with the specified startup parameters. This
-// msevod does not initialize the set of recent signers, so only ever use if for
+// method does not initialize the set of recent signers, so only ever use if for
 // the genesis block.
 func newSnapshot(config *params.CliqueConfig, sigcache *lru.ARCCache, number uint64, hash common.Hash, signers []common.Address) *Snapshot {
 	snap := &Snapshot{
@@ -84,7 +84,7 @@ func newSnapshot(config *params.CliqueConfig, sigcache *lru.ARCCache, number uin
 }
 
 // loadSnapshot loads an existing snapshot from the database.
-func loadSnapshot(config *params.CliqueConfig, sigcache *lru.ARCCache, db sevdb.Database, hash common.Hash) (*Snapshot, error) {
+func loadSnapshot(config *params.CliqueConfig, sigcache *lru.ARCCache, db ethdb.Database, hash common.Hash) (*Snapshot, error) {
 	blob, err := db.Get(append([]byte("clique-"), hash[:]...))
 	if err != nil {
 		return nil, err
@@ -100,7 +100,7 @@ func loadSnapshot(config *params.CliqueConfig, sigcache *lru.ARCCache, db sevdb.
 }
 
 // store inserts the snapshot into the database.
-func (s *Snapshot) store(db sevdb.Database) error {
+func (s *Snapshot) store(db ethdb.Database) error {
 	blob, err := json.Marshal(s)
 	if err != nil {
 		return err
@@ -134,7 +134,7 @@ func (s *Snapshot) copy() *Snapshot {
 	return cpy
 }
 
-// validVote returns whsever it makes sense to cast the specified vote in the
+// validVote returns whether it makes sense to cast the specified vote in the
 // given snapshot context (e.g. don't try to add an already authorized signer).
 func (s *Snapshot) validVote(address common.Address, authorize bool) bool {
 	_, signer := s.Signers[address]

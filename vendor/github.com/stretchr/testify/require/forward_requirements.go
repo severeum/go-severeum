@@ -1,6 +1,6 @@
 package require
 
-// Assertions provides assertion msevods around the
+// Assertions provides assertion methods around the
 // TestingT interface.
 type Assertions struct {
 	t TestingT

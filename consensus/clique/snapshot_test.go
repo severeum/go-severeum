@@ -27,7 +27,7 @@ import (
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/core/vm"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/params"
 )
 
@@ -400,7 +400,7 @@ func TestClique(t *testing.T) {
 			copy(genesis.ExtraData[extraVanity+j*common.AddressLength:], signer[:])
 		}
 		// Create a pristine blockchain with the genesis injected
-		db := sevdb.NewMemDatabase()
+		db := ethdb.NewMemDatabase()
 		genesis.Commit(db)
 
 		// Assemble a chain of headers from the cast votes
@@ -423,7 +423,7 @@ func TestClique(t *testing.T) {
 		})
 		// Iterate through the blocks and seal them individually
 		for j, block := range blocks {
-			// Ssev the header and prepare it for signing
+			// Seth the header and prepare it for signing
 			header := block.Header()
 			if j > 0 {
 				header.ParentHash = blocks[j-1].Hash()

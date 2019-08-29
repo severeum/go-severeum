@@ -37,11 +37,11 @@ func verify(t *testing.T, jsondata, calldata string, exp []interface{}) {
 	}
 	cd := common.Hex2Bytes(calldata)
 	sigdata, argdata := cd[:4], cd[4:]
-	msevod, err := abispec.MsevodById(sigdata)
+	method, err := abispec.MethodById(sigdata)
 	if err != nil {
 		t.Fatal(err)
 	}
-	data, err := msevod.Inputs.UnpackValues(argdata)
+	data, err := method.Inputs.UnpackValues(argdata)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -178,7 +178,7 @@ func TestSelectorUnmarshalling(t *testing.T) {
 	fmt.Printf("DB size %v\n", db.Size())
 	for id, selector := range db.db {
 
-		abistring, err = MsevodSelectorToAbi(selector)
+		abistring, err = MethodSelectorToAbi(selector)
 		if err != nil {
 			t.Error(err)
 			return
@@ -188,7 +188,7 @@ func TestSelectorUnmarshalling(t *testing.T) {
 			t.Error(err)
 			return
 		}
-		m, err := abistruct.MsevodById(common.Hex2Bytes(id[2:]))
+		m, err := abistruct.MethodById(common.Hex2Bytes(id[2:]))
 		if err != nil {
 			t.Error(err)
 			return
@@ -213,14 +213,14 @@ func TestCustomABI(t *testing.T) {
 	// Now we'll remove all existing signatures
 	abidb.db = make(map[string]string)
 	calldata := common.Hex2Bytes("a52c101edeadbeef")
-	_, err = abidb.LookupMsevodSelector(calldata)
+	_, err = abidb.LookupMethodSelector(calldata)
 	if err == nil {
 		t.Fatalf("Should not find a match on empty db")
 	}
 	if err = abidb.AddSignature("send(uint256)", calldata); err != nil {
 		t.Fatalf("Failed to save file: %v", err)
 	}
-	_, err = abidb.LookupMsevodSelector(calldata)
+	_, err = abidb.LookupMethodSelector(calldata)
 	if err != nil {
 		t.Fatalf("Should find a match for abi signature, got: %v", err)
 	}
@@ -229,7 +229,7 @@ func TestCustomABI(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create new abidb: %v", err)
 	}
-	_, err = abidb2.LookupMsevodSelector(calldata)
+	_, err = abidb2.LookupMethodSelector(calldata)
 	if err != nil {
 		t.Fatalf("Save failed: should find a match for abi signature after loading from disk")
 	}

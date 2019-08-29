@@ -41,7 +41,7 @@ func (p *Prque) Remove(i int) interface{} {
 	return heap.Remove(p.cont, i)
 }
 
-// Checks whsever the priority queue is empty.
+// Checks whether the priority queue is empty.
 func (p *Prque) Empty() bool {
 	return p.cont.Len() == 0
 }

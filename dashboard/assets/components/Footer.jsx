@@ -160,7 +160,7 @@ class Footer extends Component<Props> {
 				</Grid>
 				<Grid item >
 					<Typography type='caption' color='inherit'>
-						<span style={commonStyles.light}>Ssev</span> {general.version}
+						<span style={commonStyles.light}>Seth</span> {general.version}
 					</Typography>
 					{general.commit && (
 						<Typography type='caption' color='inherit'>

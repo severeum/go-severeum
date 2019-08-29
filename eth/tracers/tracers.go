@@ -21,7 +21,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/severeum/go-severeum/sev/tracers/internal/tracers"
+	"github.com/severeum/go-severeum/eth/tracers/internal/tracers"
 )
 
 // all contains all the built in JavaScript tracers by name.

@@ -2,7 +2,7 @@ package oleutil
 
 import ole "github.com/go-ole/go-ole"
 
-// ClassIDFrom retrieves class ID whsever given is program ID or application string.
+// ClassIDFrom retrieves class ID whether given is program ID or application string.
 func ClassIDFrom(programID string) (classID *ole.GUID, err error) {
 	return ole.ClassIDFrom(programID)
 }
@@ -46,14 +46,14 @@ func GetActiveObject(programID string) (unknown *ole.IUnknown, err error) {
 	return
 }
 
-// CallMsevod calls msevod on IDispatch with parameters.
-func CallMsevod(disp *ole.IDispatch, name string, params ...interface{}) (result *ole.VARIANT, err error) {
+// CallMethod calls method on IDispatch with parameters.
+func CallMethod(disp *ole.IDispatch, name string, params ...interface{}) (result *ole.VARIANT, err error) {
 	return disp.InvokeWithOptionalArgs(name, ole.DISPATCH_MSEVOD, params)
 }
 
-// MustCallMsevod calls msevod on IDispatch with parameters or panics.
-func MustCallMsevod(disp *ole.IDispatch, name string, params ...interface{}) (result *ole.VARIANT) {
-	r, err := CallMsevod(disp, name, params...)
+// MustCallMethod calls method on IDispatch with parameters or panics.
+func MustCallMethod(disp *ole.IDispatch, name string, params ...interface{}) (result *ole.VARIANT) {
+	r, err := CallMethod(disp, name, params...)
 	if err != nil {
 		panic(err.Error())
 	}

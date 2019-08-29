@@ -69,7 +69,7 @@ func (srv *Server) WebsocketHandler(allowedOrigins []string) http.Handler {
 			decoder := func(v interface{}) error {
 				return websocketJSONCodec.Receive(conn, v)
 			}
-			srv.ServeCodec(NewCodec(conn, encoder, decoder), OptionMsevodInvocation|OptionSubscriptions)
+			srv.ServeCodec(NewCodec(conn, encoder, decoder), OptionMethodInvocation|OptionSubscriptions)
 		},
 	}
 }

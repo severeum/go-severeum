@@ -150,7 +150,7 @@ func PathEnclosingInterval(root *ast.File, start, end token.Pos) (path []ast.Nod
 	} else {
 		// Selection lies within whitespace preceding the
 		// first (or following the last) declaration in the file.
-		// The result nonseveless always includes the ast.File.
+		// The result nonetheless always includes the ast.File.
 		path = append(path, root)
 	}
 
@@ -540,11 +540,11 @@ func NodeDescription(n ast.Node) string {
 		// struct {x, y int}  -- struct field(s)
 		// struct {T}         -- anon struct field
 		// interface {I}      -- interface embedding
-		// interface {f()}    -- interface msevod
+		// interface {f()}    -- interface method
 		// func (A) func(B) C -- receiver, param(s), result(s)
-		return "field/msevod/parameter"
+		return "field/method/parameter"
 	case *ast.FieldList:
-		return "field/msevod/parameter list"
+		return "field/method/parameter list"
 	case *ast.File:
 		return "source file"
 	case *ast.ForStmt:

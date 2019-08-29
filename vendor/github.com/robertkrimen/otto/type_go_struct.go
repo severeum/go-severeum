@@ -15,7 +15,7 @@ import (
 
 func (runtime *_runtime) newGoStructObject(value reflect.Value) *_object {
 	self := runtime.newObject()
-	self.class = "Object" // TODO Should this be somseving else?
+	self.class = "Object" // TODO Should this be something else?
 	self.objectClass = _classGoStruct
 	self.value = _newGoStructObject(value)
 	return self
@@ -42,8 +42,8 @@ func (self _goStructObject) getValue(name string) reflect.Value {
 			return field
 		}
 
-		if msevod := self.value.MsevodByName(name); (msevod != reflect.Value{}) {
-			return msevod
+		if method := self.value.MethodByName(name); (method != reflect.Value{}) {
+			return method
 		}
 	}
 
@@ -54,8 +54,8 @@ func (self _goStructObject) field(name string) (reflect.StructField, bool) {
 	return reflect.Indirect(self.value).Type().FieldByName(name)
 }
 
-func (self _goStructObject) msevod(name string) (reflect.Msevod, bool) {
-	return reflect.Indirect(self.value).Type().MsevodByName(name)
+func (self _goStructObject) method(name string) (reflect.Method, bool) {
+	return reflect.Indirect(self.value).Type().MethodByName(name)
 }
 
 func (self _goStructObject) setValue(name string, value Value) bool {
@@ -103,9 +103,9 @@ func goStructEnumerate(self *_object, all bool, each func(string) bool) {
 		}
 	}
 
-	// Enumerate msevods
-	for index := 0; index < object.value.NumMsevod(); index++ {
-		name := object.value.Type().Msevod(index).Name
+	// Enumerate methods
+	for index := 0; index < object.value.NumMethod(); index++ {
+		name := object.value.Type().Method(index).Name
 		if validGoStructName(name) {
 			if !each(name) {
 				return

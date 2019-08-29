@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"github.com/severeum/go-severeum/cmd/utils"
-	ssevmetrics "github.com/severeum/go-severeum/metrics"
+	sethmetrics "github.com/severeum/go-severeum/metrics"
 	"github.com/severeum/go-severeum/metrics/influxdb"
 	"github.com/severeum/go-severeum/swarm/log"
 	"gopkg.in/urfave/cli.v1"
@@ -74,7 +74,7 @@ var Flags = []cli.Flag{
 }
 
 func Setup(ctx *cli.Context) {
-	if ssevmetrics.Enabled {
+	if sethmetrics.Enabled {
 		log.Info("Enabling swarm metrics collection")
 		var (
 			enableExport = ctx.GlobalBool(MetricsEnableInfluxDBExportFlag.Name)
@@ -86,11 +86,11 @@ func Setup(ctx *cli.Context) {
 		)
 
 		// Start system runtime metrics collection
-		go ssevmetrics.CollectProcessMetrics(2 * time.Second)
+		go sethmetrics.CollectProcessMetrics(2 * time.Second)
 
 		if enableExport {
 			log.Info("Enabling swarm metrics export to InfluxDB")
-			go influxdb.InfluxDBWithTags(ssevmetrics.DefaultRegistry, 10*time.Second, endpoint, database, username, password, "swarm.", map[string]string{
+			go influxdb.InfluxDBWithTags(sethmetrics.DefaultRegistry, 10*time.Second, endpoint, database, username, password, "swarm.", map[string]string{
 				"host": hosttag,
 			})
 		}

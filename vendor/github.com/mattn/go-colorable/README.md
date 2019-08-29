@@ -27,7 +27,7 @@ logrus.SetOutput(colorable.NewColorableStdout())
 
 logrus.Info("succeeded")
 logrus.Warn("not correct")
-logrus.Error("somseving error")
+logrus.Error("something error")
 logrus.Fatal("panic")
 ```
 

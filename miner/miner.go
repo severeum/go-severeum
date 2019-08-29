@@ -27,13 +27,13 @@ import (
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/state"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sev/downloader"
+	"github.com/severeum/go-severeum/eth/downloader"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/params"
 )
 
-// Backend wraps all msevods required for mining.
+// Backend wraps all methods required for mining.
 type Backend interface {
 	BlockChain() *core.BlockChain
 	TxPool() *core.TxPool
@@ -44,21 +44,21 @@ type Miner struct {
 	mux      *event.TypeMux
 	worker   *worker
 	coinbase common.Address
-	sev      Backend
+	eth      Backend
 	engine   consensus.Engine
 	exitCh   chan struct{}
 
-	canStart    int32 // can start indicates whsever we can start the mining operation
-	shouldStart int32 // should start indicates whsever we should start after sync
+	canStart    int32 // can start indicates whether we can start the mining operation
+	shouldStart int32 // should start indicates whether we should start after sync
 }
 
-func New(sev Backend, config *params.ChainConfig, mux *event.TypeMux, engine consensus.Engine, recommit time.Duration, gasFloor, gasCeil uint64, isLocalBlock func(block *types.Block) bool) *Miner {
+func New(eth Backend, config *params.ChainConfig, mux *event.TypeMux, engine consensus.Engine, recommit time.Duration, gasFloor, gasCeil uint64, isLocalBlock func(block *types.Block) bool) *Miner {
 	miner := &Miner{
-		sev:      sev,
+		eth:      eth,
 		mux:      mux,
 		engine:   engine,
 		exitCh:   make(chan struct{}),
-		worker:   newWorker(config, engine, sev, mux, recommit, gasFloor, gasCeil, isLocalBlock),
+		worker:   newWorker(config, engine, eth, mux, recommit, gasFloor, gasCeil, isLocalBlock),
 		canStart: 1,
 	}
 	go miner.update()
@@ -159,7 +159,7 @@ func (self *Miner) Pending() (*types.Block, *state.StateDB) {
 //
 // Note, to access both the pending block and the pending state
 // simultaneously, please use Pending(), as the pending state can
-// change between multiple msevod calls
+// change between multiple method calls
 func (self *Miner) PendingBlock() *types.Block {
 	return self.worker.pendingBlock()
 }

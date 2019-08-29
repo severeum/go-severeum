@@ -25,7 +25,7 @@ import (
 
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 )
 
 func init() {
@@ -34,18 +34,18 @@ func init() {
 
 // makeProvers creates Merkle trie provers based on different implementations to
 // test all variations.
-func makeProvers(trie *Trie) []func(key []byte) *sevdb.MemDatabase {
-	var provers []func(key []byte) *sevdb.MemDatabase
+func makeProvers(trie *Trie) []func(key []byte) *ethdb.MemDatabase {
+	var provers []func(key []byte) *ethdb.MemDatabase
 
 	// Create a direct trie based Merkle prover
-	provers = append(provers, func(key []byte) *sevdb.MemDatabase {
-		proof := sevdb.NewMemDatabase()
+	provers = append(provers, func(key []byte) *ethdb.MemDatabase {
+		proof := ethdb.NewMemDatabase()
 		trie.Prove(key, 0, proof)
 		return proof
 	})
 	// Create a leaf iterator based Merkle prover
-	provers = append(provers, func(key []byte) *sevdb.MemDatabase {
-		proof := sevdb.NewMemDatabase()
+	provers = append(provers, func(key []byte) *ethdb.MemDatabase {
+		proof := ethdb.NewMemDatabase()
 		if it := NewIterator(trie.NodeIterator(key)); it.Next() && bytes.Equal(key, it.Key) {
 			for _, p := range it.Prove() {
 				proof.Put(crypto.Keccak256(p), p)
@@ -127,7 +127,7 @@ func TestMissingKeyProof(t *testing.T) {
 	updateString(trie, "k", "v")
 
 	for i, key := range []string{"a", "j", "l", "z"} {
-		proof := sevdb.NewMemDatabase()
+		proof := ethdb.NewMemDatabase()
 		trie.Prove([]byte(key), 0, proof)
 
 		if proof.Len() != 1 {
@@ -164,7 +164,7 @@ func BenchmarkProve(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		kv := vals[keys[i%len(keys)]]
-		proofs := sevdb.NewMemDatabase()
+		proofs := ethdb.NewMemDatabase()
 		if trie.Prove(kv.k, 0, proofs); len(proofs.Keys()) == 0 {
 			b.Fatalf("zero length proof for %x", kv.k)
 		}
@@ -175,10 +175,10 @@ func BenchmarkVerifyProof(b *testing.B) {
 	trie, vals := randomTrie(100)
 	root := trie.Hash()
 	var keys []string
-	var proofs []*sevdb.MemDatabase
+	var proofs []*ethdb.MemDatabase
 	for k := range vals {
 		keys = append(keys, k)
-		proof := sevdb.NewMemDatabase()
+		proof := ethdb.NewMemDatabase()
 		trie.Prove([]byte(k), 0, proof)
 		proofs = append(proofs, proof)
 	}

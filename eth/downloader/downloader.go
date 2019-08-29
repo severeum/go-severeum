@@ -29,7 +29,7 @@ import (
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/core/rawdb"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/metrics"
@@ -56,7 +56,7 @@ var (
 	qosConfidenceCap = 10   // Number of peers above which not to modify RTT confidence
 	qosTuningImpact  = 0.25 // Impact that a new tuning target has on the previous value
 
-	maxQueuedHeaders  = 32 * 1024 // [sev/62] Maximum number of headers to queue for import (DOS protection)
+	maxQueuedHeaders  = 32 * 1024 // [eth/62] Maximum number of headers to queue for import (DOS protection)
 	maxHeadersProcess = 2048      // Number of header download results to import at once into the chain
 	maxResultsProcess = 2048      // Number of content download results to import at once into the chain
 
@@ -102,7 +102,7 @@ type Downloader struct {
 	genesis uint64   // Genesis block number to limit sync to (e.g. light client CHT)
 	queue   *queue   // Scheduler for selecting the hashes to download
 	peers   *peerSet // Set of active peers from which download can proceed
-	stateDB sevdb.Database
+	stateDB ethdb.Database
 
 	rttEstimate   uint64 // Round trip time to target for download requests
 	rttConfidence uint64 // Confidence in the estimated RTT (unit: millionths to allow atomic ops)
@@ -126,17 +126,17 @@ type Downloader struct {
 	committed       int32
 
 	// Channels
-	headerCh      chan dataPack        // [sev/62] Channel receiving inbound block headers
-	bodyCh        chan dataPack        // [sev/62] Channel receiving inbound block bodies
-	receiptCh     chan dataPack        // [sev/63] Channel receiving inbound receipts
-	bodyWakeCh    chan bool            // [sev/62] Channel to signal the block body fetcher of new tasks
-	receiptWakeCh chan bool            // [sev/63] Channel to signal the receipt fetcher of new tasks
-	headerProcCh  chan []*types.Header // [sev/62] Channel to feed the header processor new tasks
+	headerCh      chan dataPack        // [eth/62] Channel receiving inbound block headers
+	bodyCh        chan dataPack        // [eth/62] Channel receiving inbound block bodies
+	receiptCh     chan dataPack        // [eth/63] Channel receiving inbound receipts
+	bodyWakeCh    chan bool            // [eth/62] Channel to signal the block body fetcher of new tasks
+	receiptWakeCh chan bool            // [eth/63] Channel to signal the receipt fetcher of new tasks
+	headerProcCh  chan []*types.Header // [eth/62] Channel to feed the header processor new tasks
 
 	// for stateFetcher
 	stateSyncStart chan *stateSync
 	trackStateReq  chan *stateReq
-	stateCh        chan dataPack // [sev/63] Channel receiving inbound node state data
+	stateCh        chan dataPack // [eth/63] Channel receiving inbound node state data
 
 	// Cancellation and termination
 	cancelPeer string         // Identifier of the peer currently being used as the master (cancel on drop)
@@ -148,10 +148,10 @@ type Downloader struct {
 	quitLock sync.RWMutex  // Lock to prevent double closes
 
 	// Testing hooks
-	syncInitHook     func(uint64, uint64)  // Msevod to call upon initiating a new sync run
-	bodyFetchHook    func([]*types.Header) // Msevod to call upon starting a block body fetch
-	receiptFetchHook func([]*types.Header) // Msevod to call upon starting a receipt fetch
-	chainInsertHook  func([]*fetchResult)  // Msevod to call upon inserting a chain of blocks (possibly in multiple invocations)
+	syncInitHook     func(uint64, uint64)  // Method to call upon initiating a new sync run
+	bodyFetchHook    func([]*types.Header) // Method to call upon starting a block body fetch
+	receiptFetchHook func([]*types.Header) // Method to call upon starting a receipt fetch
+	chainInsertHook  func([]*fetchResult)  // Method to call upon inserting a chain of blocks (possibly in multiple invocations)
 }
 
 // LightChain encapsulates functions required to synchronise a light chain.
@@ -205,7 +205,7 @@ type BlockChain interface {
 }
 
 // New creates a new downloader to fetch hashes and blocks from remote peers.
-func New(mode SyncMode, stateDb sevdb.Database, mux *event.TypeMux, chain BlockChain, lightchain LightChain, dropPeer peerDropFn) *Downloader {
+func New(mode SyncMode, stateDb ethdb.Database, mux *event.TypeMux, chain BlockChain, lightchain LightChain, dropPeer peerDropFn) *Downloader {
 	if lightchain == nil {
 		lightchain = chain
 	}
@@ -270,7 +270,7 @@ func (d *Downloader) Progress() severeum.SyncProgress {
 	}
 }
 
-// Synchronising returns whsever the downloader is currently retrieving blocks.
+// Synchronising returns whether the downloader is currently retrieving blocks.
 func (d *Downloader) Synchronising() bool {
 	return atomic.LoadInt32(&d.synchronising) > 0
 }
@@ -331,7 +331,7 @@ func (d *Downloader) Synchronise(id string, head common.Hash, td *big.Int, mode 
 		errInvalidAncestor, errInvalidChain:
 		log.Warn("Synchronisation failed, dropping peer", "peer", id, "err", err)
 		if d.dropPeer == nil {
-			// The dropPeer msevod is nil when `--copydb` is used for a local copy.
+			// The dropPeer method is nil when `--copydb` is used for a local copy.
 			// Timeouts can occur if e.g. compaction hits at the wrong time, and can be ignored
 			log.Warn("Downloader wants to drop peer, but peerdrop-function is not set", "peer", id)
 		} else {
@@ -345,7 +345,7 @@ func (d *Downloader) Synchronise(id string, head common.Hash, td *big.Int, mode 
 
 // synchronise will select the peer and use it for synchronising. If an empty string is given
 // it will use the best peer possible and synchronize if its TD is higher than our own. If any of the
-// checks fail an error will be returned. This msevod is synchronous
+// checks fail an error will be returned. This method is synchronous
 func (d *Downloader) synchronise(id string, hash common.Hash, td *big.Int, mode SyncMode) error {
 	// Mock out the synchronisation if testing
 	if d.synchroniseMock != nil {
@@ -422,7 +422,7 @@ func (d *Downloader) syncWithPeer(p *peerConnection, hash common.Hash, td *big.I
 		return errTooOld
 	}
 
-	log.Debug("Synchronising with the network", "peer", p.id, "sev", p.version, "head", hash, "td", td, "mode", d.mode)
+	log.Debug("Synchronising with the network", "peer", p.id, "eth", p.version, "head", hash, "td", td, "mode", d.mode)
 	defer func(start time.Time) {
 		log.Debug("Synchronisation terminated", "elapsed", time.Since(start))
 	}(time.Now())
@@ -509,7 +509,7 @@ func (d *Downloader) spawnSync(fetchers []func() error) error {
 }
 
 // cancel aborts all of the operations and resets the queue. However, cancel does
-// not wait for the running download goroutines to finish. This msevod should be
+// not wait for the running download goroutines to finish. This method should be
 // used when cancelling the downloads from inside the downloader.
 func (d *Downloader) cancel() {
 	// Close the current cancel channel
@@ -570,7 +570,7 @@ func (d *Downloader) fetchHeight(p *peerConnection) (*types.Header, error) {
 				log.Debug("Received headers from incorrect peer", "peer", packet.PeerId())
 				break
 			}
-			// Make sure the peer actually gave somseving valid
+			// Make sure the peer actually gave something valid
 			headers := packet.(*headerPack).headers
 			if len(headers) != 1 {
 				p.log.Debug("Multiple headers for single request", "headers", len(headers))
@@ -710,7 +710,7 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 				log.Debug("Received headers from incorrect peer", "peer", packet.PeerId())
 				break
 			}
-			// Make sure the peer actually gave somseving valid
+			// Make sure the peer actually gave something valid
 			headers := packet.(*headerPack).headers
 			if len(headers) == 0 {
 				p.log.Warn("Empty head header set")
@@ -796,7 +796,7 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 					log.Debug("Received headers from incorrect peer", "peer", packer.PeerId())
 					break
 				}
-				// Make sure the peer actually gave somseving valid
+				// Make sure the peer actually gave something valid
 				headers := packer.(*headerPack).headers
 				if len(headers) != 1 {
 					p.log.Debug("Multiple headers for single request", "headers", len(headers))
@@ -987,7 +987,7 @@ func (d *Downloader) fetchHeaders(p *peerConnection, from uint64, pivot uint64) 
 
 		case <-timeout.C:
 			if d.dropPeer == nil {
-				// The dropPeer msevod is nil when `--copydb` is used for a local copy.
+				// The dropPeer method is nil when `--copydb` is used for a local copy.
 				// Timeouts can occur if e.g. compaction hits at the wrong time, and can be ignored
 				p.log.Warn("Downloader wants to drop peer, but peerdrop-function is not set", "peer", p.id)
 				break
@@ -1020,7 +1020,7 @@ func (d *Downloader) fetchHeaders(p *peerConnection, from uint64, pivot uint64) 
 // immediately to the header processor to keep the rest of the pipeline full even
 // in the case of header stalls.
 //
-// The msevod returns the entire filled skeleton and also the number of headers
+// The method returns the entire filled skeleton and also the number of headers
 // already forwarded for processing.
 func (d *Downloader) fillHeaderSkeleton(from uint64, skeleton []*types.Header) ([]*types.Header, int, error) {
 	log.Debug("Filling up skeleton", "from", from)
@@ -1103,7 +1103,7 @@ func (d *Downloader) fetchReceipts(from uint64) error {
 // also periodically checking for timeouts.
 //
 // As the scheduling/timeout logic mostly is the same for all downloaded data
-// types, this msevod is used by each for data gathering and is instrumented with
+// types, this method is used by each for data gathering and is instrumented with
 // various callbacks to handle the slight differences between processing them.
 //
 // The instrumentation parameters:
@@ -1111,7 +1111,7 @@ func (d *Downloader) fetchReceipts(from uint64) error {
 //  - deliveryCh:  channel from which to retrieve downloaded data packets (merged from all concurrent peers)
 //  - deliver:     processing callback to deliver data packets into type specific download queues (usually within `queue`)
 //  - wakeCh:      notification channel for waking the fetcher when new tasks are available (or sync completed)
-//  - expire:      task callback msevod to abort requests that took too long and return the faulty peers (traffic shaping)
+//  - expire:      task callback method to abort requests that took too long and return the faulty peers (traffic shaping)
 //  - pending:     task callback for the number of requests still needing download (detect completion/non-completability)
 //  - inFlight:    task callback for the number of in-progress requests (wait for all active downloads to finish)
 //  - throttle:    task callback to check if the processing queue is full and activate throttling (bound memory use)
@@ -1150,7 +1150,7 @@ func (d *Downloader) fetchParts(errCancel error, deliveryCh chan dataPack, deliv
 				if err == errInvalidChain {
 					return err
 				}
-				// Unless a peer delivered somseving completely else than requested (usually
+				// Unless a peer delivered something completely else than requested (usually
 				// caused by a timed out request which came through in the end), set it to
 				// idle. If the delivery's stale, the peer should have already been idled.
 				if err != errStaleDelivery {
@@ -1211,7 +1211,7 @@ func (d *Downloader) fetchParts(errCancel error, deliveryCh chan dataPack, deliv
 					} else {
 						peer.log.Debug("Stalling delivery, dropping", "type", kind)
 						if d.dropPeer == nil {
-							// The dropPeer msevod is nil when `--copydb` is used for a local copy.
+							// The dropPeer method is nil when `--copydb` is used for a local copy.
 							// Timeouts can occur if e.g. compaction hits at the wrong time, and can be ignored
 							peer.log.Warn("Downloader wants to drop peer, but peerdrop-function is not set", "peer", pid)
 						} else {
@@ -1342,7 +1342,7 @@ func (d *Downloader) processHeaders(origin uint64, pivot uint64, td *big.Int) er
 				// L: Notice that R's head and TD increased compared to ours, start sync
 				// L: Import of block 11 finishes
 				// L: Sync begins, and finds common ancestor at 11
-				// L: Request new headers up from 11 (R's TD was higher, it must have somseving)
+				// L: Request new headers up from 11 (R's TD was higher, it must have something)
 				// R: Nothing to give
 				if d.mode != LightSync {
 					head := d.blockchain.CurrentBlock()
@@ -1356,7 +1356,7 @@ func (d *Downloader) processHeaders(origin uint64, pivot uint64, td *big.Int) er
 				//
 				// This check cannot be executed "as is" for full imports, since blocks may still be
 				// queued for processing when the header download completes. However, as long as the
-				// peer gave us somseving useful, we're already happy/progressed (above check).
+				// peer gave us something useful, we're already happy/progressed (above check).
 				if d.mode == FastSync || d.mode == LightSync {
 					head := d.lightchain.CurrentHeader()
 					if td.Cmp(d.lightchain.GetTd(head.Hash(), head.Number.Uint64())) > 0 {
@@ -1371,7 +1371,7 @@ func (d *Downloader) processHeaders(origin uint64, pivot uint64, td *big.Int) er
 			gotHeaders = true
 
 			for len(headers) > 0 {
-				// Terminate if somseving failed in between processing chunks
+				// Terminate if something failed in between processing chunks
 				select {
 				case <-d.cancelCh:
 					return errCancelHeaderProcessing
@@ -1491,9 +1491,9 @@ func (d *Downloader) importBlockResults(results []*fetchResult) error {
 		if index < len(results) {
 			log.Debug("Downloaded item processing failed", "number", results[index].Header.Number, "hash", results[index].Header.Hash(), "err", err)
 		} else {
-			// The InsertChain msevod in blockchain.go will sometimes return an out-of-bounds index,
+			// The InsertChain method in blockchain.go will sometimes return an out-of-bounds index,
 			// when it needs to preprocess blocks to import a sidechain.
-			// The importer will put tossever a new list of blocks to import, which is a superset
+			// The importer will put tosether a new list of blocks to import, which is a superset
 			// of the blocks delivered from the downloader, and the indexing will be off.
 			log.Debug("Downloaded item processing failed on sidechain import", "index", index, "err", err)
 		}

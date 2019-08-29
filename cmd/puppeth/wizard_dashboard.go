@@ -60,7 +60,7 @@ func (w *wizard) deployDashboard() {
 			available[service] = append(available[service], server)
 		}
 	}
-	for _, service := range []string{"sevstats", "explorer", "wallet", "faucet"} {
+	for _, service := range []string{"ethstats", "explorer", "wallet", "faucet"} {
 		// Gather all the locally hosted pages of this type
 		var pages []string
 		for _, server := range available[service] {
@@ -71,7 +71,7 @@ func (w *wizard) deployDashboard() {
 			// If there's a service running on the machine, retrieve it's port number
 			var port int
 			switch service {
-			case "sevstats":
+			case "ethstats":
 				if infos, err := checkSevstats(client, w.network); err == nil {
 					port = infos.port
 				}
@@ -123,8 +123,8 @@ func (w *wizard) deployDashboard() {
 		}
 		// Save the users choice
 		switch service {
-		case "sevstats":
-			infos.sevstats = page
+		case "ethstats":
+			infos.ethstats = page
 		case "explorer":
 			infos.explorer = page
 		case "wallet":
@@ -133,10 +133,10 @@ func (w *wizard) deployDashboard() {
 			infos.faucet = page
 		}
 	}
-	// If we have sevstats running, ask whsever to make the secret public or not
-	if w.conf.sevstats != "" {
+	// If we have ethstats running, ask whether to make the secret public or not
+	if w.conf.ethstats != "" {
 		fmt.Println()
-		fmt.Println("Include sevstats secret on dashboard (y/n)? (default = yes)")
+		fmt.Println("Include ethstats secret on dashboard (y/n)? (default = yes)")
 		infos.trusted = w.readDefaultYesNo(true)
 	}
 	// Try to deploy the dashboard container on the host

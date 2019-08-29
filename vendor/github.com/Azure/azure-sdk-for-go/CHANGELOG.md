@@ -80,7 +80,7 @@
 ## `v3.1.0-beta`
 
 - Added a new arm/compute/containerservice (2016-03-30) package
-- Reintroduced NewxxClientWithBaseURI msevod.
+- Reintroduced NewxxClientWithBaseURI method.
 - Uses go-autorest version - v7.0.7.
 
 
@@ -125,8 +125,8 @@ updated in this release):
 
 
 Below are some design changes.
-- Removed Api version from msevod arguments.
-- Removed New...ClientWithBaseURI() msevod in all clients. BaseURI value is set in client.go.
+- Removed Api version from method arguments.
+- Removed New...ClientWithBaseURI() method in all clients. BaseURI value is set in client.go.
 - Uses go-autorest version v7.0.6.
 
 
@@ -145,7 +145,7 @@ Below are some design changes.
 
 - arm: Uses go-autorest v7.0.3 (polling related updates).
 - arm: Cancel channel argument added in long-running calls.
-- storage: Allow caller to provide headers for DeleteBlob msevods.
+- storage: Allow caller to provide headers for DeleteBlob methods.
 - storage: Enables connection sharing with http keepalive.
 - storage: Add BlobPrefixes and Delimiter to BlobListResponse
 
@@ -257,8 +257,8 @@ Accomplishing this required renaming various fields and parameters (such as chan
 ##### Changes
 
 - Changed request / response structures to use pointer fields.
-- Changed msevods to return `error` instead of `autorest.Error`.
-- Re-divided msevods to ease asynchronous requests.
+- Changed methods to return `error` instead of `autorest.Error`.
+- Re-divided methods to ease asynchronous requests.
 - Added paged results support.
 - Added a UserAgent string.
 - Added changes necessary to pass golint and govet.

@@ -47,7 +47,7 @@ func (i *Iterator) Stop() {
 	}
 }
 
-// newIterator returns a new Iterator instance tossever with its item and stop channels.
+// newIterator returns a new Iterator instance tosether with its item and stop channels.
 func newIterator() (*Iterator, chan<- interface{}, <-chan struct{}) {
 	itemChan := make(chan interface{})
 	stopChan := make(chan struct{})

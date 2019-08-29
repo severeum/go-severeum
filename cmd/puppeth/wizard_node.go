@@ -33,8 +33,8 @@ func (w *wizard) deployNode(boot bool) {
 		log.Error("No genesis block configured")
 		return
 	}
-	if w.conf.sevstats == "" {
-		log.Error("No sevstats server configured")
+	if w.conf.ethstats == "" {
+		log.Error("No ethstats server configured")
 		return
 	}
 	// Select the server to interact with
@@ -69,12 +69,12 @@ func (w *wizard) deployNode(boot bool) {
 	}
 	if w.conf.Genesis.Config.Sevash != nil && !boot {
 		fmt.Println()
-		if infos.sevashdir == "" {
-			fmt.Printf("Where should the sevash mining DAGs be stored on the remote machine?\n")
-			infos.sevashdir = w.readString()
+		if infos.ethashdir == "" {
+			fmt.Printf("Where should the ethash mining DAGs be stored on the remote machine?\n")
+			infos.ethashdir = w.readString()
 		} else {
-			fmt.Printf("Where should the sevash mining DAGs be stored on the remote machine? (default = %s)\n", infos.sevashdir)
-			infos.sevashdir = w.readDefaultString(infos.sevashdir)
+			fmt.Printf("Where should the ethash mining DAGs be stored on the remote machine? (default = %s)\n", infos.ethashdir)
+			infos.ethashdir = w.readDefaultString(infos.ethashdir)
 		}
 	}
 	// Figure out which port to listen on
@@ -94,29 +94,29 @@ func (w *wizard) deployNode(boot bool) {
 
 	// Set a proper name to report on the stats page
 	fmt.Println()
-	if infos.sevstats == "" {
+	if infos.ethstats == "" {
 		fmt.Printf("What should the node be called on the stats page?\n")
-		infos.sevstats = w.readString() + ":" + w.conf.sevstats
+		infos.ethstats = w.readString() + ":" + w.conf.ethstats
 	} else {
-		fmt.Printf("What should the node be called on the stats page? (default = %s)\n", infos.sevstats)
-		infos.sevstats = w.readDefaultString(infos.sevstats) + ":" + w.conf.sevstats
+		fmt.Printf("What should the node be called on the stats page? (default = %s)\n", infos.ethstats)
+		infos.ethstats = w.readDefaultString(infos.ethstats) + ":" + w.conf.ethstats
 	}
 	// If the node is a miner/signer, load up needed credentials
 	if !boot {
 		if w.conf.Genesis.Config.Sevash != nil {
-			// Sevash based miners only need an severbase to mine against
+			// Sevash based miners only need an etherbase to mine against
 			fmt.Println()
-			if infos.severbase == "" {
+			if infos.etherbase == "" {
 				fmt.Printf("What address should the miner use?\n")
 				for {
 					if address := w.readAddress(); address != nil {
-						infos.severbase = address.Hex()
+						infos.etherbase = address.Hex()
 						break
 					}
 				}
 			} else {
-				fmt.Printf("What address should the miner use? (default = %s)\n", infos.severbase)
-				infos.severbase = w.readDefaultAddress(common.HexToAddress(infos.severbase)).Hex()
+				fmt.Printf("What address should the miner use? (default = %s)\n", infos.etherbase)
+				infos.etherbase = w.readDefaultAddress(common.HexToAddress(infos.etherbase)).Hex()
 			}
 		} else if w.conf.Genesis.Config.Clique != nil {
 			// If a previous signer was already set, offer to reuse it

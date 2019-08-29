@@ -6,11 +6,11 @@
 # - BUILDVERSION, build id version
 #
 # The created installer executes the following steps:
-# 1. install ssev for all users
+# 1. install seth for all users
 # 2. install optional development tools such as abigen
 # 3. create an uninstaller
-# 4. configures the Windows firewall for ssev
-# 5. create ssev, attach and uninstall start menu entries
+# 4. configures the Windows firewall for seth
+# 5. create seth, attach and uninstall start menu entries
 # 6. configures the registry that allows Windows to manage the package through its platform tools
 # 7. adds the environment system wide variable SEVEREUM_SOCKET
 # 8. adds the install directory to %PATH%
@@ -30,7 +30,7 @@
 CRCCheck on
 
 !define GROUPNAME "Severeum"
-!define APPNAME "Ssev"
+!define APPNAME "Seth"
 !define DESCRIPTION "Official Go implementation of the Severeum protocol"
 !addplugindir .\
 
@@ -55,7 +55,7 @@ ${EndIf}
 !macroend
 
 function .onInit
-  # make vars are global for all users since ssev is installed global
+  # make vars are global for all users since seth is installed global
   setShellVarContext all
   !insertmacro VerifyUserIsAdmin
 

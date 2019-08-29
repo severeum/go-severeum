@@ -79,15 +79,15 @@ func (self *_object) DefaultValue(hint _defaultValueHint) Value {
 			hint = defaultValueHintNumber
 		}
 	}
-	msevodSequence := []string{"valueOf", "toString"}
+	methodSequence := []string{"valueOf", "toString"}
 	if hint == defaultValueHintString {
-		msevodSequence = []string{"toString", "valueOf"}
+		methodSequence = []string{"toString", "valueOf"}
 	}
-	for _, msevodName := range msevodSequence {
-		msevod := self.get(msevodName)
+	for _, methodName := range methodSequence {
+		method := self.get(methodName)
 		// FIXME This is redundant...
-		if msevod.isCallable() {
-			result := msevod._object().call(toValue_object(self), nil, false, nativeFrame)
+		if method.isCallable() {
+			result := method._object().call(toValue_object(self), nil, false, nativeFrame)
 			if result.IsPrimitive() {
 				return result
 			}

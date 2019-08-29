@@ -17,7 +17,7 @@ import (
 	"github.com/Azure/azure-pipeline-go/pipeline"
 )
 
-// containerClient is the client for the Container msevods of the Azblob service.
+// containerClient is the client for the Container methods of the Azblob service.
 type containerClient struct {
 	managementClient
 }
@@ -257,7 +257,7 @@ func (client containerClient) changeLeaseResponder(resp pipeline.Response) (pipe
 // file to the destination blob. If one or more name-value pairs are specified, the destination blob is created with
 // the specified metadata, and metadata is not copied from the source blob or file. Note that beginning with version
 // 2009-09-19, metadata names must adhere to the naming rules for C# identifiers. See Naming and Referencing
-// Containers, Blobs, and Metadata for more information. access is specifies whsever data in the container may be
+// Containers, Blobs, and Metadata for more information. access is specifies whether data in the container may be
 // accessed publicly and the level of access requestID is provides a client-generated, opaque value with a 1 KB
 // character limit that is recorded in the analytics logs when storage analytics logging is enabled.
 func (client containerClient) Create(ctx context.Context, timeout *int32, metadata map[string]string, access PublicAccessType, requestID *string) (*ContainerCreateResponse, error) {
@@ -386,7 +386,7 @@ func (client containerClient) deleteResponder(resp pipeline.Response) (pipeline.
 	return &ContainerDeleteResponse{rawResponse: resp.Response()}, err
 }
 
-// GetAccessPolicy gets the permissions for the specified container. The permissions indicate whsever container data
+// GetAccessPolicy gets the permissions for the specified container. The permissions indicate whether container data
 // may be accessed publicly.
 //
 // timeout is the timeout parameter is expressed in seconds. For more information, see <a
@@ -847,14 +847,14 @@ func (client containerClient) renewLeaseResponder(resp pipeline.Response) (pipel
 	return &ContainerRenewLeaseResponse{rawResponse: resp.Response()}, err
 }
 
-// SetAccessPolicy sets the permissions for the specified container. The permissions indicate whsever blobs in a
+// SetAccessPolicy sets the permissions for the specified container. The permissions indicate whether blobs in a
 // container may be accessed publicly.
 //
 // containerACL is the acls for the container timeout is the timeout parameter is expressed in seconds. For more
 // information, see <a
 // href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations">Setting
 // Timeouts for Blob Service Operations.</a> leaseID is if specified, the operation only succeeds if the container's
-// lease is active and matches this ID. access is specifies whsever data in the container may be accessed publicly and
+// lease is active and matches this ID. access is specifies whether data in the container may be accessed publicly and
 // the level of access ifModifiedSince is specify this header value to operate only on a blob if it has been modified
 // since the specified date/time. ifUnmodifiedSince is specify this header value to operate only on a blob if it has
 // not been modified since the specified date/time. requestID is provides a client-generated, opaque value with a 1 KB

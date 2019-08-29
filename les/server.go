@@ -27,8 +27,8 @@ import (
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/rawdb"
 	"github.com/severeum/go-severeum/core/types"
-	"github.com/severeum/go-severeum/sev"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/eth"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/les/flowcontrol"
 	"github.com/severeum/go-severeum/light"
 	"github.com/severeum/go-severeum/log"
@@ -49,25 +49,25 @@ type LesServer struct {
 	quitSync    chan struct{}
 }
 
-func NewLesServer(sev *sev.Severeum, config *sev.Config) (*LesServer, error) {
+func NewLesServer(eth *eth.Severeum, config *eth.Config) (*LesServer, error) {
 	quitSync := make(chan struct{})
-	pm, err := NewProtocolManager(sev.BlockChain().Config(), light.DefaultServerIndexerConfig, false, config.NetworkId, sev.EventMux(), sev.Engine(), newPeerSet(), sev.BlockChain(), sev.TxPool(), sev.ChainDb(), nil, nil, nil, quitSync, new(sync.WaitGroup))
+	pm, err := NewProtocolManager(eth.BlockChain().Config(), light.DefaultServerIndexerConfig, false, config.NetworkId, eth.EventMux(), eth.Engine(), newPeerSet(), eth.BlockChain(), eth.TxPool(), eth.ChainDb(), nil, nil, nil, quitSync, new(sync.WaitGroup))
 	if err != nil {
 		return nil, err
 	}
 
 	lesTopics := make([]discv5.Topic, len(AdvertiseProtocolVersions))
 	for i, pv := range AdvertiseProtocolVersions {
-		lesTopics[i] = lesTopic(sev.BlockChain().Genesis().Hash(), pv)
+		lesTopics[i] = lesTopic(eth.BlockChain().Genesis().Hash(), pv)
 	}
 
 	srv := &LesServer{
 		lesCommons: lesCommons{
 			config:           config,
-			chainDb:          sev.ChainDb(),
+			chainDb:          eth.ChainDb(),
 			iConfig:          light.DefaultServerIndexerConfig,
-			chtIndexer:       light.NewChtIndexer(sev.ChainDb(), nil, params.CHTFrequencyServer, params.HelperTrieProcessConfirmations),
-			bloomTrieIndexer: light.NewBloomTrieIndexer(sev.ChainDb(), nil, params.BloomBitsBlocks, params.BloomTrieFrequency),
+			chtIndexer:       light.NewChtIndexer(eth.ChainDb(), nil, params.CHTFrequencyServer, params.HelperTrieProcessConfirmations),
+			bloomTrieIndexer: light.NewBloomTrieIndexer(eth.ChainDb(), nil, params.BloomBitsBlocks, params.BloomTrieFrequency),
 			protocolManager:  pm,
 		},
 		quitSync:  quitSync,
@@ -95,7 +95,7 @@ func NewLesServer(sev *sev.Severeum, config *sev.Config) (*LesServer, error) {
 		logger.Info("Loaded bloom trie", "section", bloomTrieLastSection, "head", bloomTrieSectionHead, "root", bloomTrieRoot)
 	}
 
-	srv.chtIndexer.Start(sev.BlockChain())
+	srv.chtIndexer.Start(eth.BlockChain())
 	pm.server = srv
 
 	srv.defParams = &flowcontrol.ServerParams{
@@ -103,7 +103,7 @@ func NewLesServer(sev *sev.Severeum, config *sev.Config) (*LesServer, error) {
 		MinRecharge: 50000,
 	}
 	srv.fcManager = flowcontrol.NewClientManager(uint64(config.LightServ), 10, 1000000000)
-	srv.fcCostStats = newCostStats(sev.ChainDb())
+	srv.fcCostStats = newCostStats(eth.ChainDb())
 	return srv, nil
 }
 
@@ -229,7 +229,7 @@ func linRegFromBytes(data []byte) *linReg {
 
 type requestCostStats struct {
 	lock  sync.RWMutex
-	db    sevdb.Database
+	db    ethdb.Database
 	stats map[uint64]*linReg
 }
 
@@ -240,7 +240,7 @@ type requestCostStatsRlp []struct {
 
 var rcStatsKey = []byte("_requestCostStats")
 
-func newCostStats(db sevdb.Database) *requestCostStats {
+func newCostStats(db ethdb.Database) *requestCostStats {
 	stats := make(map[uint64]*linReg)
 	for _, code := range reqList {
 		stats[code] = &linReg{cnt: 100}

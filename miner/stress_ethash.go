@@ -31,12 +31,12 @@ import (
 	"github.com/severeum/go-severeum/accounts/keystore"
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/common/fdlimit"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sev"
-	"github.com/severeum/go-severeum/sev/downloader"
+	"github.com/severeum/go-severeum/eth"
+	"github.com/severeum/go-severeum/eth/downloader"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/node"
 	"github.com/severeum/go-severeum/p2p"
@@ -53,8 +53,8 @@ func main() {
 	for i := 0; i < len(faucets); i++ {
 		faucets[i], _ = crypto.GenerateKey()
 	}
-	// Pre-generate the sevash mining DAG so we don't race
-	sevash.MakeDataset(1, filepath.Join(os.Getenv("HOME"), ".sevash"))
+	// Pre-generate the ethash mining DAG so we don't race
+	ethash.MakeDataset(1, filepath.Join(os.Getenv("HOME"), ".ethash"))
 
 	// Create an Sevash network based off of the Ropsten config
 	genesis := makeGenesis(faucets)
@@ -92,7 +92,7 @@ func main() {
 	time.Sleep(3 * time.Second)
 
 	for _, node := range nodes {
-		var severeum *sev.Severeum
+		var severeum *eth.Severeum
 		if err := node.Service(&severeum); err != nil {
 			panic(err)
 		}
@@ -108,7 +108,7 @@ func main() {
 		index := rand.Intn(len(faucets))
 
 		// Fetch the accessor for the relevant signer
-		var severeum *sev.Severeum
+		var severeum *eth.Severeum
 		if err := nodes[index%len(nodes)].Service(&severeum); err != nil {
 			panic(err)
 		}
@@ -153,7 +153,7 @@ func makeMiner(genesis *core.Genesis) (*node.Node, error) {
 	datadir, _ := ioutil.TempDir("", "")
 
 	config := &node.Config{
-		Name:    "ssev",
+		Name:    "seth",
 		Version: params.Version,
 		DataDir: datadir,
 		P2P: p2p.Config{
@@ -170,15 +170,15 @@ func makeMiner(genesis *core.Genesis) (*node.Node, error) {
 		return nil, err
 	}
 	if err := stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
-		return sev.New(ctx, &sev.Config{
+		return eth.New(ctx, &eth.Config{
 			Genesis:         genesis,
 			NetworkId:       genesis.Config.ChainID.Uint64(),
 			SyncMode:        downloader.FullSync,
 			DatabaseCache:   256,
 			DatabaseHandles: 256,
 			TxPool:          core.DefaultTxPoolConfig,
-			GPO:             sev.DefaultConfig.GPO,
-			Sevash:          sev.DefaultConfig.Sevash,
+			GPO:             eth.DefaultConfig.GPO,
+			Sevash:          eth.DefaultConfig.Sevash,
 			MinerGasFloor:   genesis.GasLimit * 9 / 10,
 			MinerGasCeil:    genesis.GasLimit * 11 / 10,
 			MinerGasPrice:   big.NewInt(1),

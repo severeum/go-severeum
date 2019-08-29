@@ -30,13 +30,13 @@ import (
 	"github.com/severeum/go-severeum/rpc"
 )
 
-// PrivateAdminAPI is the collection of administrative API msevods exposed only
+// PrivateAdminAPI is the collection of administrative API methods exposed only
 // over a secure RPC channel.
 type PrivateAdminAPI struct {
 	node *Node // Node interfaced by this API
 }
 
-// NewPrivateAdminAPI creates a new API definition for the private admin msevods
+// NewPrivateAdminAPI creates a new API definition for the private admin methods
 // of the node itself.
 func NewPrivateAdminAPI(node *Node) *PrivateAdminAPI {
 	return &PrivateAdminAPI{node: node}
@@ -260,13 +260,13 @@ func (api *PrivateAdminAPI) StopWS() (bool, error) {
 	return true, nil
 }
 
-// PublicAdminAPI is the collection of administrative API msevods exposed over
+// PublicAdminAPI is the collection of administrative API methods exposed over
 // both secure and unsecure RPC channels.
 type PublicAdminAPI struct {
 	node *Node // Node interfaced by this API
 }
 
-// NewPublicAdminAPI creates a new API definition for the public admin msevods
+// NewPublicAdminAPI creates a new API definition for the public admin methods
 // of the node itself.
 func NewPublicAdminAPI(node *Node) *PublicAdminAPI {
 	return &PublicAdminAPI{node: node}
@@ -297,13 +297,13 @@ func (api *PublicAdminAPI) Datadir() string {
 	return api.node.DataDir()
 }
 
-// PublicDebugAPI is the collection of debugging related API msevods exposed over
+// PublicDebugAPI is the collection of debugging related API methods exposed over
 // both secure and unsecure RPC channels.
 type PublicDebugAPI struct {
 	node *Node // Node interfaced by this API
 }
 
-// NewPublicDebugAPI creates a new API definition for the public debug msevods
+// NewPublicDebugAPI creates a new API definition for the public debug methods
 // of the node itself.
 func NewPublicDebugAPI(node *Node) *PublicDebugAPI {
 	return &PublicDebugAPI{node: node}

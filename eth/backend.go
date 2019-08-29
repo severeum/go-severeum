@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package sev implements the Severeum protocol.
-package sev
+// Package eth implements the Severeum protocol.
+package eth
 
 import (
 	"errors"
@@ -30,18 +30,18 @@ import (
 	"github.com/severeum/go-severeum/common/hexutil"
 	"github.com/severeum/go-severeum/consensus"
 	"github.com/severeum/go-severeum/consensus/clique"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core"
 	"github.com/severeum/go-severeum/core/bloombits"
 	"github.com/severeum/go-severeum/core/rawdb"
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/core/vm"
-	"github.com/severeum/go-severeum/sev/downloader"
-	"github.com/severeum/go-severeum/sev/filters"
-	"github.com/severeum/go-severeum/sev/gasprice"
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/eth/downloader"
+	"github.com/severeum/go-severeum/eth/filters"
+	"github.com/severeum/go-severeum/eth/gasprice"
+	"github.com/severeum/go-severeum/ethdb"
 	"github.com/severeum/go-severeum/event"
-	"github.com/severeum/go-severeum/internal/sevapi"
+	"github.com/severeum/go-severeum/internal/ethapi"
 	"github.com/severeum/go-severeum/log"
 	"github.com/severeum/go-severeum/miner"
 	"github.com/severeum/go-severeum/node"
@@ -73,7 +73,7 @@ type Severeum struct {
 	lesServer       LesServer
 
 	// DB interfaces
-	chainDb sevdb.Database // Block chain database
+	chainDb ethdb.Database // Block chain database
 
 	eventMux       *event.TypeMux
 	engine         consensus.Engine
@@ -86,12 +86,12 @@ type Severeum struct {
 
 	miner     *miner.Miner
 	gasPrice  *big.Int
-	severbase common.Address
+	etherbase common.Address
 
 	networkID     uint64
-	netRPCService *sevapi.PublicNetAPI
+	netRPCService *ethapi.PublicNetAPI
 
-	lock sync.RWMutex // Protects the variadic fields (e.g. gas price and severbase)
+	lock sync.RWMutex // Protects the variadic fields (e.g. gas price and etherbase)
 }
 
 func (s *Severeum) AddLesServer(ls LesServer) {
@@ -104,7 +104,7 @@ func (s *Severeum) AddLesServer(ls LesServer) {
 func New(ctx *node.ServiceContext, config *Config) (*Severeum, error) {
 	// Ensure configuration values are compatible and sane
 	if config.SyncMode == downloader.LightSync {
-		return nil, errors.New("can't run sev.Severeum in light sync mode, use les.LightSevereum")
+		return nil, errors.New("can't run eth.Severeum in light sync mode, use les.LightSevereum")
 	}
 	if !config.SyncMode.IsValid() {
 		return nil, fmt.Errorf("invalid sync mode %d", config.SyncMode)
@@ -124,7 +124,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Severeum, error) {
 	}
 	log.Info("Initialised chain configuration", "config", chainConfig)
 
-	sev := &Severeum{
+	eth := &Severeum{
 		config:         config,
 		chainDb:        chainDb,
 		chainConfig:    chainConfig,
@@ -134,7 +134,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Severeum, error) {
 		shutdownChan:   make(chan bool),
 		networkID:      config.NetworkId,
 		gasPrice:       config.MinerGasPrice,
-		severbase:      config.Severbase,
+		etherbase:      config.Severbase,
 		bloomRequests:  make(chan chan *bloombits.Retrieval),
 		bloomIndexer:   NewBloomIndexer(chainDb, params.BloomBitsBlocks, params.BloomConfirms),
 	}
@@ -144,7 +144,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Severeum, error) {
 	if !config.SkipBcVersionCheck {
 		bcVersion := rawdb.ReadDatabaseVersion(chainDb)
 		if bcVersion != nil && *bcVersion > core.BlockChainVersion {
-			return nil, fmt.Errorf("database version is v%d, Ssev %s only supports v%d", *bcVersion, params.VersionWithMeta, core.BlockChainVersion)
+			return nil, fmt.Errorf("database version is v%d, Seth %s only supports v%d", *bcVersion, params.VersionWithMeta, core.BlockChainVersion)
 		} else if bcVersion != nil && *bcVersion < core.BlockChainVersion {
 			log.Warn("Upgrade blockchain database version", "from", *bcVersion, "to", core.BlockChainVersion)
 		}
@@ -158,38 +158,38 @@ func New(ctx *node.ServiceContext, config *Config) (*Severeum, error) {
 		}
 		cacheConfig = &core.CacheConfig{Disabled: config.NoPruning, TrieCleanLimit: config.TrieCleanCache, TrieDirtyLimit: config.TrieDirtyCache, TrieTimeLimit: config.TrieTimeout}
 	)
-	sev.blockchain, err = core.NewBlockChain(chainDb, cacheConfig, sev.chainConfig, sev.engine, vmConfig, sev.shouldPreserve)
+	eth.blockchain, err = core.NewBlockChain(chainDb, cacheConfig, eth.chainConfig, eth.engine, vmConfig, eth.shouldPreserve)
 	if err != nil {
 		return nil, err
 	}
 	// Rewind the chain in case of an incompatible config upgrade.
 	if compat, ok := genesisErr.(*params.ConfigCompatError); ok {
 		log.Warn("Rewinding chain to upgrade configuration", "err", compat)
-		sev.blockchain.SetHead(compat.RewindTo)
+		eth.blockchain.SetHead(compat.RewindTo)
 		rawdb.WriteChainConfig(chainDb, genesisHash, chainConfig)
 	}
-	sev.bloomIndexer.Start(sev.blockchain)
+	eth.bloomIndexer.Start(eth.blockchain)
 
 	if config.TxPool.Journal != "" {
 		config.TxPool.Journal = ctx.ResolvePath(config.TxPool.Journal)
 	}
-	sev.txPool = core.NewTxPool(config.TxPool, sev.chainConfig, sev.blockchain)
+	eth.txPool = core.NewTxPool(config.TxPool, eth.chainConfig, eth.blockchain)
 
-	if sev.protocolManager, err = NewProtocolManager(sev.chainConfig, config.SyncMode, config.NetworkId, sev.eventMux, sev.txPool, sev.engine, sev.blockchain, chainDb, config.Whitelist); err != nil {
+	if eth.protocolManager, err = NewProtocolManager(eth.chainConfig, config.SyncMode, config.NetworkId, eth.eventMux, eth.txPool, eth.engine, eth.blockchain, chainDb, config.Whitelist); err != nil {
 		return nil, err
 	}
 
-	sev.miner = miner.New(sev, sev.chainConfig, sev.EventMux(), sev.engine, config.MinerRecommit, config.MinerGasFloor, config.MinerGasCeil, sev.isLocalBlock)
-	sev.miner.SetExtra(makeExtraData(config.MinerExtraData))
+	eth.miner = miner.New(eth, eth.chainConfig, eth.EventMux(), eth.engine, config.MinerRecommit, config.MinerGasFloor, config.MinerGasCeil, eth.isLocalBlock)
+	eth.miner.SetExtra(makeExtraData(config.MinerExtraData))
 
-	sev.APIBackend = &SevAPIBackend{sev, nil}
+	eth.APIBackend = &SevAPIBackend{eth, nil}
 	gpoParams := config.GPO
 	if gpoParams.Default == nil {
 		gpoParams.Default = config.MinerGasPrice
 	}
-	sev.APIBackend.gpo = gasprice.NewOracle(sev.APIBackend, gpoParams)
+	eth.APIBackend.gpo = gasprice.NewOracle(eth.APIBackend, gpoParams)
 
-	return sev, nil
+	return eth, nil
 }
 
 func makeExtraData(extra []byte) []byte {
@@ -197,7 +197,7 @@ func makeExtraData(extra []byte) []byte {
 		// create default extradata
 		extra, _ = rlp.EncodeToBytes([]interface{}{
 			uint(params.VersionMajor<<16 | params.VersionMinor<<8 | params.VersionPatch),
-			"ssev",
+			"seth",
 			runtime.Version(),
 			runtime.GOOS,
 		})
@@ -210,36 +210,36 @@ func makeExtraData(extra []byte) []byte {
 }
 
 // CreateDB creates the chain database.
-func CreateDB(ctx *node.ServiceContext, config *Config, name string) (sevdb.Database, error) {
+func CreateDB(ctx *node.ServiceContext, config *Config, name string) (ethdb.Database, error) {
 	db, err := ctx.OpenDatabase(name, config.DatabaseCache, config.DatabaseHandles)
 	if err != nil {
 		return nil, err
 	}
-	if db, ok := db.(*sevdb.LDBDatabase); ok {
-		db.Meter("sev/db/chaindata/")
+	if db, ok := db.(*ethdb.LDBDatabase); ok {
+		db.Meter("eth/db/chaindata/")
 	}
 	return db, nil
 }
 
 // CreateConsensusEngine creates the required type of consensus engine instance for an Severeum service
-func CreateConsensusEngine(ctx *node.ServiceContext, chainConfig *params.ChainConfig, config *sevash.Config, notify []string, noverify bool, db sevdb.Database) consensus.Engine {
+func CreateConsensusEngine(ctx *node.ServiceContext, chainConfig *params.ChainConfig, config *ethash.Config, notify []string, noverify bool, db ethdb.Database) consensus.Engine {
 	// If proof-of-authority is requested, set it up
 	if chainConfig.Clique != nil {
 		return clique.New(chainConfig.Clique, db)
 	}
 	// Otherwise assume proof-of-work
 	switch config.PowMode {
-	case sevash.ModeFake:
+	case ethash.ModeFake:
 		log.Warn("Sevash used in fake mode")
-		return sevash.NewFaker()
-	case sevash.ModeTest:
+		return ethash.NewFaker()
+	case ethash.ModeTest:
 		log.Warn("Sevash used in test mode")
-		return sevash.NewTester(nil, noverify)
-	case sevash.ModeShared:
+		return ethash.NewTester(nil, noverify)
+	case ethash.ModeShared:
 		log.Warn("Sevash used in shared mode")
-		return sevash.NewShared()
+		return ethash.NewShared()
 	default:
-		engine := sevash.New(sevash.Config{
+		engine := ethash.New(ethash.Config{
 			CacheDir:       ctx.ResolvePath(config.CacheDir),
 			CachesInMem:    config.CachesInMem,
 			CachesOnDisk:   config.CachesOnDisk,
@@ -255,7 +255,7 @@ func CreateConsensusEngine(ctx *node.ServiceContext, chainConfig *params.ChainCo
 // APIs return the collection of RPC services the severeum package offers.
 // NOTE, some of these services probably need to be moved to somewhere else.
 func (s *Severeum) APIs() []rpc.API {
-	apis := sevapi.GetAPIs(s.APIBackend)
+	apis := ethapi.GetAPIs(s.APIBackend)
 
 	// Append any APIs exposed explicitly by the consensus engine
 	apis = append(apis, s.engine.APIs(s.BlockChain())...)
@@ -263,17 +263,17 @@ func (s *Severeum) APIs() []rpc.API {
 	// Append all the local APIs and return
 	return append(apis, []rpc.API{
 		{
-			Namespace: "sev",
+			Namespace: "eth",
 			Version:   "1.0",
 			Service:   NewPublicSevereumAPI(s),
 			Public:    true,
 		}, {
-			Namespace: "sev",
+			Namespace: "eth",
 			Version:   "1.0",
 			Service:   NewPublicMinerAPI(s),
 			Public:    true,
 		}, {
-			Namespace: "sev",
+			Namespace: "eth",
 			Version:   "1.0",
 			Service:   downloader.NewPublicDownloaderAPI(s.protocolManager.downloader, s.eventMux),
 			Public:    true,
@@ -283,7 +283,7 @@ func (s *Severeum) APIs() []rpc.API {
 			Service:   NewPrivateMinerAPI(s),
 			Public:    false,
 		}, {
-			Namespace: "sev",
+			Namespace: "eth",
 			Version:   "1.0",
 			Service:   filters.NewPublicFilterAPI(s.APIBackend, false),
 			Public:    true,
@@ -315,31 +315,31 @@ func (s *Severeum) ResetWithGenesisBlock(gb *types.Block) {
 
 func (s *Severeum) Severbase() (eb common.Address, err error) {
 	s.lock.RLock()
-	severbase := s.severbase
+	etherbase := s.etherbase
 	s.lock.RUnlock()
 
-	if severbase != (common.Address{}) {
-		return severbase, nil
+	if etherbase != (common.Address{}) {
+		return etherbase, nil
 	}
 	if wallets := s.AccountManager().Wallets(); len(wallets) > 0 {
 		if accounts := wallets[0].Accounts(); len(accounts) > 0 {
-			severbase := accounts[0].Address
+			etherbase := accounts[0].Address
 
 			s.lock.Lock()
-			s.severbase = severbase
+			s.etherbase = etherbase
 			s.lock.Unlock()
 
-			log.Info("Severbase automatically configured", "address", severbase)
-			return severbase, nil
+			log.Info("Severbase automatically configured", "address", etherbase)
+			return etherbase, nil
 		}
 	}
-	return common.Address{}, fmt.Errorf("severbase must be explicitly specified")
+	return common.Address{}, fmt.Errorf("etherbase must be explicitly specified")
 }
 
-// isLocalBlock checks whsever the specified block is mined
+// isLocalBlock checks whether the specified block is mined
 // by local miner accounts.
 //
-// We regard two types of accounts as local miner account: severbase
+// We regard two types of accounts as local miner account: etherbase
 // and accounts specified via `txpool.locals` flag.
 func (s *Severeum) isLocalBlock(block *types.Block) bool {
 	author, err := s.engine.Author(block.Header())
@@ -347,14 +347,14 @@ func (s *Severeum) isLocalBlock(block *types.Block) bool {
 		log.Warn("Failed to retrieve block author", "number", block.NumberU64(), "hash", block.Hash(), "err", err)
 		return false
 	}
-	// Check whsever the given address is severbase.
+	// Check whether the given address is etherbase.
 	s.lock.RLock()
-	severbase := s.severbase
+	etherbase := s.etherbase
 	s.lock.RUnlock()
-	if author == severbase {
+	if author == etherbase {
 		return true
 	}
-	// Check whsever the given address is specified by `txpool.local`
+	// Check whether the given address is specified by `txpool.local`
 	// CLI flag.
 	for _, account := range s.config.TxPool.Locals {
 		if account == author {
@@ -364,8 +364,8 @@ func (s *Severeum) isLocalBlock(block *types.Block) bool {
 	return false
 }
 
-// shouldPreserve checks whsever we should preserve the given block
-// during the chain reorg depending on whsever the author of block
+// shouldPreserve checks whether we should preserve the given block
+// during the chain reorg depending on whether the author of block
 // is a local account.
 func (s *Severeum) shouldPreserve(block *types.Block) bool {
 	// The reason we need to disable the self-reorg preserving for clique
@@ -391,16 +391,16 @@ func (s *Severeum) shouldPreserve(block *types.Block) bool {
 }
 
 // SetSeverbase sets the mining reward address.
-func (s *Severeum) SetSeverbase(severbase common.Address) {
+func (s *Severeum) SetSeverbase(etherbase common.Address) {
 	s.lock.Lock()
-	s.severbase = severbase
+	s.etherbase = etherbase
 	s.lock.Unlock()
 
-	s.miner.SetSeverbase(severbase)
+	s.miner.SetSeverbase(etherbase)
 }
 
 // StartMining starts the miner with the given number of CPU threads. If mining
-// is already running, this msevod adjust the number of threads allowed to use
+// is already running, this method adjust the number of threads allowed to use
 // and updates the minimum price required by the transaction pool.
 func (s *Severeum) StartMining(threads int) error {
 	// Update the thread count within the consensus engine
@@ -425,8 +425,8 @@ func (s *Severeum) StartMining(threads int) error {
 		// Configure the local mining address
 		eb, err := s.Severbase()
 		if err != nil {
-			log.Error("Cannot start mining without severbase", "err", err)
-			return fmt.Errorf("severbase missing: %v", err)
+			log.Error("Cannot start mining without etherbase", "err", err)
+			return fmt.Errorf("etherbase missing: %v", err)
 		}
 		if clique, ok := s.engine.(*clique.Clique); ok {
 			wallet, err := s.accountManager.Find(accounts.Account{Address: eb})
@@ -467,7 +467,7 @@ func (s *Severeum) BlockChain() *core.BlockChain       { return s.blockchain }
 func (s *Severeum) TxPool() *core.TxPool               { return s.txPool }
 func (s *Severeum) EventMux() *event.TypeMux           { return s.eventMux }
 func (s *Severeum) Engine() consensus.Engine           { return s.engine }
-func (s *Severeum) ChainDb() sevdb.Database            { return s.chainDb }
+func (s *Severeum) ChainDb() ethdb.Database            { return s.chainDb }
 func (s *Severeum) IsListening() bool                  { return true } // Always listening
 func (s *Severeum) SevVersion() int                    { return int(s.protocolManager.SubProtocols[0].Version) }
 func (s *Severeum) NetVersion() uint64                 { return s.networkID }
@@ -489,7 +489,7 @@ func (s *Severeum) Start(srvr *p2p.Server) error {
 	s.startBloomHandlers(params.BloomBitsBlocks)
 
 	// Start the RPC service
-	s.netRPCService = sevapi.NewPublicNetAPI(srvr, s.NetVersion())
+	s.netRPCService = ethapi.NewPublicNetAPI(srvr, s.NetVersion())
 
 	// Figure out a max peers count based on the server limits
 	maxPeers := srvr.MaxPeers

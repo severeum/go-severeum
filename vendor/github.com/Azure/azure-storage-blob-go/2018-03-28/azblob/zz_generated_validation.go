@@ -51,7 +51,7 @@ const (
 	inclusiveMinimum = "InclusiveMinimum"
 )
 
-// Validate msevod validates constraints on parameter
+// Validate method validates constraints on parameter
 // passed in validation array.
 func validate(m []validation) error {
 	for _, item := range m {

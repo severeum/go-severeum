@@ -1518,7 +1518,7 @@ var errors = [...]string{
 	88: "programming error",
 	89: "bad message",
 	90: "multihop attempted",
-	91: "link has been severed",
+	91: "link has been ethered",
 	92: "protocol error",
 	93: "no medium found",
 	94: "unknown error: 94",

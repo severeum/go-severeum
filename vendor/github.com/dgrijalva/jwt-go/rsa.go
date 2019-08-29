@@ -6,46 +6,46 @@ import (
 	"crypto/rsa"
 )
 
-// Implements the RSA family of signing msevods signing msevods
-type SigningMsevodRSA struct {
+// Implements the RSA family of signing methods signing methods
+type SigningMethodRSA struct {
 	Name string
 	Hash crypto.Hash
 }
 
 // Specific instances for RS256 and company
 var (
-	SigningMsevodRS256 *SigningMsevodRSA
-	SigningMsevodRS384 *SigningMsevodRSA
-	SigningMsevodRS512 *SigningMsevodRSA
+	SigningMethodRS256 *SigningMethodRSA
+	SigningMethodRS384 *SigningMethodRSA
+	SigningMethodRS512 *SigningMethodRSA
 )
 
 func init() {
 	// RS256
-	SigningMsevodRS256 = &SigningMsevodRSA{"RS256", crypto.SHA256}
-	RegisterSigningMsevod(SigningMsevodRS256.Alg(), func() SigningMsevod {
-		return SigningMsevodRS256
+	SigningMethodRS256 = &SigningMethodRSA{"RS256", crypto.SHA256}
+	RegisterSigningMethod(SigningMethodRS256.Alg(), func() SigningMethod {
+		return SigningMethodRS256
 	})
 
 	// RS384
-	SigningMsevodRS384 = &SigningMsevodRSA{"RS384", crypto.SHA384}
-	RegisterSigningMsevod(SigningMsevodRS384.Alg(), func() SigningMsevod {
-		return SigningMsevodRS384
+	SigningMethodRS384 = &SigningMethodRSA{"RS384", crypto.SHA384}
+	RegisterSigningMethod(SigningMethodRS384.Alg(), func() SigningMethod {
+		return SigningMethodRS384
 	})
 
 	// RS512
-	SigningMsevodRS512 = &SigningMsevodRSA{"RS512", crypto.SHA512}
-	RegisterSigningMsevod(SigningMsevodRS512.Alg(), func() SigningMsevod {
-		return SigningMsevodRS512
+	SigningMethodRS512 = &SigningMethodRSA{"RS512", crypto.SHA512}
+	RegisterSigningMethod(SigningMethodRS512.Alg(), func() SigningMethod {
+		return SigningMethodRS512
 	})
 }
 
-func (m *SigningMsevodRSA) Alg() string {
+func (m *SigningMethodRSA) Alg() string {
 	return m.Name
 }
 
-// Implements the Verify msevod from SigningMsevod
-// For this signing msevod, must be an rsa.PublicKey structure.
-func (m *SigningMsevodRSA) Verify(signingString, signature string, key interface{}) error {
+// Implements the Verify method from SigningMethod
+// For this signing method, must be an rsa.PublicKey structure.
+func (m *SigningMethodRSA) Verify(signingString, signature string, key interface{}) error {
 	var err error
 
 	// Decode the signature
@@ -72,9 +72,9 @@ func (m *SigningMsevodRSA) Verify(signingString, signature string, key interface
 	return rsa.VerifyPKCS1v15(rsaKey, m.Hash, hasher.Sum(nil), sig)
 }
 
-// Implements the Sign msevod from SigningMsevod
-// For this signing msevod, must be an rsa.PrivateKey structure.
-func (m *SigningMsevodRSA) Sign(signingString string, key interface{}) (string, error) {
+// Implements the Sign method from SigningMethod
+// For this signing method, must be an rsa.PrivateKey structure.
+func (m *SigningMethodRSA) Sign(signingString string, key interface{}) (string, error) {
 	var rsaKey *rsa.PrivateKey
 	var ok bool
 

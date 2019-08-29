@@ -18,7 +18,7 @@ package throttler
 // are always sampled, a throttler can be enabled per client to rate limit the amount
 // of debug spans a client can start.
 type Throttler interface {
-	// IsAllowed determines whsever the operation should be allowed and not be
+	// IsAllowed determines whether the operation should be allowed and not be
 	// throttled.
 	IsAllowed(operation string) bool
 }

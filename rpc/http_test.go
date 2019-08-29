@@ -24,29 +24,29 @@ import (
 )
 
 func TestHTTPErrorResponseWithDelete(t *testing.T) {
-	testHTTPErrorResponse(t, http.MsevodDelete, contentType, "", http.StatusMsevodNotAllowed)
+	testHTTPErrorResponse(t, http.MethodDelete, contentType, "", http.StatusMethodNotAllowed)
 }
 
 func TestHTTPErrorResponseWithPut(t *testing.T) {
-	testHTTPErrorResponse(t, http.MsevodPut, contentType, "", http.StatusMsevodNotAllowed)
+	testHTTPErrorResponse(t, http.MethodPut, contentType, "", http.StatusMethodNotAllowed)
 }
 
 func TestHTTPErrorResponseWithMaxContentLength(t *testing.T) {
 	body := make([]rune, maxRequestContentLength+1)
 	testHTTPErrorResponse(t,
-		http.MsevodPost, contentType, string(body), http.StatusRequestEntityTooLarge)
+		http.MethodPost, contentType, string(body), http.StatusRequestEntityTooLarge)
 }
 
 func TestHTTPErrorResponseWithEmptyContentType(t *testing.T) {
-	testHTTPErrorResponse(t, http.MsevodPost, "", "", http.StatusUnsupportedMediaType)
+	testHTTPErrorResponse(t, http.MethodPost, "", "", http.StatusUnsupportedMediaType)
 }
 
 func TestHTTPErrorResponseWithValidRequest(t *testing.T) {
-	testHTTPErrorResponse(t, http.MsevodPost, contentType, "", 0)
+	testHTTPErrorResponse(t, http.MethodPost, contentType, "", 0)
 }
 
-func testHTTPErrorResponse(t *testing.T, msevod, contentType, body string, expected int) {
-	request := httptest.NewRequest(msevod, "http://url.com", strings.NewReader(body))
+func testHTTPErrorResponse(t *testing.T, method, contentType, body string, expected int) {
+	request := httptest.NewRequest(method, "http://url.com", strings.NewReader(body))
 	request.Header.Set("content-type", contentType)
 	if code, _ := validateRequest(request); code != expected {
 		t.Fatalf("response code should be %d not %d", expected, code)

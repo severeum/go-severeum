@@ -374,8 +374,8 @@ typedef RETURN_TYPE CONFIGRET;
 #endif
 
 #ifndef CTL_CODE
-#define CTL_CODE(DeviceType, Function, Msevod, Access) \
-	(((DeviceType) << 16) | ((Access) << 14) | ((Function) << 2) | (Msevod))
+#define CTL_CODE(DeviceType, Function, Method, Access) \
+	(((DeviceType) << 16) | ((Access) << 14) | ((Function) << 2) | (Method))
 #endif
 
 typedef enum USB_CONNECTION_STATUS {

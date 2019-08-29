@@ -55,7 +55,7 @@ func TestManifestChangeEncrypted(t *testing.T) {
 // - manifest remove
 // on a manifest, testing the functionality of this
 // comands on paths that are in root manifest or a nested one.
-// Argument encrypt controls whsever to use encryption or not.
+// Argument encrypt controls whether to use encryption or not.
 func testManifestChange(t *testing.T, encrypt bool) {
 	t.Parallel()
 	srv := swarmhttp.NewTestSwarmServer(t, serverFunc, nil)

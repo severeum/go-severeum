@@ -130,7 +130,7 @@ func NewType(t string, components []ArgumentMarshaling) (typ Type, err error) {
 		}
 	} else {
 		if parsedType[0] == "uint" || parsedType[0] == "int" {
-			// this should fail because it means that there's somseving wrong with
+			// this should fail because it means that there's something wrong with
 			// the abi type (the compiler should always format it to the size...always)
 			return Type{}, fmt.Errorf("unsupported arg type: %s", t)
 		}
@@ -301,7 +301,7 @@ func (t Type) pack(v reflect.Value) ([]byte, error) {
 	}
 }
 
-// requireLengthPrefix returns whsever the type requires any sort of length
+// requireLengthPrefix returns whether the type requires any sort of length
 // prefixing.
 func (t Type) requiresLengthPrefix() bool {
 	return t.T == StringTy || t.T == BytesTy || t.T == SliceTy

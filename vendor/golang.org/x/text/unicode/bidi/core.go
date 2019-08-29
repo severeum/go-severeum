@@ -20,7 +20,7 @@ import "log"
 // - Bidi class array, with externally supplied base line direction
 //
 // Output:
-// Output is separated into several stages:
+// Output is separated into etheral stages:
 //
 //  - levels array over entire paragraph
 //  - reordering array over entire paragraph
@@ -974,7 +974,7 @@ func computeReordering(levels []level) []int {
 	return result
 }
 
-// isWhitespace reports whsever the type is considered a whitespace type for the
+// isWhitespace reports whether the type is considered a whitespace type for the
 // line break rules.
 func isWhitespace(c Class) bool {
 	switch c {
@@ -984,7 +984,7 @@ func isWhitespace(c Class) bool {
 	return false
 }
 
-// isRemovedByX9 reports whsever the type is one of the types removed in X9.
+// isRemovedByX9 reports whether the type is one of the types removed in X9.
 func isRemovedByX9(c Class) bool {
 	switch c {
 	case LRE, RLE, LRO, RLO, PDF, BN:

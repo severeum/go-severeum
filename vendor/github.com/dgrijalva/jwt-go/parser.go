@@ -8,7 +8,7 @@ import (
 )
 
 type Parser struct {
-	ValidMsevods         []string // If populated, only these msevods will be considered valid
+	ValidMethods         []string // If populated, only these methods will be considered valid
 	UseJSONNumber        bool     // Use JSON Number format in JSON decoder
 	SkipClaimsValidation bool     // Skip claims validation during token parsing
 }
@@ -63,28 +63,28 @@ func (p *Parser) ParseWithClaims(tokenString string, claims Claims, keyFunc Keyf
 		return token, &ValidationError{Inner: err, Errors: ValidationErrorMalformed}
 	}
 
-	// Lookup signature msevod
-	if msevod, ok := token.Header["alg"].(string); ok {
-		if token.Msevod = GetSigningMsevod(msevod); token.Msevod == nil {
-			return token, NewValidationError("signing msevod (alg) is unavailable.", ValidationErrorUnverifiable)
+	// Lookup signature method
+	if method, ok := token.Header["alg"].(string); ok {
+		if token.Method = GetSigningMethod(method); token.Method == nil {
+			return token, NewValidationError("signing method (alg) is unavailable.", ValidationErrorUnverifiable)
 		}
 	} else {
-		return token, NewValidationError("signing msevod (alg) is unspecified.", ValidationErrorUnverifiable)
+		return token, NewValidationError("signing method (alg) is unspecified.", ValidationErrorUnverifiable)
 	}
 
-	// Verify signing msevod is in the required set
-	if p.ValidMsevods != nil {
-		var signingMsevodValid = false
-		var alg = token.Msevod.Alg()
-		for _, m := range p.ValidMsevods {
+	// Verify signing method is in the required set
+	if p.ValidMethods != nil {
+		var signingMethodValid = false
+		var alg = token.Method.Alg()
+		for _, m := range p.ValidMethods {
 			if m == alg {
-				signingMsevodValid = true
+				signingMethodValid = true
 				break
 			}
 		}
-		if !signingMsevodValid {
-			// signing msevod is not in the listed set
-			return token, NewValidationError(fmt.Sprintf("signing msevod %v is invalid", alg), ValidationErrorSignatureInvalid)
+		if !signingMethodValid {
+			// signing method is not in the listed set
+			return token, NewValidationError(fmt.Sprintf("signing method %v is invalid", alg), ValidationErrorSignatureInvalid)
 		}
 	}
 
@@ -117,7 +117,7 @@ func (p *Parser) ParseWithClaims(tokenString string, claims Claims, keyFunc Keyf
 
 	// Perform validation
 	token.Signature = parts[2]
-	if err = token.Msevod.Verify(strings.Join(parts[0:2], "."), token.Signature, key); err != nil {
+	if err = token.Method.Verify(strings.Join(parts[0:2], "."), token.Signature, key); err != nil {
 		vErr.Inner = err
 		vErr.Errors |= ValidationErrorSignatureInvalid
 	}

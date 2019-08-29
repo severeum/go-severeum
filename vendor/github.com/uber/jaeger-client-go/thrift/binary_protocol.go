@@ -72,7 +72,7 @@ func (p *TBinaryProtocolFactory) GetProtocol(t TTransport) TProtocol {
 }
 
 /**
- * Writing Msevods
+ * Writing Methods
  */
 
 func (p *TBinaryProtocol) WriteMessageBegin(name string, typeId TMessageType, seqId int32) error {
@@ -232,7 +232,7 @@ func (p *TBinaryProtocol) WriteBinary(value []byte) error {
 }
 
 /**
- * Reading msevods
+ * Reading methods
  */
 
 func (p *TBinaryProtocol) ReadMessageBegin() (name string, typeId TMessageType, seqId int32, err error) {

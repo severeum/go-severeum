@@ -27,9 +27,9 @@ import (
 	"time"
 
 	"github.com/severeum/go-severeum/common"
-	"github.com/severeum/go-severeum/consensus/sevash"
+	"github.com/severeum/go-severeum/consensus/ethash"
 	"github.com/severeum/go-severeum/core"
-	"github.com/severeum/go-severeum/sev"
+	"github.com/severeum/go-severeum/eth"
 	"github.com/severeum/go-severeum/internal/jsre"
 	"github.com/severeum/go-severeum/node"
 )
@@ -75,7 +75,7 @@ func (p *hookedPrompter) SetWordCompleter(completer WordCompleter) {}
 type tester struct {
 	workspace string
 	stack     *node.Node
-	severeum  *sev.Severeum
+	severeum  *eth.Severeum
 	console   *Console
 	input     *hookedPrompter
 	output    *bytes.Buffer
@@ -83,7 +83,7 @@ type tester struct {
 
 // newTester creates a test environment based on which the console can operate.
 // Please ensure you call Close() on the returned tester to avoid leaks.
-func newTester(t *testing.T, confOverride func(*sev.Config)) *tester {
+func newTester(t *testing.T, confOverride func(*eth.Config)) *tester {
 	// Create a temporary storage for the node keys and initialize it
 	workspace, err := ioutil.TempDir("", "console-tester-")
 	if err != nil {
@@ -95,17 +95,17 @@ func newTester(t *testing.T, confOverride func(*sev.Config)) *tester {
 	if err != nil {
 		t.Fatalf("failed to create node: %v", err)
 	}
-	sevConf := &sev.Config{
+	ethConf := &eth.Config{
 		Genesis:   core.DeveloperGenesisBlock(15, common.Address{}),
 		Severbase: common.HexToAddress(testAddress),
-		Sevash: sevash.Config{
-			PowMode: sevash.ModeTest,
+		Sevash: ethash.Config{
+			PowMode: ethash.ModeTest,
 		},
 	}
 	if confOverride != nil {
-		confOverride(sevConf)
+		confOverride(ethConf)
 	}
-	if err = stack.Register(func(ctx *node.ServiceContext) (node.Service, error) { return sev.New(ctx, sevConf) }); err != nil {
+	if err = stack.Register(func(ctx *node.ServiceContext) (node.Service, error) { return eth.New(ctx, ethConf) }); err != nil {
 		t.Fatalf("failed to register Severeum protocol: %v", err)
 	}
 	// Start the node and assemble the JavaScript console around it
@@ -131,7 +131,7 @@ func newTester(t *testing.T, confOverride func(*sev.Config)) *tester {
 		t.Fatalf("failed to create JavaScript console: %v", err)
 	}
 	// Create the final tester and return
-	var severeum *sev.Severeum
+	var severeum *eth.Severeum
 	stack.Service(&severeum)
 
 	return &tester{

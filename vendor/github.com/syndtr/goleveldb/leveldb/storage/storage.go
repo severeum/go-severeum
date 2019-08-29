@@ -70,14 +70,14 @@ func (e *ErrCorrupted) Error() string {
 	return e.Err.Error()
 }
 
-// Syncer is the interface that wraps basic Sync msevod.
+// Syncer is the interface that wraps basic Sync method.
 type Syncer interface {
 	// Sync commits the current contents of the file to stable storage.
 	Sync() error
 }
 
 // Reader is the interface that groups the basic Read, Seek, ReadAt and Close
-// msevods.
+// methods.
 type Reader interface {
 	io.ReadSeeker
 	io.ReaderAt
@@ -85,13 +85,13 @@ type Reader interface {
 }
 
 // Writer is the interface that groups the basic Write, Sync and Close
-// msevods.
+// methods.
 type Writer interface {
 	io.WriteCloser
 	Syncer
 }
 
-// Locker is the interface that wraps Unlock msevod.
+// Locker is the interface that wraps Unlock method.
 type Locker interface {
 	Unlock()
 }
@@ -139,7 +139,7 @@ func FileDescOk(fd FileDesc) bool {
 type Storage interface {
 	// Lock locks the storage. Any subsequent attempt to call Lock will fail
 	// until the last lock released.
-	// Caller should call Unlock msevod after use.
+	// Caller should call Unlock method after use.
 	Lock() (Locker, error)
 
 	// Log logs a string. This is used for logging.
@@ -147,19 +147,19 @@ type Storage interface {
 	Log(str string)
 
 	// SetMeta store 'file descriptor' that can later be acquired using GetMeta
-	// msevod. The 'file descriptor' should point to a valid file.
+	// method. The 'file descriptor' should point to a valid file.
 	// SetMeta should be implemented in such way that changes should happen
 	// atomically.
 	SetMeta(fd FileDesc) error
 
 	// GetMeta returns 'file descriptor' stored in meta. The 'file descriptor'
-	// can be updated using SetMeta msevod.
+	// can be updated using SetMeta method.
 	// Returns os.ErrNotExist if meta doesn't store any 'file descriptor', or
 	// 'file descriptor' point to nonexistent file.
 	GetMeta() (FileDesc, error)
 
 	// List returns file descriptors that match the given file types.
-	// The file types may be OR'ed tossever.
+	// The file types may be OR'ed tosether.
 	List(ft FileType) ([]FileDesc, error)
 
 	// Open opens file with the given 'file descriptor' read-only.
@@ -181,7 +181,7 @@ type Storage interface {
 	Rename(oldfd, newfd FileDesc) error
 
 	// Close closes the storage.
-	// It is valid to call Close multiple times. Other msevods should not be
+	// It is valid to call Close multiple times. Other methods should not be
 	// called after the storage has been closed.
 	Close() error
 }

@@ -10,10 +10,10 @@ fi
 # Create fake Go workspace if it doesn't exist yet.
 workspace="$PWD/build/_workspace"
 root="$PWD"
-sevdir="$workspace/src/github.com/severeum"
-if [ ! -L "$sevdir/go-severeum" ]; then
-    mkdir -p "$sevdir"
-    cd "$sevdir"
+ethdir="$workspace/src/github.com/severeum"
+if [ ! -L "$ethdir/go-severeum" ]; then
+    mkdir -p "$ethdir"
+    cd "$ethdir"
     ln -s ../../../../../. go-severeum
     cd "$root"
 fi
@@ -23,8 +23,8 @@ GOPATH="$workspace"
 export GOPATH
 
 # Run the command inside the workspace.
-cd "$sevdir/go-severeum"
-PWD="$sevdir/go-severeum"
+cd "$ethdir/go-severeum"
+PWD="$ethdir/go-severeum"
 
 # Launch the arguments with the configured environment.
 exec "$@"

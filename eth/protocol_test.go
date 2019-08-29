@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-severeum library. If not, see <http://www.gnu.org/licenses/>.
 
-package sev
+package eth
 
 import (
 	"fmt"
@@ -25,7 +25,7 @@ import (
 	"github.com/severeum/go-severeum/common"
 	"github.com/severeum/go-severeum/core/types"
 	"github.com/severeum/go-severeum/crypto"
-	"github.com/severeum/go-severeum/sev/downloader"
+	"github.com/severeum/go-severeum/eth/downloader"
 	"github.com/severeum/go-severeum/p2p"
 	"github.com/severeum/go-severeum/rlp"
 )
@@ -136,7 +136,7 @@ func testSendTransactions(t *testing.T, protocol int) {
 	}
 	pm.txpool.AddRemotes(alltxs)
 
-	// Connect several peers. They should all receive the pending transactions.
+	// Connect etheral peers. They should all receive the pending transactions.
 	var wg sync.WaitGroup
 	checktxs := func(p *testPeer) {
 		defer wg.Done()

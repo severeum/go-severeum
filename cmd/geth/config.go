@@ -29,7 +29,7 @@ import (
 
 	"github.com/severeum/go-severeum/cmd/utils"
 	"github.com/severeum/go-severeum/dashboard"
-	"github.com/severeum/go-severeum/sev"
+	"github.com/severeum/go-severeum/eth"
 	"github.com/severeum/go-severeum/node"
 	"github.com/severeum/go-severeum/params"
 	whisper "github.com/severeum/go-severeum/whisper/whisperv6"
@@ -70,19 +70,19 @@ var tomlSettings = toml.Config{
 	},
 }
 
-type sevstatsConfig struct {
+type ethstatsConfig struct {
 	URL string `toml:",omitempty"`
 }
 
-type ssevConfig struct {
-	Sev       sev.Config
+type sethConfig struct {
+	Sev       eth.Config
 	Shh       whisper.Config
 	Node      node.Config
-	Sevstats  sevstatsConfig
+	Sevstats  ethstatsConfig
 	Dashboard dashboard.Config
 }
 
-func loadConfig(file string, cfg *ssevConfig) error {
+func loadConfig(file string, cfg *sethConfig) error {
 	f, err := os.Open(file)
 	if err != nil {
 		return err
@@ -101,16 +101,16 @@ func defaultNodeConfig() node.Config {
 	cfg := node.DefaultConfig
 	cfg.Name = clientIdentifier
 	cfg.Version = params.VersionWithCommit(gitCommit)
-	cfg.HTTPModules = append(cfg.HTTPModules, "sev", "shh")
-	cfg.WSModules = append(cfg.WSModules, "sev", "shh")
-	cfg.IPCPath = "ssev.ipc"
+	cfg.HTTPModules = append(cfg.HTTPModules, "eth", "shh")
+	cfg.WSModules = append(cfg.WSModules, "eth", "shh")
+	cfg.IPCPath = "seth.ipc"
 	return cfg
 }
 
-func makeConfigNode(ctx *cli.Context) (*node.Node, ssevConfig) {
+func makeConfigNode(ctx *cli.Context) (*node.Node, sethConfig) {
 	// Load defaults.
-	cfg := ssevConfig{
-		Sev:       sev.DefaultConfig,
+	cfg := sethConfig{
+		Sev:       eth.DefaultConfig,
 		Shh:       whisper.DefaultConfig,
 		Node:      defaultNodeConfig(),
 		Dashboard: dashboard.DefaultConfig,

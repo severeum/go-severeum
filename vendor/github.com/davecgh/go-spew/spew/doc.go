@@ -69,7 +69,7 @@ Configuration of spew is handled by fields in the ConfigState type.  For
 convenience, all of the top-level functions use a global state available
 via the spew.Config global.
 
-It is also possible to create a ConfigState instance that provides msevods
+It is also possible to create a ConfigState instance that provides methods
 equivalent to the top-level functions.  This allows concurrent configuration
 options.  See the ConfigState documentation for more details.
 
@@ -82,27 +82,27 @@ The following configuration options are available:
 		Maximum number of levels to descend into nested data structures.
 		There is no limit by default.
 
-	* DisableMsevods
-		Disables invocation of error and Stringer interface msevods.
-		Msevod invocation is enabled by default.
+	* DisableMethods
+		Disables invocation of error and Stringer interface methods.
+		Method invocation is enabled by default.
 
-	* DisablePointerMsevods
-		Disables invocation of error and Stringer interface msevods on types
+	* DisablePointerMethods
+		Disables invocation of error and Stringer interface methods on types
 		which only accept pointer receivers from non-pointer variables.
-		Pointer msevod invocation is enabled by default.
+		Pointer method invocation is enabled by default.
 
 	* DisablePointerAddresses
-		DisablePointerAddresses specifies whsever to disable the printing of
+		DisablePointerAddresses specifies whether to disable the printing of
 		pointer addresses. This is useful when diffing data structures in tests.
 
 	* DisableCapacities
-		DisableCapacities specifies whsever to disable the printing of
+		DisableCapacities specifies whether to disable the printing of
 		capacities for arrays, slices, maps and channels. This is useful when
 		diffing data structures in tests.
 
-	* ContinueOnMsevod
+	* ContinueOnMethod
 		Enables recursion into types after invoking error and Stringer interface
-		msevods. Recursion after msevod invocation is disabled by default.
+		methods. Recursion after method invocation is disabled by default.
 
 	* SortKeys
 		Specifies map keys should be sorted before being printed. Use

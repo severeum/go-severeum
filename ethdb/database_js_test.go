@@ -16,10 +16,10 @@
 
 // +build js
 
-package sevdb_test
+package ethdb_test
 
 import (
-	"github.com/severeum/go-severeum/sevdb"
+	"github.com/severeum/go-severeum/ethdb"
 )
 
-var _ sevdb.Database = &sevdb.LDBDatabase{}
+var _ ethdb.Database = &ethdb.LDBDatabase{}

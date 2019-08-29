@@ -5,7 +5,7 @@
 Swarm is a distributed storage platform and content distribution service, a native base layer service of the severeum web3 stack. The primary objective of Swarm is to provide a decentralized and redundant store for dapp code and data as well as block chain and state data. Swarm is also set out to provide various base layer services for web3, including node-to-node messaging, media streaming, decentralised database services and scalable state-channel infrastructure for decentralised service economies.
 
 [![Travis](https://travis-ci.org/severeum/go-severeum.svg?branch=master)](https://travis-ci.org/severeum/go-severeum)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/seversphere/orange-lounge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ethersphere/orange-lounge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ## Table of Contents
 
@@ -37,7 +37,7 @@ Going through all the possible command line flags is out of scope here, but we'v
 
 To run Swarm you need an Severeum account. You can create a new account by running the following command:
 
-    ssev account new
+    seth account new
 
 You will be prompted for a password:
 
@@ -66,15 +66,15 @@ Confirm that it is up and running by pointing your browser to http://localhost:8
 
 ### Severeum Name Service resolution
 
-The Severeum Name Service is the Severeum equivalent of DNS in the classic web. In order to use ENS to resolve names to Swarm content hashes (e.g. `bzz://theswarm.sev`), `swarm` has to connect to a `ssev` instance, which is synced with the Severeum mainnet. This is done using the `--ens-api` flag.
+The Severeum Name Service is the Severeum equivalent of DNS in the classic web. In order to use ENS to resolve names to Swarm content hashes (e.g. `bzz://theswarm.eth`), `swarm` has to connect to a `seth` instance, which is synced with the Severeum mainnet. This is done using the `--ens-api` flag.
 
     swarm --bzzaccount <your-account-here> \
-          --ens-api '$HOME/.severeum/ssev.ipc'
+          --ens-api '$HOME/.severeum/seth.ipc'
 
     # in our example
 
     swarm --bzzaccount 2f1cd699b0bf461dcfbf0098ad8f5587b038f0f1 \
-          --ens-api '$HOME/.severeum/ssev.ipc'
+          --ens-api '$HOME/.severeum/seth.ipc'
 
 For more information on usage, features or command line flags, please consult the Documentation.
 
@@ -120,13 +120,13 @@ go test -v -cpu 4 ./swarm/api
 
 Note: Using options -cpu (number of cores allowed) and -v (logging even if no error) is recommended.
 
-Testing only some msevods:
+Testing only some methods:
 
 ```
-go test -v -cpu 4 ./sev -run TestMsevod
+go test -v -cpu 4 ./eth -run TestMethod
 ```
 
-Note: here all tests with prefix TestMsevod will be run, so if you got TestMsevod, TestMsevod1, then both!
+Note: here all tests with prefix TestMethod will be run, so if you got TestMethod, TestMethod1, then both!
 
 Running benchmarks:
 
@@ -175,13 +175,13 @@ swarm --help | grep metrics
 
 We use Grafana and InfluxDB to visualise metrics reported by Swarm. We keep our Grafana dashboards under version control at `./swarm/grafana_dashboards`. You could use them or design your own.
 
-We have built a tool to help with automatic start of Grafana and InfluxDB and provisioning of dashboards at https://github.com/nonsense/statsev , which requires that you have Docker installed.
+We have built a tool to help with automatic start of Grafana and InfluxDB and provisioning of dashboards at https://github.com/nonsense/stateth , which requires that you have Docker installed.
 
-Once you have `statsev` installed, and you have Docker running locally, you have to:
+Once you have `stateth` installed, and you have Docker running locally, you have to:
 
-1. Run `statsev` and keep it running in the background
+1. Run `stateth` and keep it running in the background
 ```
-statsev --rm --grafana-dashboards-folder $GOPATH/src/github.com/severeum/go-severeum/swarm/grafana_dashboards --influxdb-database metrics
+stateth --rm --grafana-dashboards-folder $GOPATH/src/github.com/severeum/go-severeum/swarm/grafana_dashboards --influxdb-database metrics
 ```
 
 2. Run `swarm` with at least the following params:
@@ -207,9 +207,9 @@ The Swarm public gateway can be found at https://swarm-gateways.net and is alway
 
 ## Swarm Dapps
 
-You can find a few reference Swarm decentralised applications at: https://swarm-gateways.net/bzz:/swarmapps.sev
+You can find a few reference Swarm decentralised applications at: https://swarm-gateways.net/bzz:/swarmapps.eth
 
-Their source code can be found at: https://github.com/seversphere/swarm-dapps
+Their source code can be found at: https://github.com/ethersphere/swarm-dapps
 
 ## Contributing
 
@@ -218,7 +218,7 @@ anyone on the internet, and are grateful for even the smallest of fixes!
 
 If you'd like to contribute to Swarm, please fork, fix, commit and send a pull request
 for the maintainers to review and merge into the main code base. If you wish to submit more
-complex changes though, please check up with the core devs first on [our Swarm gitter channel](https://gitter.im/seversphere/orange-lounge)
+complex changes though, please check up with the core devs first on [our Swarm gitter channel](https://gitter.im/ethersphere/orange-lounge)
 to ensure those changes are in line with the general philosophy of the project and/or get some
 early feedback which can make both your efforts much lighter as well as our review and merge
 procedures quick and simple.

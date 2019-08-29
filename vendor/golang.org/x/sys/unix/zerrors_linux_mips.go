@@ -2144,7 +2144,7 @@ var errors = [...]string{
 	64:   "machine is not on the network",
 	65:   "package not installed",
 	66:   "object is remote",
-	67:   "link has been severed",
+	67:   "link has been ethered",
 	68:   "advertise error",
 	69:   "srmount error",
 	70:   "communication error on send",

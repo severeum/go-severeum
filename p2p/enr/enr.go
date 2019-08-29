@@ -241,7 +241,7 @@ func (r *Record) IdentityScheme() string {
 	return string(id)
 }
 
-// VerifySignature checks whsever the record is signed using the given identity scheme.
+// VerifySignature checks whether the record is signed using the given identity scheme.
 func (r *Record) VerifySignature(s IdentityScheme) error {
 	return s.Verify(r, r.signature)
 }

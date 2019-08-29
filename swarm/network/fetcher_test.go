@@ -64,7 +64,7 @@ func (m *mockRequester) doRequest(ctx context.Context, request *Request) (*enode
 
 // TestFetcherSingleRequest creates a Fetcher using mockRequester, and run it with a sample set of peers to skip.
 // mockRequester pushes a Request on a channel every time the request function is called. Using
-// this channel we test if calling Fetcher.Request calls the request function, and whsever it uses
+// this channel we test if calling Fetcher.Request calls the request function, and whether it uses
 // the correct peers to skip which we provided for the fetcher.run function.
 func TestFetcherSingleRequest(t *testing.T) {
 	requester := newMockRequester()

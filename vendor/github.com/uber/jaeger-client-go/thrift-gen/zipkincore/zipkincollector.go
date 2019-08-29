@@ -83,12 +83,12 @@ func (p *ZipkinCollectorClient) recvSubmitZipkinBatch() (value []*Response, err 
 		iprot = p.ProtocolFactory.GetProtocol(p.Transport)
 		p.InputProtocol = iprot
 	}
-	msevod, mTypeId, seqId, err := iprot.ReadMessageBegin()
+	method, mTypeId, seqId, err := iprot.ReadMessageBegin()
 	if err != nil {
 		return
 	}
-	if msevod != "submitZipkinBatch" {
-		err = thrift.NewTApplicationException(thrift.WRONG_MSEVOD_NAME, "submitZipkinBatch failed: wrong msevod name")
+	if method != "submitZipkinBatch" {
+		err = thrift.NewTApplicationException(thrift.WRONG_MSEVOD_NAME, "submitZipkinBatch failed: wrong method name")
 		return
 	}
 	if p.SeqId != seqId {

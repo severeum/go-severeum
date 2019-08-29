@@ -16,7 +16,7 @@ It has these top-level messages:
 	EnumDescriptorProto
 	EnumValueDescriptorProto
 	ServiceDescriptorProto
-	MsevodDescriptorProto
+	MethodDescriptorProto
 	FileOptions
 	MessageOptions
 	FieldOptions
@@ -24,7 +24,7 @@ It has these top-level messages:
 	EnumOptions
 	EnumValueOptions
 	ServiceOptions
-	MsevodOptions
+	MethodOptions
 	UninterpretedOption
 	SourceCodeInfo
 	GeneratedCodeInfo
@@ -296,45 +296,45 @@ func (x *FieldOptions_JSType) UnmarshalJSON(data []byte) error {
 }
 func (FieldOptions_JSType) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{11, 1} }
 
-// Is this msevod side-effect-free (or safe in HTTP parlance), or idempotent,
+// Is this method side-effect-free (or safe in HTTP parlance), or idempotent,
 // or neither? HTTP based RPC implementation may choose GET verb for safe
-// msevods, and PUT verb for idempotent msevods instead of the default POST.
-type MsevodOptions_IdempotencyLevel int32
+// methods, and PUT verb for idempotent methods instead of the default POST.
+type MethodOptions_IdempotencyLevel int32
 
 const (
-	MsevodOptions_IDEMPOTENCY_UNKNOWN MsevodOptions_IdempotencyLevel = 0
-	MsevodOptions_NO_SIDE_EFFECTS     MsevodOptions_IdempotencyLevel = 1
-	MsevodOptions_IDEMPOTENT          MsevodOptions_IdempotencyLevel = 2
+	MethodOptions_IDEMPOTENCY_UNKNOWN MethodOptions_IdempotencyLevel = 0
+	MethodOptions_NO_SIDE_EFFECTS     MethodOptions_IdempotencyLevel = 1
+	MethodOptions_IDEMPOTENT          MethodOptions_IdempotencyLevel = 2
 )
 
-var MsevodOptions_IdempotencyLevel_name = map[int32]string{
+var MethodOptions_IdempotencyLevel_name = map[int32]string{
 	0: "IDEMPOTENCY_UNKNOWN",
 	1: "NO_SIDE_EFFECTS",
 	2: "IDEMPOTENT",
 }
-var MsevodOptions_IdempotencyLevel_value = map[string]int32{
+var MethodOptions_IdempotencyLevel_value = map[string]int32{
 	"IDEMPOTENCY_UNKNOWN": 0,
 	"NO_SIDE_EFFECTS":     1,
 	"IDEMPOTENT":          2,
 }
 
-func (x MsevodOptions_IdempotencyLevel) Enum() *MsevodOptions_IdempotencyLevel {
-	p := new(MsevodOptions_IdempotencyLevel)
+func (x MethodOptions_IdempotencyLevel) Enum() *MethodOptions_IdempotencyLevel {
+	p := new(MethodOptions_IdempotencyLevel)
 	*p = x
 	return p
 }
-func (x MsevodOptions_IdempotencyLevel) String() string {
-	return proto.EnumName(MsevodOptions_IdempotencyLevel_name, int32(x))
+func (x MethodOptions_IdempotencyLevel) String() string {
+	return proto.EnumName(MethodOptions_IdempotencyLevel_name, int32(x))
 }
-func (x *MsevodOptions_IdempotencyLevel) UnmarshalJSON(data []byte) error {
-	value, err := proto.UnmarshalJSONEnum(MsevodOptions_IdempotencyLevel_value, data, "MsevodOptions_IdempotencyLevel")
+func (x *MethodOptions_IdempotencyLevel) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(MethodOptions_IdempotencyLevel_value, data, "MethodOptions_IdempotencyLevel")
 	if err != nil {
 		return err
 	}
-	*x = MsevodOptions_IdempotencyLevel(value)
+	*x = MethodOptions_IdempotencyLevel(value)
 	return nil
 }
-func (MsevodOptions_IdempotencyLevel) EnumDescriptor() ([]byte, []int) {
+func (MethodOptions_IdempotencyLevel) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor0, []int{16, 0}
 }
 
@@ -830,7 +830,7 @@ func (m *EnumValueDescriptorProto) GetOptions() *EnumValueOptions {
 // Describes a service.
 type ServiceDescriptorProto struct {
 	Name             *string                  `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Msevod           []*MsevodDescriptorProto `protobuf:"bytes,2,rep,name=msevod" json:"msevod,omitempty"`
+	Method           []*MethodDescriptorProto `protobuf:"bytes,2,rep,name=method" json:"method,omitempty"`
 	Options          *ServiceOptions          `protobuf:"bytes,3,opt,name=options" json:"options,omitempty"`
 	XXX_unrecognized []byte                   `json:"-"`
 }
@@ -847,9 +847,9 @@ func (m *ServiceDescriptorProto) GetName() string {
 	return ""
 }
 
-func (m *ServiceDescriptorProto) GetMsevod() []*MsevodDescriptorProto {
+func (m *ServiceDescriptorProto) GetMethod() []*MethodDescriptorProto {
 	if m != nil {
-		return m.Msevod
+		return m.Method
 	}
 	return nil
 }
@@ -861,14 +861,14 @@ func (m *ServiceDescriptorProto) GetOptions() *ServiceOptions {
 	return nil
 }
 
-// Describes a msevod of a service.
-type MsevodDescriptorProto struct {
+// Describes a method of a service.
+type MethodDescriptorProto struct {
 	Name *string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	// Input and output type names.  These are resolved in the same way as
 	// FieldDescriptorProto.type_name, but must refer to a message type.
 	InputType  *string        `protobuf:"bytes,2,opt,name=input_type,json=inputType" json:"input_type,omitempty"`
 	OutputType *string        `protobuf:"bytes,3,opt,name=output_type,json=outputType" json:"output_type,omitempty"`
-	Options    *MsevodOptions `protobuf:"bytes,4,opt,name=options" json:"options,omitempty"`
+	Options    *MethodOptions `protobuf:"bytes,4,opt,name=options" json:"options,omitempty"`
 	// Identifies if client streams multiple client messages
 	ClientStreaming *bool `protobuf:"varint,5,opt,name=client_streaming,json=clientStreaming,def=0" json:"client_streaming,omitempty"`
 	// Identifies if server streams multiple server messages
@@ -876,54 +876,54 @@ type MsevodDescriptorProto struct {
 	XXX_unrecognized []byte `json:"-"`
 }
 
-func (m *MsevodDescriptorProto) Reset()                    { *m = MsevodDescriptorProto{} }
-func (m *MsevodDescriptorProto) String() string            { return proto.CompactTextString(m) }
-func (*MsevodDescriptorProto) ProtoMessage()               {}
-func (*MsevodDescriptorProto) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
+func (m *MethodDescriptorProto) Reset()                    { *m = MethodDescriptorProto{} }
+func (m *MethodDescriptorProto) String() string            { return proto.CompactTextString(m) }
+func (*MethodDescriptorProto) ProtoMessage()               {}
+func (*MethodDescriptorProto) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
 
-const Default_MsevodDescriptorProto_ClientStreaming bool = false
-const Default_MsevodDescriptorProto_ServerStreaming bool = false
+const Default_MethodDescriptorProto_ClientStreaming bool = false
+const Default_MethodDescriptorProto_ServerStreaming bool = false
 
-func (m *MsevodDescriptorProto) GetName() string {
+func (m *MethodDescriptorProto) GetName() string {
 	if m != nil && m.Name != nil {
 		return *m.Name
 	}
 	return ""
 }
 
-func (m *MsevodDescriptorProto) GetInputType() string {
+func (m *MethodDescriptorProto) GetInputType() string {
 	if m != nil && m.InputType != nil {
 		return *m.InputType
 	}
 	return ""
 }
 
-func (m *MsevodDescriptorProto) GetOutputType() string {
+func (m *MethodDescriptorProto) GetOutputType() string {
 	if m != nil && m.OutputType != nil {
 		return *m.OutputType
 	}
 	return ""
 }
 
-func (m *MsevodDescriptorProto) GetOptions() *MsevodOptions {
+func (m *MethodDescriptorProto) GetOptions() *MethodOptions {
 	if m != nil {
 		return m.Options
 	}
 	return nil
 }
 
-func (m *MsevodDescriptorProto) GetClientStreaming() bool {
+func (m *MethodDescriptorProto) GetClientStreaming() bool {
 	if m != nil && m.ClientStreaming != nil {
 		return *m.ClientStreaming
 	}
-	return Default_MsevodDescriptorProto_ClientStreaming
+	return Default_MethodDescriptorProto_ClientStreaming
 }
 
-func (m *MsevodDescriptorProto) GetServerStreaming() bool {
+func (m *MethodDescriptorProto) GetServerStreaming() bool {
 	if m != nil && m.ServerStreaming != nil {
 		return *m.ServerStreaming
 	}
-	return Default_MsevodDescriptorProto_ServerStreaming
+	return Default_MethodDescriptorProto_ServerStreaming
 }
 
 type FileOptions struct {
@@ -942,7 +942,7 @@ type FileOptions struct {
 	// file for each top-level message, enum, and service defined in the .proto
 	// file.  Thus, these types will *not* be nested inside the outer class
 	// named by java_outer_classname.  However, the outer class will still be
-	// generated to contain the file's getDescriptor() msevod as well as any
+	// generated to contain the file's getDescriptor() method as well as any
 	// top-level extensions defined in the file.
 	JavaMultipleFiles *bool `protobuf:"varint,10,opt,name=java_multiple_files,json=javaMultipleFiles,def=0" json:"java_multiple_files,omitempty"`
 	// This option does nothing.
@@ -1171,7 +1171,7 @@ type MessageOptions struct {
 	// for the message, or it will be completely ignored; in the very least,
 	// this is a formalization for deprecating messages.
 	Deprecated *bool `protobuf:"varint,3,opt,name=deprecated,def=0" json:"deprecated,omitempty"`
-	// Whsever the message is an automatically generated map entry type for the
+	// Whether the message is an automatically generated map entry type for the
 	// maps field.
 	//
 	// For maps fields:
@@ -1278,16 +1278,16 @@ type FieldOptions struct {
 	// inner message's contents will not be parsed but instead stored in encoded
 	// form.  The inner message will actually be parsed when it is first accessed.
 	//
-	// This is only a hint.  Implementations are free to choose whsever to use
+	// This is only a hint.  Implementations are free to choose whether to use
 	// eager or lazy parsing regardless of the value of this option.  However,
 	// setting this option true suggests that the protocol author believes that
 	// using lazy parsing on this field is worth the additional bookkeeping
 	// overhead typically needed to implement it.
 	//
 	// This option does not affect the public interface of any generated code;
-	// all msevod signatures remain the same.  Furthermore, thread-safety of the
-	// interface is not affected by this option; const msevods remain safe to
-	// call from multiple threads concurrently, while non-const msevods continue
+	// all method signatures remain the same.  Furthermore, thread-safety of the
+	// interface is not affected by this option; const methods remain safe to
+	// call from multiple threads concurrently, while non-const methods continue
 	// to require exclusive access.
 	//
 	//
@@ -1299,7 +1299,7 @@ type FieldOptions struct {
 	// parsing.  An implementation which chooses not to check required fields
 	// must be consistent about it.  That is, for any particular sub-message, the
 	// implementation must either *always* check its required fields, or *never*
-	// check its required fields, regardless of whsever or not the message has
+	// check its required fields, regardless of whether or not the message has
 	// been parsed.
 	Lazy *bool `protobuf:"varint,5,opt,name=lazy,def=0" json:"lazy,omitempty"`
 	// Is this field deprecated?
@@ -1543,50 +1543,50 @@ func (m *ServiceOptions) GetUninterpretedOption() []*UninterpretedOption {
 	return nil
 }
 
-type MsevodOptions struct {
-	// Is this msevod deprecated?
+type MethodOptions struct {
+	// Is this method deprecated?
 	// Depending on the target platform, this can emit Deprecated annotations
-	// for the msevod, or it will be completely ignored; in the very least,
-	// this is a formalization for deprecating msevods.
+	// for the method, or it will be completely ignored; in the very least,
+	// this is a formalization for deprecating methods.
 	Deprecated       *bool                           `protobuf:"varint,33,opt,name=deprecated,def=0" json:"deprecated,omitempty"`
-	IdempotencyLevel *MsevodOptions_IdempotencyLevel `protobuf:"varint,34,opt,name=idempotency_level,json=idempotencyLevel,enum=google.protobuf.MsevodOptions_IdempotencyLevel,def=0" json:"idempotency_level,omitempty"`
+	IdempotencyLevel *MethodOptions_IdempotencyLevel `protobuf:"varint,34,opt,name=idempotency_level,json=idempotencyLevel,enum=google.protobuf.MethodOptions_IdempotencyLevel,def=0" json:"idempotency_level,omitempty"`
 	// The parser stores options it doesn't recognize here. See above.
 	UninterpretedOption          []*UninterpretedOption `protobuf:"bytes,999,rep,name=uninterpreted_option,json=uninterpretedOption" json:"uninterpreted_option,omitempty"`
 	proto.XXX_InternalExtensions `json:"-"`
 	XXX_unrecognized             []byte `json:"-"`
 }
 
-func (m *MsevodOptions) Reset()                    { *m = MsevodOptions{} }
-func (m *MsevodOptions) String() string            { return proto.CompactTextString(m) }
-func (*MsevodOptions) ProtoMessage()               {}
-func (*MsevodOptions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
+func (m *MethodOptions) Reset()                    { *m = MethodOptions{} }
+func (m *MethodOptions) String() string            { return proto.CompactTextString(m) }
+func (*MethodOptions) ProtoMessage()               {}
+func (*MethodOptions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
 
-var extRange_MsevodOptions = []proto.ExtensionRange{
+var extRange_MethodOptions = []proto.ExtensionRange{
 	{1000, 536870911},
 }
 
-func (*MsevodOptions) ExtensionRangeArray() []proto.ExtensionRange {
-	return extRange_MsevodOptions
+func (*MethodOptions) ExtensionRangeArray() []proto.ExtensionRange {
+	return extRange_MethodOptions
 }
 
-const Default_MsevodOptions_Deprecated bool = false
-const Default_MsevodOptions_IdempotencyLevel MsevodOptions_IdempotencyLevel = MsevodOptions_IDEMPOTENCY_UNKNOWN
+const Default_MethodOptions_Deprecated bool = false
+const Default_MethodOptions_IdempotencyLevel MethodOptions_IdempotencyLevel = MethodOptions_IDEMPOTENCY_UNKNOWN
 
-func (m *MsevodOptions) GetDeprecated() bool {
+func (m *MethodOptions) GetDeprecated() bool {
 	if m != nil && m.Deprecated != nil {
 		return *m.Deprecated
 	}
-	return Default_MsevodOptions_Deprecated
+	return Default_MethodOptions_Deprecated
 }
 
-func (m *MsevodOptions) GetIdempotencyLevel() MsevodOptions_IdempotencyLevel {
+func (m *MethodOptions) GetIdempotencyLevel() MethodOptions_IdempotencyLevel {
 	if m != nil && m.IdempotencyLevel != nil {
 		return *m.IdempotencyLevel
 	}
-	return Default_MsevodOptions_IdempotencyLevel
+	return Default_MethodOptions_IdempotencyLevel
 }
 
-func (m *MsevodOptions) GetUninterpretedOption() []*UninterpretedOption {
+func (m *MethodOptions) GetUninterpretedOption() []*UninterpretedOption {
 	if m != nil {
 		return m.UninterpretedOption
 	}
@@ -1968,7 +1968,7 @@ func init() {
 	proto.RegisterType((*EnumDescriptorProto)(nil), "google.protobuf.EnumDescriptorProto")
 	proto.RegisterType((*EnumValueDescriptorProto)(nil), "google.protobuf.EnumValueDescriptorProto")
 	proto.RegisterType((*ServiceDescriptorProto)(nil), "google.protobuf.ServiceDescriptorProto")
-	proto.RegisterType((*MsevodDescriptorProto)(nil), "google.protobuf.MsevodDescriptorProto")
+	proto.RegisterType((*MethodDescriptorProto)(nil), "google.protobuf.MethodDescriptorProto")
 	proto.RegisterType((*FileOptions)(nil), "google.protobuf.FileOptions")
 	proto.RegisterType((*MessageOptions)(nil), "google.protobuf.MessageOptions")
 	proto.RegisterType((*FieldOptions)(nil), "google.protobuf.FieldOptions")
@@ -1976,7 +1976,7 @@ func init() {
 	proto.RegisterType((*EnumOptions)(nil), "google.protobuf.EnumOptions")
 	proto.RegisterType((*EnumValueOptions)(nil), "google.protobuf.EnumValueOptions")
 	proto.RegisterType((*ServiceOptions)(nil), "google.protobuf.ServiceOptions")
-	proto.RegisterType((*MsevodOptions)(nil), "google.protobuf.MsevodOptions")
+	proto.RegisterType((*MethodOptions)(nil), "google.protobuf.MethodOptions")
 	proto.RegisterType((*UninterpretedOption)(nil), "google.protobuf.UninterpretedOption")
 	proto.RegisterType((*UninterpretedOption_NamePart)(nil), "google.protobuf.UninterpretedOption.NamePart")
 	proto.RegisterType((*SourceCodeInfo)(nil), "google.protobuf.SourceCodeInfo")
@@ -1988,7 +1988,7 @@ func init() {
 	proto.RegisterEnum("google.protobuf.FileOptions_OptimizeMode", FileOptions_OptimizeMode_name, FileOptions_OptimizeMode_value)
 	proto.RegisterEnum("google.protobuf.FieldOptions_CType", FieldOptions_CType_name, FieldOptions_CType_value)
 	proto.RegisterEnum("google.protobuf.FieldOptions_JSType", FieldOptions_JSType_name, FieldOptions_JSType_value)
-	proto.RegisterEnum("google.protobuf.MsevodOptions_IdempotencyLevel", MsevodOptions_IdempotencyLevel_name, MsevodOptions_IdempotencyLevel_value)
+	proto.RegisterEnum("google.protobuf.MethodOptions_IdempotencyLevel", MethodOptions_IdempotencyLevel_name, MethodOptions_IdempotencyLevel_value)
 }
 
 func init() { proto.RegisterFile("google/protobuf/descriptor.proto", fileDescriptor0) }

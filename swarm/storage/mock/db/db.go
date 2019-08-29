@@ -33,7 +33,7 @@ import (
 
 // GlobalStore contains the LevelDB database that is storing
 // chunk data for all swarm nodes.
-// Closing the GlobalStore with Close msevod is required to
+// Closing the GlobalStore with Close method is required to
 // release resources used by the database.
 type GlobalStore struct {
 	db *leveldb.DB
@@ -93,7 +93,7 @@ func (s *GlobalStore) Delete(addr common.Address, key []byte) error {
 	return s.db.Write(batch, nil)
 }
 
-// HasKey returns whsever a node with addr contains the key.
+// HasKey returns whether a node with addr contains the key.
 func (s *GlobalStore) HasKey(addr common.Address, key []byte) bool {
 	has, err := s.db.Has(nodeDBKey(addr, key), nil)
 	if err != nil {
