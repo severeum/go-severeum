@@ -22,11 +22,13 @@ Building seth requires both a Go (version 1.9 or later) and a C compiler.
 You can install them using your favourite package manager.
 Once the dependencies are installed, run
 
-    mkdir ~/bin;make seth;cp build/bin/seth ~/bin
+    make seth
+   
+To install and run seth,
 
-or, to build the full suite of utilities:
-
-    make all
+    mkdir ~/bin
+    cp build/bin/seth ~/bin
+    seth
 
 ## Executables
 
