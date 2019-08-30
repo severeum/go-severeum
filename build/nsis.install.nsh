@@ -24,14 +24,14 @@ Section "Seth" GSEV_IDX
   createShortCut "$SMPROGRAMS\${APPNAME}\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "" ""
 
   # Firewall - remove rules (if exists)
-  SimpleFC::AdvRemoveRule "Seth incoming peers (TCP:30303)"
-  SimpleFC::AdvRemoveRule "Seth outgoing peers (TCP:30303)"
-  SimpleFC::AdvRemoveRule "Seth UDP discovery (UDP:30303)"
+  SimpleFC::AdvRemoveRule "Seth incoming peers (TCP:13337)"
+  SimpleFC::AdvRemoveRule "Seth outgoing peers (TCP:13337)"
+  SimpleFC::AdvRemoveRule "Seth UDP discovery (UDP:13337)"
 
   # Firewall - add rules
-  SimpleFC::AdvAddRule "Seth incoming peers (TCP:30303)" ""  6 1 1 2147483647 1 "$INSTDIR\seth.exe" "" "" "Severeum" 30303 "" "" ""
-  SimpleFC::AdvAddRule "Seth outgoing peers (TCP:30303)" ""  6 2 1 2147483647 1 "$INSTDIR\seth.exe" "" "" "Severeum" "" 30303 "" ""
-  SimpleFC::AdvAddRule "Seth UDP discovery (UDP:30303)" "" 17 2 1 2147483647 1 "$INSTDIR\seth.exe" "" "" "Severeum" "" 30303 "" ""
+  SimpleFC::AdvAddRule "Seth incoming peers (TCP:13337)" ""  6 1 1 2147483647 1 "$INSTDIR\seth.exe" "" "" "Severeum" 13337 "" "" ""
+  SimpleFC::AdvAddRule "Seth outgoing peers (TCP:13337)" ""  6 2 1 2147483647 1 "$INSTDIR\seth.exe" "" "" "Severeum" "" 13337 "" ""
+  SimpleFC::AdvAddRule "Seth UDP discovery (UDP:13337)" "" 17 2 1 2147483647 1 "$INSTDIR\seth.exe" "" "" "Severeum" "" 13337 "" ""
 
   # Set default IPC endpoint (https://github.com/severeum/EIPs/issues/147)
   ${EnvVarUpdate} $0 "SEVEREUM_SOCKET" "R" "HKLM" "\\.\pipe\seth.ipc"

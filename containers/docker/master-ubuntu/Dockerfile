@@ -12,6 +12,6 @@ RUN \
   rm -rf /go-severeum
 
 EXPOSE 8545
-EXPOSE 30303
+EXPOSE 13337
 
 ENTRYPOINT ["/seth"]

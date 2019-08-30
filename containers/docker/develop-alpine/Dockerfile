@@ -9,6 +9,6 @@ RUN \
   rm -rf /go-severeum && rm -rf /var/cache/apk/*
 
 EXPOSE 8545
-EXPOSE 30303
+EXPOSE 13337
 
 ENTRYPOINT ["/seth"]

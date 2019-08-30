@@ -131,7 +131,7 @@ One of the quickest ways to get Severeum up and running on your machine is by us
 
 ```
 docker run -d --name severeum-node -v /Users/alice/severeum:/root \
-           -p 8545:8545 -p 30303:30303 \
+           -p 8545:8545 -p 13337:13337 \
            severeum/client-go
 ```
 
