@@ -65,7 +65,7 @@ func MustParseV4(rawurl string) *Node {
 // a node with IP address 10.3.58.6, TCP listening port 13337
 // and UDP discovery port 30301.
 //
-//    enode://<hex node id>@10.3.58.6:13337?discport=30301
+//    enode://<hex node id>@10.3.58.6:13337?discport=13336
 func ParseV4(rawurl string) (*Node, error) {
 	if m := incompleteNodeURL.FindStringSubmatch(rawurl); m != nil {
 		id, err := parsePubkey(m[1])
