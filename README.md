@@ -43,7 +43,7 @@ The go-severeum project comes with etheral wrappers/executables found in the `cm
 | `sethrpctest` | Developer utility tool to support our [severeum/rpc-test](https://github.com/severeum/rpc-tests) test suite which validates baseline conformity to the [Severeum JSON RPC](https://github.com/severeum/wiki/wiki/JSON-RPC) specs. Please see the [test suite's readme](https://github.com/severeum/rpc-tests/blob/master/README.md) for details. |
 | `rlpdump` | Developer utility tool to convert binary RLP ([Recursive Length Prefix](https://github.com/severeum/wiki/wiki/RLP)) dumps (data encoding used by the Severeum protocol both network as well as consensus wise) to user friendlier hierarchical representation (e.g. `rlpdump --hex CE0183FFFFFFC4C304050583616263`). |
 | `swarm`    | Swarm daemon and tools. This is the entrypoint for the Swarm network. `swarm --help` for command line options and subcommands. See [Swarm README](https://github.com/severeum/go-severeum/tree/master/swarm) for more information. |
-| `puppeth`    | a CLI wizard that aids in creating a new Severeum network. |
+| `puppeth`    | a CLI wizard that aids in creating a new Provigen network. |
 
 ## Running seth
 
